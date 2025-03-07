@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            padding: 20px;
+        }
+        .order {
+            background: #ffffff;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 0 5px;
+            background: #00aaff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0077bb;
+        }
+    </style>
+</head>
+<body>
+    <h1>Admin Panel</h1>
+    <div id="orders"></div>
+
+    <script>
+        const secretKey = 'your-secret-key'; // Replace with a secure key
+
+        async function loadOrders() {
+            const response = await fetch('/.netlify/functions/get-orders');
+            const encryptedOrders = await response.json();
+            const orders = encryptedOrders.map(encrypted => {
+                const bytes = CryptoJS.AES.decrypt(encrypted.data, secretKey);
+                return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+            });
+            const ordersDiv = document.getElementById('orders');
+            ordersDiv.innerHTML = '';
+            orders.forEach((order, index) => {
+                const div = document.createElement('div');
+                div.className = 'order';
+                div.innerHTML = `
+                    <p>Months: ${order.months}</p>
+                    <p>Quantity: ${order.quantity}</p>
+                    <p>Total: ${order.total} MMK</p>
+                    <p>Transaction ID: ${order.transactionId}</p>
+                    <p>Telegram Username: ${order.telegramUsername}</p>
+                    <p>IP: ${order.ip}</p>
+                    <p>Status: ${order.status}</p>
+                    <button onclick="approveOrder(${index})">Approve</button>
+                    <button onclick="rejectOrder(${index})">Reject</button>
+                `;
+                ordersDiv.appendChild(div);
+            });
+        }
+
+        async function approveOrder(index) {
+            const response = await fetch('/.netlify/functions/get-orders');
+            const encryptedOrders = await response.json();
+            const orders = encryptedOrders.map(encrypted => {
+                const bytes = CryptoJS.AES.decrypt(encrypted.data, secretKey);
+                return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+            });
+            orders[index].status = 'approved';
+            const updatedEncryptedOrders = orders.map(order => ({
+                data: CryptoJS.AES.encrypt(JSON.stringify(order), secretKey).toString()
+            }));
+            await fetch('/.netlify/functions/save-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedEncryptedOrders)
+            });
+            sendUpdate(orders[index]);
+            loadOrders();
+        }
+
+        async function rejectOrder(index) {
+            const response = await fetch('/.netlify/functions/get-orders');
+            const encryptedOrders = await response.json();
+            const orders = encryptedOrders.map(encrypted => {
+                const bytes = CryptoJS.AES.decrypt(encrypted.data, secretKey);
+                return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+            });
+            orders[index].status = 'rejected';
+            const updatedEncryptedOrders = orders.map(order => ({
+                data: CryptoJS.AES.encrypt(JSON.stringify(order), secretKey).toString()
+            }));
+            await fetch('/.netlify/functions/save-order', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedEncryptedOrders)
+            });
+            sendUpdate(orders[index]);
+            loadOrders();
+        }
+
+        function sendUpdate(order) {
+            const event = new EventSource('/.netlify/functions/update');
+            event.onmessage = () => {
+                const message = `Your order for ${order.quantity} x ${order.months} months (Total: ${order.total} MMK) has been ${order.status}. Transaction ID: ${order.transactionId}`;
+                alert(`Message for ${order.telegramUsername}: ${message}`);
+            };
+        }
+
+        window.onload = loadOrders;
+    </script>
+</body>
+</html>
