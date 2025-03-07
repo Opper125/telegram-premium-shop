@@ -28,7 +28,6 @@
             color: #ff6f61;
             font-size: 2.5em;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-            animation: fadeIn 1s ease-in-out;
         }
         .premium-option {
             margin: 10px 0;
@@ -68,7 +67,6 @@
             font-size: 1.5em;
             color: #ff5722;
             margin: 15px 0;
-            animation: bounce 0.5s ease-in-out;
         }
         #paymentMethod {
             margin: 15px 0;
@@ -91,44 +89,23 @@
             margin: 10px 0;
             border: 2px solid #ff4081;
             border-radius: 10px;
-            animation: slideIn 0.5s ease-in-out;
         }
-        .message {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #4caf50;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-            animation: slideInMessage 0.5s ease-in-out;
-            z-index: 1000;
+        .error-message {
+            color: red;
+            animation: blink 1s step-end infinite;
+            display: none;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
         }
         .star {
             position: absolute;
-            background: url('https://img.icons8.com/emoji/48/000000/star-emoji.png') no-repeat center;
-            background-size: contain;
-            width: 20px;
-            height: 20px;
+            background: rgba(255, 215, 0, 0.8); /* More visible yellow stars */
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
             animation: fall 3s linear infinite;
             z-index: 0;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        @keyframes bounce {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-        }
-        @keyframes slideIn {
-            from { transform: translateX(-100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes slideInMessage {
-            from { transform: translateY(-100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
         }
         @keyframes fall {
             0% { transform: translateY(-100vh); opacity: 1; }
@@ -138,15 +115,15 @@
 </head>
 <body>
     <div class="container">
-        <h1>TELEGRAM PREMIUM ✨</h1>
+        <h1>TELEGRAM PREMIUM SHOP</h1>
         <div class="premium-option" onclick="selectPremium(3, 60000)">
-            Premium 3 Months - 60,000 MMK 🌟
+            Premium 3 Months - 60,000 MMK
         </div>
         <div class="premium-option" onclick="selectPremium(6, 135000)">
-            Premium 6 Months - 135,000 MMK 🎉
+            Premium 6 Months - 135,000 MMK
         </div>
         <div class="premium-option" onclick="selectPremium(12, 210000)">
-            Premium 1 Year - 210,000 MMK 💎
+            Premium 1 Year - 210,000 MMK
         </div>
         <div class="quantity">
             <button onclick="decreaseQuantity()">-</button>
@@ -156,17 +133,18 @@
         <div id="totalPrice">Total: 60,000 MMK</div>
         <div id="paymentMethod">
             <select onchange="showPhoneNumber()">
-                <option value="">Select Payment Method 💳</option>
+                <option value="">Select Payment Method</option>
                 <option value="kpay">Kpay</option>
                 <option value="wave">Wave</option>
             </select>
         </div>
-        <input type="text" id="transactionId" placeholder="Enter Transaction ID 📝" required>
-        <input type="text" id="telegramUsername" placeholder="Enter Telegram Username 📱" required>
-        <button onclick="submitOrder()">Submit Order 🚀</button>
+        <input type="text" id="transactionId" placeholder="Enter Transaction ID" required>
+        <input type="text" id="telegramUsername" placeholder="Enter Telegram Username" required>
+        <button onclick="submitOrder()">Submit Order</button>
         <div id="status"></div>
-        <h2>Order History 📜</h2>
+        <h2>Order History</h2>
         <div id="orderHistory"></div>
+        <div id="errorMessage" class="error-message"></div>
     </div>
 
     <script>
@@ -199,13 +177,12 @@
         function updateTotal() {
             const total = selectedPrice * quantity;
             document.getElementById('totalPrice').innerText = `Total: ${total} MMK`;
-            document.getElementById('quantity').innerText = quantity;
         }
 
         function showPhoneNumber() {
             const method = document.querySelector('#paymentMethod').value;
             if (method) {
-                showMessage(`Payment Phone Number: 09786284670 (DHMK) 📞`);
+                document.getElementById('status').innerText = `Payment Phone Number: 09786284670 (DHMK)`;
             }
         }
 
@@ -224,10 +201,11 @@
                     timestamp: new Date().toISOString()
                 };
                 saveOrder(order);
-                showMessage('Order submitted! Waiting for admin approval. 🎉');
+                document.getElementById('status').innerText = 'Order submitted! Waiting for admin approval.';
                 loadOrderHistory();
+                checkTransactionId(transactionId);
             } else {
-                showMessage('Please fill all fields! ⚠️');
+                document.getElementById('status').innerText = 'Please fill all fields!';
             }
         }
 
@@ -246,21 +224,25 @@
                 const div = document.createElement('div');
                 div.className = 'order';
                 div.innerHTML = `
-                    <p>Months: ${order.months} 🕒</p>
-                    <p>Quantity: ${order.quantity} 📦</p>
-                    <p>Total: ${order.total} MMK 💰</p>
-                    <p>Status: ${order.status} ${order.status === 'approved' ? '✅' : order.status === 'rejected' ? '❌' : '⏳'}</p>
+                    <p>Months: ${order.months}</p>
+                    <p>Quantity: ${order.quantity}</p>
+                    <p>Total: ${order.total} MMK</p>
+                    <p>Status: ${order.status}</p>
+                    <p>Transaction ID: ${order.transactionId}</p>
                 `;
                 orderHistoryDiv.appendChild(div);
             });
         }
 
-        function showMessage(message) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message';
-            messageDiv.innerText = message;
-            document.body.appendChild(messageDiv);
-            setTimeout(() => messageDiv.remove(), 3000);
+        function checkTransactionId(transactionId) {
+            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            const duplicate = orders.filter(order => order.transactionId === transactionId && order.status !== 'approved' && order.status !== 'rejected');
+            if (duplicate.length > 1) {
+                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('errorMessage').innerText = 'This Transaction ID is already in use! 🚫';
+            } else {
+                document.getElementById('errorMessage').style.display = 'none';
+            }
         }
 
         function createStars() {
