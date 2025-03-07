@@ -56,9 +56,16 @@
             margin: 5px 0;
             width: 80%;
         }
-        #status {
+        #status, #orderHistory {
             margin-top: 20px;
             color: #333;
+        }
+        .order {
+            background: #fff;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
     </style>
 </head>
@@ -91,6 +98,8 @@
         <input type="text" id="telegramUsername" placeholder="Enter Telegram Username" required>
         <button onclick="submitOrder()">Submit Order</button>
         <div id="status"></div>
+        <h2>Order History</h2>
+        <div id="orderHistory"></div>
     </div>
 
     <script>
@@ -98,12 +107,18 @@
         let selectedPrice = 60000;
         let quantity = 1;
         const secretKey = 'your-secret-key'; // Replace with a secure key
-        const eventSource = new EventSource('/.netlify/functions/update');
+        let userId = localStorage.getItem('userId') || generateUserId();
+        localStorage.setItem('userId', userId);
 
+        function generateUserId() {
+            return 'user-' + Math.random().toString(36).substr(2, 9);
+        }
+
+        const eventSource = new EventSource('/.netlify/functions/update');
         eventSource.onmessage = (event) => {
             const data = JSON.parse(event.data);
-            if (data.username === document.getElementById('telegramUsername').value) {
-                document.getElementById('status').innerText = `Status: ${data.status}`;
+            if (data.userId === userId) {
+                loadOrderHistory();
             }
         };
 
@@ -140,29 +155,17 @@
             const transactionId = document.getElementById('transactionId').value;
             const telegramUsername = document.getElementById('telegramUsername').value;
             if (transactionId && telegramUsername) {
-                const ip = await fetch('/.netlify/functions/get-ip')
-                    .then(res => res.json())
-                    .then(data => data.ip);
-                
-                // Check for duplicate IP
-                const existingOrders = await fetch('/.netlify/functions/get-orders').then(res => res.json());
-                if (existingOrders.some(order => order.ip === ip && order.status === 'pending')) {
-                    alert('An order from this IP is already pending. Please wait for approval.');
-                    return;
-                }
-
                 const order = {
+                    userId: userId,
                     months: selectedMonths,
                     quantity: quantity,
                     total: selectedPrice * quantity,
                     transactionId: transactionId,
                     telegramUsername: telegramUsername,
-                    ip: ip,
                     status: 'pending',
                     timestamp: new Date().toISOString()
                 };
 
-                // Encrypt the order before sending
                 const encryptedOrder = CryptoJS.AES.encrypt(JSON.stringify(order), secretKey).toString();
                 
                 await fetch('/.netlify/functions/save-order', {
@@ -171,10 +174,36 @@
                     body: JSON.stringify({ data: encryptedOrder })
                 });
                 alert('Order submitted! Waiting for admin approval.');
+                loadOrderHistory();
             } else {
                 alert('Please fill all fields!');
             }
         }
+
+        async function loadOrderHistory() {
+            const response = await fetch('/.netlify/functions/get-orders');
+            const encryptedOrders = await response.json();
+            const orders = encryptedOrders.map(encrypted => {
+                const bytes = CryptoJS.AES.decrypt(encrypted.data, secretKey);
+                return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+            }).filter(order => order.userId === userId);
+
+            const orderHistoryDiv = document.getElementById('orderHistory');
+            orderHistoryDiv.innerHTML = '';
+            orders.forEach(order => {
+                const div = document.createElement('div');
+                div.className = 'order';
+                div.innerHTML = `
+                    <p>Months: ${order.months}</p>
+                    <p>Quantity: ${order.quantity}</p>
+                    <p>Total: ${order.total} MMK</p>
+                    <p>Status: ${order.status}</p>
+                `;
+                orderHistoryDiv.appendChild(div);
+            });
+        }
+
+        window.onload = loadOrderHistory;
     </script>
 </body>
 </html>
