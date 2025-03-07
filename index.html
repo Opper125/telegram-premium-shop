@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Premium Shop</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #e0f7fa, #fff9e6);
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #e6f0fa;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .premium-option {
+            margin: 10px 0;
+            padding: 10px;
+            background: #ffffff;
+            border: 2px solid #00aaff;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .quantity {
+            margin: 10px 0;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 0 5px;
+            background: #00aaff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0077bb;
+        }
+        #totalPrice {
+            font-size: 20px;
+            color: #ff6600;
+            margin: 10px 0;
+        }
+        #paymentMethod {
+            margin: 10px 0;
+        }
+        input {
+            padding: 10px;
+            margin: 5px 0;
+            width: 80%;
+        }
+        #status {
+            margin-top: 20px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TELEGRAM PREMIUM</h1>
+        <div class="premium-option" onclick="selectPremium(3, 60000)">
+            Premium 3 Months - 60,000 MMK
+        </div>
+        <div class="premium-option" onclick="selectPremium(6, 135000)">
+            Premium 6 Months - 135,000 MMK
+        </div>
+        <div class="premium-option" onclick="selectPremium(12, 210000)">
+            Premium 1 Year - 210,000 MMK
+        </div>
+        <div class="quantity">
+            <button onclick="decreaseQuantity()">-</button>
+            <span id="quantity">1</span>
+            <button onclick="increaseQuantity()">+</button>
+        </div>
+        <div id="totalPrice">Total: 60,000 MMK</div>
+        <div id="paymentMethod">
+            <select onchange="showPhoneNumber()">
+                <option value="">Select Payment Method</option>
+                <option value="kpay">Kpay</option>
+                <option value="wave">Wave</option>
+            </select>
+        </div>
+        <input type="text" id="transactionId" placeholder="Enter Transaction ID" required>
+        <input type="text" id="telegramUsername" placeholder="Enter Telegram Username" required>
+        <button onclick="submitOrder()">Submit Order</button>
+        <div id="status"></div>
+    </div>
+
+    <script>
+        let selectedMonths = 3;
+        let selectedPrice = 60000;
+        let quantity = 1;
+        const secretKey = 'your-secret-key'; // Replace with a secure key
+        const eventSource = new EventSource('/.netlify/functions/update');
+
+        eventSource.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            if (data.username === document.getElementById('telegramUsername').value) {
+                document.getElementById('status').innerText = `Status: ${data.status}`;
+            }
+        };
+
+        function selectPremium(months, price) {
+            selectedMonths = months;
+            selectedPrice = price;
+            updateTotal();
+        }
+
+        function increaseQuantity() {
+            quantity++;
+            updateTotal();
+        }
+
+        function decreaseQuantity() {
+            if (quantity > 1) quantity--;
+            updateTotal();
+        }
+
+        function updateTotal() {
+            const total = selectedPrice * quantity;
+            document.getElementById('totalPrice').innerText = `Total: ${total} MMK`;
+            document.getElementById('quantity').innerText = quantity;
+        }
+
+        function showPhoneNumber() {
+            const method = document.querySelector('#paymentMethod').value;
+            if (method) {
+                alert(`Payment Phone Number: 09786284670 (DHMK)`);
+            }
+        }
+
+        async function submitOrder() {
+            const transactionId = document.getElementById('transactionId').value;
+            const telegramUsername = document.getElementById('telegramUsername').value;
+            if (transactionId && telegramUsername) {
+                const ip = await fetch('/.netlify/functions/get-ip')
+                    .then(res => res.json())
+                    .then(data => data.ip);
+                
+                // Check for duplicate IP
+                const existingOrders = await fetch('/.netlify/functions/get-orders').then(res => res.json());
+                if (existingOrders.some(order => order.ip === ip && order.status === 'pending')) {
+                    alert('An order from this IP is already pending. Please wait for approval.');
+                    return;
+                }
+
+                const order = {
+                    months: selectedMonths,
+                    quantity: quantity,
+                    total: selectedPrice * quantity,
+                    transactionId: transactionId,
+                    telegramUsername: telegramUsername,
+                    ip: ip,
+                    status: 'pending',
+                    timestamp: new Date().toISOString()
+                };
+
+                // Encrypt the order before sending
+                const encryptedOrder = CryptoJS.AES.encrypt(JSON.stringify(order), secretKey).toString();
+                
+                await fetch('/.netlify/functions/save-order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data: encryptedOrder })
+                });
+                alert('Order submitted! Waiting for admin approval.');
+            } else {
+                alert('Please fill all fields!');
+            }
+        }
+    </script>
+</body>
+</html>
