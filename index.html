@@ -109,12 +109,29 @@
             animation: blink 1s step-end infinite;
             display: none;
         }
+        .phone-number {
+            position: fixed;
+            top: 50%;
+            left: -300px;
+            background: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            animation: slideInPhone 1s forwards;
+            z-index: 1000;
+        }
+        @keyframes slideInPhone {
+            0% { left: -300px; }
+            50% { left: calc(50% - 150px); }
+            100% { left: calc(50% - 150px); }
+        }
         @keyframes blink {
             50% { opacity: 0; }
         }
         .star {
             position: absolute;
-            background: rgba(255, 215, 0, 0.9); /* More visible yellow stars */
+            background: rgba(255, 215, 0, 0.9);
             width: 5px;
             height: 5px;
             border-radius: 50%;
@@ -125,10 +142,18 @@
             0% { transform: translateY(-100vh); opacity: 1; }
             100% { transform: translateY(100vh); opacity: 0; }
         }
+        .telegram-logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/031aad7e04708285d06e718bfcad2b7a25eaa4ae/telegram-logo.png" alt="Telegram Logo" class="telegram-logo">
         <h1>TELEGRAM PREMIUM SHOP</h1>
         <div class="premium-option" onclick="selectPremium(3, 60000)">
             Premium 3 Months - 60,000 MMK
@@ -197,7 +222,11 @@
         function showPhoneNumber() {
             const method = document.querySelector('#paymentMethod').value;
             if (method) {
-                document.getElementById('status').innerText = `Payment Phone Number: 09786284670 (DHMK)`;
+                const phoneDiv = document.createElement('div');
+                phoneDiv.className = 'phone-number';
+                phoneDiv.innerText = 'Pay to: 09786284670 (DHMK)';
+                document.body.appendChild(phoneDiv);
+                setTimeout(() => phoneDiv.remove(), 5000);
             }
         }
 
@@ -243,10 +272,25 @@
                     <p>Months: ${order.months}</p>
                     <p>Quantity: ${order.quantity}</p>
                     <p>Total: ${order.total} MMK</p>
-                    <p>Status: ${order.status === 'approved' ? 'Approved!' : order.status === 'rejected' ? 'Rejected!' : 'Pending'}</p>
+                    <p>Status: ${order.status === 'approved' ? 'Approved! ✅' : order.status === 'rejected' ? 'Rejected! ❌' : 'Pending ⏳'}</p>
                     <p>Transaction ID: ${order.transactionId}</p>
                 `;
                 orderHistoryDiv.appendChild(div);
+
+                // Check for status updates
+                if (order.status === 'approved') {
+                    const notification = document.getElementById('notification');
+                    notification.className = 'notification approved';
+                    notification.innerText = 'Approved! 🎉';
+                    notification.style.display = 'block';
+                    setTimeout(() => notification.style.display = 'none', 3000);
+                } else if (order.status === 'rejected') {
+                    const notification = document.getElementById('notification');
+                    notification.className = 'notification rejected';
+                    notification.innerText = 'Rejected! 🚫';
+                    notification.style.display = 'block';
+                    setTimeout(() => notification.style.display = 'none', 3000);
+                }
             });
         }
 
