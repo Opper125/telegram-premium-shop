@@ -90,6 +90,20 @@
             border: 2px solid #ff4081;
             border-radius: 10px;
         }
+        .notification {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+        .approved {
+            background: #4caf50;
+            color: white;
+        }
+        .rejected {
+            background: #f44336;
+            color: white;
+        }
         .error-message {
             color: red;
             animation: blink 1s step-end infinite;
@@ -100,7 +114,7 @@
         }
         .star {
             position: absolute;
-            background: rgba(255, 215, 0, 0.8); /* More visible yellow stars */
+            background: rgba(255, 215, 0, 0.9); /* More visible yellow stars */
             width: 5px;
             height: 5px;
             border-radius: 50%;
@@ -141,7 +155,8 @@
         <input type="text" id="transactionId" placeholder="Enter Transaction ID" required>
         <input type="text" id="telegramUsername" placeholder="Enter Telegram Username" required>
         <button onclick="submitOrder()">Submit Order</button>
-        <div id="status"></div>
+        <div id="status">Wait Admin Check <audio id="waitAudio" src="wait_admin_check.mp3" preload="auto"></audio></div>
+        <div id="notification" class="notification"></div>
         <h2>Order History</h2>
         <div id="orderHistory"></div>
         <div id="errorMessage" class="error-message"></div>
@@ -201,7 +216,8 @@
                     timestamp: new Date().toISOString()
                 };
                 saveOrder(order);
-                document.getElementById('status').innerText = 'Order submitted! Waiting for admin approval.';
+                document.getElementById('status').innerText = 'Wait Admin Check';
+                document.getElementById('waitAudio').play();
                 loadOrderHistory();
                 checkTransactionId(transactionId);
             } else {
@@ -227,7 +243,7 @@
                     <p>Months: ${order.months}</p>
                     <p>Quantity: ${order.quantity}</p>
                     <p>Total: ${order.total} MMK</p>
-                    <p>Status: ${order.status}</p>
+                    <p>Status: ${order.status === 'approved' ? 'Approved!' : order.status === 'rejected' ? 'Rejected!' : 'Pending'}</p>
                     <p>Transaction ID: ${order.transactionId}</p>
                 `;
                 orderHistoryDiv.appendChild(div);
@@ -260,6 +276,7 @@
         window.onload = () => {
             loadOrderHistory();
             createStars();
+            document.getElementById('waitAudio').play();
         };
     </script>
 </body>
