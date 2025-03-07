@@ -3,58 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Premium Shop</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <title>Telegram Premium Shop ✨</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #e0f7fa, #fff9e6);
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
             text-align: center;
             padding: 20px;
+            margin: 0;
+            overflow-x: hidden;
+            position: relative;
         }
         .container {
             max-width: 600px;
             margin: 0 auto;
-            background: #e6f0fa;
+            background: rgba(255, 255, 255, 0.9);
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+        h1 {
+            color: #ff6f61;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1s ease-in-out;
         }
         .premium-option {
             margin: 10px 0;
-            padding: 10px;
-            background: #ffffff;
-            border: 2px solid #00aaff;
-            border-radius: 5px;
+            padding: 15px;
+            background: #ffeb3b;
+            border: 2px solid #ff9800;
+            border-radius: 10px;
             cursor: pointer;
+            font-size: 1.2em;
+            color: #d81b60;
+            transition: transform 0.3s, background 0.3s;
+        }
+        .premium-option:hover {
+            transform: scale(1.05);
+            background: #ffee58;
         }
         .quantity {
-            margin: 10px 0;
+            margin: 15px 0;
         }
         button {
             padding: 10px 20px;
-            margin: 0 5px;
-            background: #00aaff;
+            margin: 5px;
+            background: linear-gradient(45deg, #ff4081, #f50057);
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 25px;
             cursor: pointer;
+            font-size: 1em;
+            transition: transform 0.2s, background 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
         }
         button:hover {
-            background: #0077bb;
+            transform: scale(1.1);
+            background: linear-gradient(45deg, #f50057, #ff4081);
         }
         #totalPrice {
-            font-size: 20px;
-            color: #ff6600;
-            margin: 10px 0;
+            font-size: 1.5em;
+            color: #ff5722;
+            margin: 15px 0;
+            animation: bounce 0.5s ease-in-out;
         }
         #paymentMethod {
-            margin: 10px 0;
+            margin: 15px 0;
         }
-        input {
+        select, input {
             padding: 10px;
             margin: 5px 0;
             width: 80%;
+            border: 2px solid #ff9800;
+            border-radius: 10px;
+            font-size: 1em;
         }
         #status, #orderHistory {
             margin-top: 20px;
@@ -62,24 +87,66 @@
         }
         .order {
             background: #fff;
-            padding: 10px;
+            padding: 15px;
             margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            border: 2px solid #ff4081;
+            border-radius: 10px;
+            animation: slideIn 0.5s ease-in-out;
+        }
+        .message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            animation: slideInMessage 0.5s ease-in-out;
+            z-index: 1000;
+        }
+        .star {
+            position: absolute;
+            background: url('https://img.icons8.com/emoji/48/000000/star-emoji.png') no-repeat center;
+            background-size: contain;
+            width: 20px;
+            height: 20px;
+            animation: fall 3s linear infinite;
+            z-index: 0;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideInMessage {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes fall {
+            0% { transform: translateY(-100vh); opacity: 1; }
+            100% { transform: translateY(100vh); opacity: 0; }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>TELEGRAM PREMIUM</h1>
+        <h1>TELEGRAM PREMIUM ✨</h1>
         <div class="premium-option" onclick="selectPremium(3, 60000)">
-            Premium 3 Months - 60,000 MMK
+            Premium 3 Months - 60,000 MMK 🌟
         </div>
         <div class="premium-option" onclick="selectPremium(6, 135000)">
-            Premium 6 Months - 135,000 MMK
+            Premium 6 Months - 135,000 MMK 🎉
         </div>
         <div class="premium-option" onclick="selectPremium(12, 210000)">
-            Premium 1 Year - 210,000 MMK
+            Premium 1 Year - 210,000 MMK 💎
         </div>
         <div class="quantity">
             <button onclick="decreaseQuantity()">-</button>
@@ -89,16 +156,16 @@
         <div id="totalPrice">Total: 60,000 MMK</div>
         <div id="paymentMethod">
             <select onchange="showPhoneNumber()">
-                <option value="">Select Payment Method</option>
+                <option value="">Select Payment Method 💳</option>
                 <option value="kpay">Kpay</option>
                 <option value="wave">Wave</option>
             </select>
         </div>
-        <input type="text" id="transactionId" placeholder="Enter Transaction ID" required>
-        <input type="text" id="telegramUsername" placeholder="Enter Telegram Username" required>
-        <button onclick="submitOrder()">Submit Order</button>
+        <input type="text" id="transactionId" placeholder="Enter Transaction ID 📝" required>
+        <input type="text" id="telegramUsername" placeholder="Enter Telegram Username 📱" required>
+        <button onclick="submitOrder()">Submit Order 🚀</button>
         <div id="status"></div>
-        <h2>Order History</h2>
+        <h2>Order History 📜</h2>
         <div id="orderHistory"></div>
     </div>
 
@@ -106,21 +173,12 @@
         let selectedMonths = 3;
         let selectedPrice = 60000;
         let quantity = 1;
-        const secretKey = 'your-secret-key'; // Replace with a secure key
         let userId = localStorage.getItem('userId') || generateUserId();
         localStorage.setItem('userId', userId);
 
         function generateUserId() {
             return 'user-' + Math.random().toString(36).substr(2, 9);
         }
-
-        const eventSource = new EventSource('/.netlify/functions/update');
-        eventSource.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            if (data.userId === userId) {
-                loadOrderHistory();
-            }
-        };
 
         function selectPremium(months, price) {
             selectedMonths = months;
@@ -147,11 +205,11 @@
         function showPhoneNumber() {
             const method = document.querySelector('#paymentMethod').value;
             if (method) {
-                alert(`Payment Phone Number: 09786284670 (DHMK)`);
+                showMessage(`Payment Phone Number: 09786284670 (DHMK) 📞`);
             }
         }
 
-        async function submitOrder() {
+        function submitOrder() {
             const transactionId = document.getElementById('transactionId').value;
             const telegramUsername = document.getElementById('telegramUsername').value;
             if (transactionId && telegramUsername) {
@@ -165,45 +223,62 @@
                     status: 'pending',
                     timestamp: new Date().toISOString()
                 };
-
-                const encryptedOrder = CryptoJS.AES.encrypt(JSON.stringify(order), secretKey).toString();
-                
-                await fetch('/.netlify/functions/save-order', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ data: encryptedOrder })
-                });
-                alert('Order submitted! Waiting for admin approval.');
+                saveOrder(order);
+                showMessage('Order submitted! Waiting for admin approval. 🎉');
                 loadOrderHistory();
             } else {
-                alert('Please fill all fields!');
+                showMessage('Please fill all fields! ⚠️');
             }
         }
 
-        async function loadOrderHistory() {
-            const response = await fetch('/.netlify/functions/get-orders');
-            const encryptedOrders = await response.json();
-            const orders = encryptedOrders.map(encrypted => {
-                const bytes = CryptoJS.AES.decrypt(encrypted.data, secretKey);
-                return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-            }).filter(order => order.userId === userId);
+        function saveOrder(order) {
+            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            orders.push(order);
+            localStorage.setItem('orders', JSON.stringify(orders));
+        }
 
+        function loadOrderHistory() {
+            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            const userOrders = orders.filter(order => order.userId === userId);
             const orderHistoryDiv = document.getElementById('orderHistory');
             orderHistoryDiv.innerHTML = '';
-            orders.forEach(order => {
+            userOrders.forEach(order => {
                 const div = document.createElement('div');
                 div.className = 'order';
                 div.innerHTML = `
-                    <p>Months: ${order.months}</p>
-                    <p>Quantity: ${order.quantity}</p>
-                    <p>Total: ${order.total} MMK</p>
-                    <p>Status: ${order.status}</p>
+                    <p>Months: ${order.months} 🕒</p>
+                    <p>Quantity: ${order.quantity} 📦</p>
+                    <p>Total: ${order.total} MMK 💰</p>
+                    <p>Status: ${order.status} ${order.status === 'approved' ? '✅' : order.status === 'rejected' ? '❌' : '⏳'}</p>
                 `;
                 orderHistoryDiv.appendChild(div);
             });
         }
 
-        window.onload = loadOrderHistory;
+        function showMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            messageDiv.innerText = message;
+            document.body.appendChild(messageDiv);
+            setTimeout(() => messageDiv.remove(), 3000);
+        }
+
+        function createStars() {
+            setInterval(() => {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + 'vw';
+                star.style.animationDuration = Math.random() * 2 + 2 + 's';
+                document.body.appendChild(star);
+                setTimeout(() => star.remove(), 5000);
+            }, 200);
+        }
+
+        setInterval(loadOrderHistory, 1000); // Check for updates every second
+        window.onload = () => {
+            loadOrderHistory();
+            createStars();
+        };
     </script>
 </body>
 </html>
