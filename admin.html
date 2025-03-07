@@ -28,7 +28,6 @@
             color: #0288d1;
             font-size: 2.5em;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-            animation: fadeIn 1s ease-in-out;
         }
         .order {
             background: #fff;
@@ -36,7 +35,6 @@
             margin: 10px 0;
             border: 2px solid #0288d1;
             border-radius: 10px;
-            animation: slideIn 0.5s ease-in-out;
         }
         button {
             padding: 10px 20px;
@@ -54,38 +52,14 @@
             transform: scale(1.1);
             background: linear-gradient(45deg, #03a9f4, #0288d1);
         }
-        .message {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #4caf50;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-            animation: slideInMessage 0.5s ease-in-out;
-            z-index: 1000;
-        }
         .star {
             position: absolute;
-            background: url('https://img.icons8.com/emoji/48/000000/star-emoji.png') no-repeat center;
-            background-size: contain;
-            width: 20px;
-            height: 20px;
+            background: rgba(255, 215, 0, 0.8); /* More visible yellow stars */
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
             animation: fall 3s linear infinite;
             z-index: 0;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        @keyframes slideIn {
-            from { transform: translateX(-100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes slideInMessage {
-            from { transform: translateY(-100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
         }
         @keyframes fall {
             0% { transform: translateY(-100vh); opacity: 1; }
@@ -95,7 +69,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Admin Panel 🌟</h1>
+        <h1>Admin Panel</h1>
         <div id="orders"></div>
     </div>
 
@@ -105,20 +79,22 @@
             const ordersDiv = document.getElementById('orders');
             ordersDiv.innerHTML = '';
             orders.forEach((order, index) => {
-                const div = document.createElement('div');
-                div.className = 'order';
-                div.innerHTML = `
-                    <p>User ID: ${order.userId} 🆔</p>
-                    <p>Months: ${order.months} 🕒</p>
-                    <p>Quantity: ${order.quantity} 📦</p>
-                    <p>Total: ${order.total} MMK 💰</p>
-                    <p>Transaction ID: ${order.transactionId} 📝</p>
-                    <p>Telegram Username: ${order.telegramUsername} 📱</p>
-                    <p>Status: ${order.status} ${order.status === 'approved' ? '✅' : order.status === 'rejected' ? '❌' : '⏳'}</p>
-                    <button onclick="approveOrder(${index})">Approve ✅</button>
-                    <button onclick="rejectOrder(${index})">Reject ❌</button>
-                `;
-                ordersDiv.appendChild(div);
+                if (order.status === 'pending') {
+                    const div = document.createElement('div');
+                    div.className = 'order';
+                    div.innerHTML = `
+                        <p>User ID: ${order.userId}</p>
+                        <p>Months: ${order.months}</p>
+                        <p>Quantity: ${order.quantity}</p>
+                        <p>Total: ${order.total} MMK</p>
+                        <p>Transaction ID: ${order.transactionId}</p>
+                        <p>Telegram Username: ${order.telegramUsername}</p>
+                        <p>Status: ${order.status}</p>
+                        <button onclick="approveOrder(${index})">Approve</button>
+                        <button onclick="rejectOrder(${index})">Reject</button>
+                    `;
+                    ordersDiv.appendChild(div);
+                }
             });
         }
 
@@ -126,7 +102,7 @@
             let orders = JSON.parse(localStorage.getItem('orders') || '[]');
             orders[index].status = 'approved';
             localStorage.setItem('orders', JSON.stringify(orders));
-            showMessage(`Order approved for ${orders[index].telegramUsername}! ✅`);
+            removeProcessedOrder(index);
             loadOrders();
         }
 
@@ -134,16 +110,28 @@
             let orders = JSON.parse(localStorage.getItem('orders') || '[]');
             orders[index].status = 'rejected';
             localStorage.setItem('orders', JSON.stringify(orders));
-            showMessage(`Order rejected for ${orders[index].telegramUsername}! ❌`);
+            removeProcessedOrder(index);
             loadOrders();
         }
 
-        function showMessage(message) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message';
-            messageDiv.innerText = message;
-            document.body.appendChild(messageDiv);
-            setTimeout(() => messageDiv.remove(), 3000);
+        function removeProcessedOrder(index) {
+            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            const processedOrder = orders[index];
+            orders = orders.filter((_, i) => i !== index);
+            localStorage.setItem('orders', JSON.stringify(orders));
+            checkDuplicateTransaction(processedOrder.transactionId);
+        }
+
+        function checkDuplicateTransaction(transactionId) {
+            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
+            const duplicates = orders.filter(order => order.transactionId === transactionId && order.status !== 'approved' && order.status !== 'rejected');
+            if (duplicates.length > 0) {
+                duplicates.forEach(order => {
+                    const index = orders.findIndex(o => o === order);
+                    orders.splice(index, 1);
+                    localStorage.setItem('orders', JSON.stringify(orders));
+                });
+            }
         }
 
         function createStars() {
