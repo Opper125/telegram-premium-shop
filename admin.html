@@ -3,119 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <title>Admin Panel 🌟</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background: #f0f0f0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+            text-align: center;
             padding: 20px;
+            margin: 0;
+            overflow-x: hidden;
+            position: relative;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+        h1 {
+            color: #0288d1;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1s ease-in-out;
         }
         .order {
-            background: #ffffff;
+            background: #fff;
             padding: 15px;
             margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            border: 2px solid #0288d1;
+            border-radius: 10px;
+            animation: slideIn 0.5s ease-in-out;
         }
         button {
             padding: 10px 20px;
-            margin: 0 5px;
-            background: #00aaff;
+            margin: 5px;
+            background: linear-gradient(45deg, #0288d1, #03a9f4);
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 25px;
             cursor: pointer;
+            font-size: 1em;
+            transition: transform 0.2s, background 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
         }
         button:hover {
-            background: #0077bb;
+            transform: scale(1.1);
+            background: linear-gradient(45deg, #03a9f4, #0288d1);
+        }
+        .message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            animation: slideInMessage 0.5s ease-in-out;
+            z-index: 1000;
+        }
+        .star {
+            position: absolute;
+            background: url('https://img.icons8.com/emoji/48/000000/star-emoji.png') no-repeat center;
+            background-size: contain;
+            width: 20px;
+            height: 20px;
+            animation: fall 3s linear infinite;
+            z-index: 0;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideInMessage {
+            from { transform: translateY(-100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes fall {
+            0% { transform: translateY(-100vh); opacity: 1; }
+            100% { transform: translateY(100vh); opacity: 0; }
         }
     </style>
 </head>
 <body>
-    <h1>Admin Panel</h1>
-    <div id="orders"></div>
+    <div class="container">
+        <h1>Admin Panel 🌟</h1>
+        <div id="orders"></div>
+    </div>
 
     <script>
-        const secretKey = 'your-secret-key'; // Replace with a secure key
-
-        async function loadOrders() {
-            const response = await fetch('/.netlify/functions/get-orders');
-            const encryptedOrders = await response.json();
-            const orders = encryptedOrders.map(encrypted => {
-                const bytes = CryptoJS.AES.decrypt(encrypted.data, secretKey);
-                return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-            });
+        function loadOrders() {
+            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
             const ordersDiv = document.getElementById('orders');
             ordersDiv.innerHTML = '';
             orders.forEach((order, index) => {
                 const div = document.createElement('div');
                 div.className = 'order';
                 div.innerHTML = `
-                    <p>User ID: ${order.userId}</p>
-                    <p>Months: ${order.months}</p>
-                    <p>Quantity: ${order.quantity}</p>
-                    <p>Total: ${order.total} MMK</p>
-                    <p>Transaction ID: ${order.transactionId}</p>
-                    <p>Telegram Username: ${order.telegramUsername}</p>
-                    <p>Status: ${order.status}</p>
-                    <button onclick="approveOrder(${index})">Approve</button>
-                    <button onclick="rejectOrder(${index})">Reject</button>
+                    <p>User ID: ${order.userId} 🆔</p>
+                    <p>Months: ${order.months} 🕒</p>
+                    <p>Quantity: ${order.quantity} 📦</p>
+                    <p>Total: ${order.total} MMK 💰</p>
+                    <p>Transaction ID: ${order.transactionId} 📝</p>
+                    <p>Telegram Username: ${order.telegramUsername} 📱</p>
+                    <p>Status: ${order.status} ${order.status === 'approved' ? '✅' : order.status === 'rejected' ? '❌' : '⏳'}</p>
+                    <button onclick="approveOrder(${index})">Approve ✅</button>
+                    <button onclick="rejectOrder(${index})">Reject ❌</button>
                 `;
                 ordersDiv.appendChild(div);
             });
         }
 
-        async function approveOrder(index) {
-            const response = await fetch('/.netlify/functions/get-orders');
-            const encryptedOrders = await response.json();
-            const orders = encryptedOrders.map(encrypted => {
-                const bytes = CryptoJS.AES.decrypt(encrypted.data, secretKey);
-                return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-            });
+        function approveOrder(index) {
+            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
             orders[index].status = 'approved';
-            const updatedEncryptedOrders = orders.map(order => ({
-                data: CryptoJS.AES.encrypt(JSON.stringify(order), secretKey).toString()
-            }));
-            await fetch('/.netlify/functions/save-order', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updatedEncryptedOrders)
-            });
-            sendUpdate(orders[index]);
+            localStorage.setItem('orders', JSON.stringify(orders));
+            showMessage(`Order approved for ${orders[index].telegramUsername}! ✅`);
             loadOrders();
         }
 
-        async function rejectOrder(index) {
-            const response = await fetch('/.netlify/functions/get-orders');
-            const encryptedOrders = await response.json();
-            const orders = encryptedOrders.map(encrypted => {
-                const bytes = CryptoJS.AES.decrypt(encrypted.data, secretKey);
-                return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-            });
+        function rejectOrder(index) {
+            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
             orders[index].status = 'rejected';
-            const updatedEncryptedOrders = orders.map(order => ({
-                data: CryptoJS.AES.encrypt(JSON.stringify(order), secretKey).toString()
-            }));
-            await fetch('/.netlify/functions/save-order', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updatedEncryptedOrders)
-            });
-            sendUpdate(orders[index]);
+            localStorage.setItem('orders', JSON.stringify(orders));
+            showMessage(`Order rejected for ${orders[index].telegramUsername}! ❌`);
             loadOrders();
         }
 
-        function sendUpdate(order) {
-            fetch('/.netlify/functions/update', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId: order.userId, status: order.status })
-            });
+        function showMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message';
+            messageDiv.innerText = message;
+            document.body.appendChild(messageDiv);
+            setTimeout(() => messageDiv.remove(), 3000);
         }
 
-        window.onload = loadOrders;
-        setInterval(loadOrders, 5000); // Auto-refresh every 5 seconds
+        function createStars() {
+            setInterval(() => {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + 'vw';
+                star.style.animationDuration = Math.random() * 2 + 2 + 's';
+                document.body.appendChild(star);
+                setTimeout(() => star.remove(), 5000);
+            }, 200);
+        }
+
+        setInterval(loadOrders, 1000); // Check for updates every second
+        window.onload = () => {
+            loadOrders();
+            createStars();
+        };
     </script>
 </body>
 </html>
