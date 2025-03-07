@@ -54,7 +54,7 @@
         }
         .star {
             position: absolute;
-            background: rgba(255, 215, 0, 0.8); /* More visible yellow stars */
+            background: rgba(255, 215, 0, 0.9); /* More visible yellow stars */
             width: 5px;
             height: 5px;
             border-radius: 50%;
@@ -102,6 +102,7 @@
             let orders = JSON.parse(localStorage.getItem('orders') || '[]');
             orders[index].status = 'approved';
             localStorage.setItem('orders', JSON.stringify(orders));
+            notifyUser(orders[index].userId, 'approved');
             removeProcessedOrder(index);
             loadOrders();
         }
@@ -110,28 +111,35 @@
             let orders = JSON.parse(localStorage.getItem('orders') || '[]');
             orders[index].status = 'rejected';
             localStorage.setItem('orders', JSON.stringify(orders));
+            notifyUser(orders[index].userId, 'rejected');
             removeProcessedOrder(index);
             loadOrders();
         }
 
         function removeProcessedOrder(index) {
             let orders = JSON.parse(localStorage.getItem('orders') || '[]');
-            const processedOrder = orders[index];
-            orders = orders.filter((_, i) => i !== index);
+            orders.splice(index, 1);
             localStorage.setItem('orders', JSON.stringify(orders));
-            checkDuplicateTransaction(processedOrder.transactionId);
+            checkDuplicateTransaction(orders);
         }
 
-        function checkDuplicateTransaction(transactionId) {
-            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
-            const duplicates = orders.filter(order => order.transactionId === transactionId && order.status !== 'approved' && order.status !== 'rejected');
-            if (duplicates.length > 0) {
-                duplicates.forEach(order => {
-                    const index = orders.findIndex(o => o === order);
-                    orders.splice(index, 1);
-                    localStorage.setItem('orders', JSON.stringify(orders));
-                });
-            }
+        function notifyUser(userId, status) {
+            const event = new EventSource(`http://localhost:3000/update?userId=${userId}&status=${status}`);
+            event.onmessage = () => {
+                // Notification handled in index.html
+            };
+        }
+
+        function checkDuplicateTransaction(orders) {
+            const transactionIds = {};
+            orders.forEach(order => {
+                if (transactionIds[order.transactionId]) {
+                    const index = orders.findIndex(o => o.transactionId === order.transactionId && o.status !== 'approved' && o.status !== 'rejected');
+                    if (index !== -1) orders.splice(index, 1);
+                }
+                transactionIds[order.transactionId] = true;
+            });
+            localStorage.setItem('orders', JSON.stringify(orders));
         }
 
         function createStars() {
