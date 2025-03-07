@@ -1,0 +1,7 @@
+[build]
+  command = "echo 'No build required'"
+  publish = "/"
+  functions = "netlify/functions"
+
+[dev]
+  command = "netlify dev"
