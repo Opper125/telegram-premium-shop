@@ -52,12 +52,12 @@
                 const div = document.createElement('div');
                 div.className = 'order';
                 div.innerHTML = `
+                    <p>User ID: ${order.userId}</p>
                     <p>Months: ${order.months}</p>
                     <p>Quantity: ${order.quantity}</p>
                     <p>Total: ${order.total} MMK</p>
                     <p>Transaction ID: ${order.transactionId}</p>
                     <p>Telegram Username: ${order.telegramUsername}</p>
-                    <p>IP: ${order.ip}</p>
                     <p>Status: ${order.status}</p>
                     <button onclick="approveOrder(${index})">Approve</button>
                     <button onclick="rejectOrder(${index})">Reject</button>
@@ -107,14 +107,15 @@
         }
 
         function sendUpdate(order) {
-            const event = new EventSource('/.netlify/functions/update');
-            event.onmessage = () => {
-                const message = `Your order for ${order.quantity} x ${order.months} months (Total: ${order.total} MMK) has been ${order.status}. Transaction ID: ${order.transactionId}`;
-                alert(`Message for ${order.telegramUsername}: ${message}`);
-            };
+            fetch('/.netlify/functions/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId: order.userId, status: order.status })
+            });
         }
 
         window.onload = loadOrders;
+        setInterval(loadOrders, 5000); // Auto-refresh every 5 seconds
     </script>
 </body>
 </html>
