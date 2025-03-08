@@ -11,7 +11,7 @@
             background-image: url('https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/telegram-logo.png');
             background-size: 100px;
             background-repeat: repeat;
-            background-opacity: 0.1;
+            opacity: 0.1;
             text-align: center;
             padding: 20px;
             margin: 0;
@@ -120,7 +120,13 @@
     </div>
 
     <script>
-        function displayOrders(orders) {
+        let orders = JSON.parse(localStorage.getItem('orders')) || [];
+
+        function saveOrdersToLocal() {
+            localStorage.setItem('orders', JSON.stringify(orders));
+        }
+
+        function displayOrders() {
             const ordersDiv = document.getElementById('orders');
             ordersDiv.innerHTML = '';
             const groupedOrders = {};
@@ -164,65 +170,28 @@
             }
         }
 
-        async function approveOrder(orderId) {
-            try {
-                const response = await fetch('/api/data', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: orderId, status: 'approved' })
-                });
-                if (!response.ok) throw new Error('Failed to approve order');
-                const result = await response.json();
-                console.log(result.message);
-            } catch (error) {
-                console.error('Error approving order:', error);
+        function approveOrder(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                order.status = 'approved';
+                saveOrdersToLocal();
+                displayOrders();
             }
         }
 
-        async function rejectOrder(orderId) {
-            try {
-                const response = await fetch('/api/data', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id: orderId, status: 'rejected' })
-                });
-                if (!response.ok) throw new Error('Failed to reject order');
-                const result = await response.json();
-                console.log(result.message);
-            } catch (error) {
-                console.error('Error rejecting order:', error);
+        function rejectOrder(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                order.status = 'rejected';
+                saveOrdersToLocal();
+                displayOrders();
             }
         }
 
-        async function clearData() {
-            try {
-                const response = await fetch('/api/data', {
-                    method: 'DELETE'
-                });
-                if (!response.ok) throw new Error('Failed to clear orders');
-                const result = await response.json();
-                console.log(result.message);
-            } catch (error) {
-                console.error('Error clearing data:', error);
-            }
-        }
-
-        function setupRealTime() {
-            const eventSource = new EventSource('/api/data-stream');
-            eventSource.onmessage = (event) => {
-                try {
-                    const orders = JSON.parse(event.data);
-                    displayOrders(orders);
-                    console.log('Received orders:', orders);
-                } catch (error) {
-                    console.error('Error parsing SSE data:', error);
-                }
-            };
-            eventSource.onerror = (error) => {
-                console.error('SSE Error:', error);
-                eventSource.close();
-                setTimeout(setupRealTime, 5000);
-            };
+        function clearData() {
+            orders = [];
+            saveOrdersToLocal();
+            displayOrders();
         }
 
         function createConfetti() {
@@ -238,8 +207,20 @@
         }
 
         window.onload = () => {
-            setupRealTime();
+            displayOrders();
             createConfetti();
+            // Offline mode with local data
+            if (!navigator.onLine) {
+                console.log('Offline mode: Using local order data');
+                displayOrders();
+            }
+            // Listen for new orders from index.html (simulated)
+            window.addEventListener('storage', (event) => {
+                if (event.key === 'orders') {
+                    orders = JSON.parse(localStorage.getItem('orders')) || [];
+                    displayOrders();
+                }
+            });
         };
     </script>
 </body>
