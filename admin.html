@@ -81,10 +81,10 @@
     </div>
 
     <script>
-        async function loadOrders() {
-            try {
-                const response = await fetch('/.netlify/functions/getOrders');
-                const orders = await response.json();
+        function setupSSE() {
+            const eventSource = new EventSource('/.netlify/functions/streamOrders');
+            eventSource.onmessage = (event) => {
+                const orders = JSON.parse(event.data);
                 const ordersDiv = document.getElementById('orders');
                 ordersDiv.innerHTML = '';
                 orders.forEach((order, index) => {
@@ -105,9 +105,11 @@
                         ordersDiv.appendChild(div);
                     }
                 });
-            } catch (error) {
-                console.error('Error loading orders:', error);
-            }
+            };
+            eventSource.onerror = () => {
+                console.error('SSE connection error, retrying...');
+                setTimeout(setupSSE, 1000); // Retry on error
+            };
         }
 
         async function approveOrder(index) {
@@ -120,8 +122,6 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(orders)
                 });
-                removeProcessedOrder(index);
-                loadOrders();
             } catch (error) {
                 console.error('Error approving order:', error);
             }
@@ -137,47 +137,8 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(orders)
                 });
-                removeProcessedOrder(index);
-                loadOrders();
             } catch (error) {
                 console.error('Error rejecting order:', error);
-            }
-        }
-
-        async function removeProcessedOrder(index) {
-            try {
-                const response = await fetch('/.netlify/functions/getOrders');
-                const orders = await response.json();
-                orders.splice(index, 1);
-                await fetch('/.netlify/functions/saveOrders', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(orders)
-                });
-                checkDuplicateTransaction();
-            } catch (error) {
-                console.error('Error removing order:', error);
-            }
-        }
-
-        async function checkDuplicateTransaction() {
-            try {
-                const response = await fetch('/.netlify/functions/getOrders');
-                const orders = await response.json();
-                const transactionIds = {};
-                orders.forEach((order, index) => {
-                    if (transactionIds[order.transactionId] && order.status !== 'approved' && order.status !== 'rejected') {
-                        orders.splice(index, 1);
-                    }
-                    transactionIds[order.transactionId] = true;
-                });
-                await fetch('/.netlify/functions/saveOrders', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(orders)
-                });
-            } catch (error) {
-                console.error('Error checking duplicates:', error);
             }
         }
 
@@ -188,7 +149,6 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify([])
                 });
-                loadOrders();
             } catch (error) {
                 console.error('Error clearing data:', error);
             }
@@ -205,9 +165,8 @@
             }, 200);
         }
 
-        setInterval(loadOrders, 5000); // Poll every 5 seconds for updates
         window.onload = () => {
-            loadOrders();
+            setupSSE();
             createStars();
         };
     </script>
