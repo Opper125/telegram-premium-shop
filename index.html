@@ -71,6 +71,7 @@
         }
         #paymentMethod {
             margin: 15px 0;
+            position: relative;
         }
         select, input {
             padding: 10px;
@@ -79,6 +80,14 @@
             border: 2px solid #ff9800;
             border-radius: 10px;
             font-size: 1em;
+        }
+        .payment-logo {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            margin-left: 5px;
         }
         #status, #orderHistory {
             margin-top: 20px;
@@ -174,11 +183,12 @@
         </div>
         <div id="totalPrice">Total: 60,000 MMK</div>
         <div id="paymentMethod">
-            <select onchange="showPhoneNumber()">
+            <select id="paymentSelect" onchange="showPhoneNumber()">
                 <option value="">Select Payment Method</option>
                 <option value="kpay">Kpay</option>
                 <option value="wave">Wave</option>
             </select>
+            <img id="paymentLogo" class="payment-logo" src="" alt="Payment Logo" style="display: none;">
         </div>
         <input type="text" id="transactionId" placeholder="Enter Transaction ID" required>
         <input type="text" id="telegramUsername" placeholder="Enter Telegram Username" required>
@@ -223,13 +233,26 @@
         }
 
         function showPhoneNumber() {
-            const method = document.querySelector('#paymentMethod').value;
-            if (method) {
+            const method = document.getElementById('paymentSelect').value;
+            const paymentLogo = document.getElementById('paymentLogo');
+            if (method === 'kpay') {
+                paymentLogo.src = 'https://github.com/Opper125/telegram-premium-shop/blob/92f6aac8a5242653c44e1640d2b83f7a5bcfb226/kpay-logo.png?raw=true';
+                paymentLogo.style.display = 'inline';
                 const phoneDiv = document.createElement('div');
                 phoneDiv.className = 'phone-number';
                 phoneDiv.innerText = 'Pay to: 09786284670 (DHMK)';
                 document.body.appendChild(phoneDiv);
                 setTimeout(() => phoneDiv.remove(), 5000);
+            } else if (method === 'wave') {
+                paymentLogo.src = 'https://github.com/Opper125/telegram-premium-shop/blob/92f6aac8a5242653c44e1640d2b83f7a5bcfb226/wave-logo.png?raw=true';
+                paymentLogo.style.display = 'inline';
+                const phoneDiv = document.createElement('div');
+                phoneDiv.className = 'phone-number';
+                phoneDiv.innerText = 'Pay to: 09786284670 (DHMK)';
+                document.body.appendChild(phoneDiv);
+                setTimeout(() => phoneDiv.remove(), 5000);
+            } else {
+                paymentLogo.style.display = 'none';
             }
         }
 
