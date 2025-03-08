@@ -13,6 +13,12 @@
             margin: 0;
             overflow-x: hidden;
             position: relative;
+            animation: shimmer 3s infinite;
+        }
+        @keyframes shimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
         .container {
             max-width: 600px;
@@ -25,21 +31,32 @@
             z-index: 1;
         }
         h1 {
-            color: #ff6f61;
+            color: #ff0000;
             font-size: 2.5em;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            animation: gradientText 3s ease infinite;
+        }
+        @keyframes gradientText {
+            0% { color: #ff0000; }
+            50% { color: #ff4500; }
+            100% { color: #ff0000; }
         }
         .premium-option {
             margin: 10px 0;
             padding: 15px;
-            background: #ffeb3b;
-            border: 2px solid #ff9800;
+            background: linear-gradient(45deg, #ffeb3b, #ff9800);
+            border: 2px solid #ff4500;
             border-radius: 10px;
             cursor: pointer;
             font-size: 1.2em;
             color: #d81b60;
             transition: transform 0.3s, background 0.3s;
-            position: relative;
+            animation: gradientBg 3s ease infinite;
+        }
+        @keyframes gradientBg {
+            0% { background: linear-gradient(45deg, #ffeb3b, #ff9800); }
+            50% { background: linear-gradient(45deg, #ff9800, #ffeb3b); }
+            100% { background: linear-gradient(45deg, #ffeb3b, #ff9800); }
         }
         .premium-option:hover {
             transform: scale(1.05);
@@ -58,7 +75,12 @@
             cursor: pointer;
             font-size: 1em;
             transition: transform 0.2s, background 0.3s;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            animation: buttonGlow 2s infinite;
+        }
+        @keyframes buttonGlow {
+            0% { box-shadow: 0 0 5px #ff0000; }
+            50% { box-shadow: 0 0 10px #ff4500; }
+            100% { box-shadow: 0 0 5px #ff0000; }
         }
         button:hover {
             transform: scale(1.1);
@@ -68,6 +90,7 @@
             font-size: 1.5em;
             color: #ff5722;
             margin: 15px 0;
+            animation: gradientText 3s ease infinite;
         }
         #paymentMethod {
             margin: 15px 0;
@@ -77,9 +100,15 @@
             padding: 10px;
             margin: 5px 0;
             width: 80%;
-            border: 2px solid #ff9800;
+            border: 2px solid #ff4500;
             border-radius: 10px;
             font-size: 1em;
+            animation: inputGlow 2s infinite;
+        }
+        @keyframes inputGlow {
+            0% { border-color: #ff0000; }
+            50% { border-color: #ff4500; }
+            100% { border-color: #ff0000; }
         }
         .payment-logo {
             position: absolute;
@@ -99,6 +128,12 @@
             margin: 10px 0;
             border: 2px solid #ff4081;
             border-radius: 10px;
+            animation: orderGlow 2s infinite;
+        }
+        @keyframes orderGlow {
+            0% { border-color: #ff0000; }
+            50% { border-color: #ff4500; }
+            100% { border-color: #ff0000; }
         }
         .notification {
             margin-top: 10px;
@@ -139,18 +174,18 @@
         @keyframes blink {
             50% { opacity: 0; }
         }
-        .star {
+        .confetti {
             position: absolute;
-            background: rgba(255, 215, 0, 0.9);
-            width: 5px;
-            height: 5px;
+            width: 10px;
+            height: 10px;
+            background: #ff0000;
+            opacity: 0.8;
             border-radius: 50%;
-            animation: fall 3s linear infinite;
-            z-index: 0;
+            animation: fallConfetti 3s linear infinite;
         }
-        @keyframes fall {
-            0% { transform: translateY(-100vh); opacity: 1; }
-            100% { transform: translateY(100vh); opacity: 0; }
+        @keyframes fallConfetti {
+            0% { transform: translateY(-100vh) rotate(0deg); }
+            100% { transform: translateY(100vh) rotate(360deg); }
         }
         .telegram-logo {
             position: absolute;
@@ -273,6 +308,7 @@
                 await saveOrder(order);
                 document.getElementById('status').innerText = 'Wait Admin Check';
                 document.getElementById('waitAudio').play();
+                logAction('Order Submitted', order);
             } else {
                 document.getElementById('status').innerText = 'Please fill all fields!';
             }
@@ -349,6 +385,10 @@
             }
         }
 
+        function logAction(action, details) {
+            console.log(`${new Date().toISOString()} - ${action}:`, details);
+        }
+
         function setupRealTime() {
             const eventSource = new EventSource('/api/data-stream');
             eventSource.onmessage = () => {
@@ -360,21 +400,22 @@
             };
         }
 
-        function createStars() {
+        function createConfetti() {
             setInterval(() => {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.style.left = Math.random() * 100 + 'vw';
-                star.style.animationDuration = Math.random() * 2 + 2 + 's';
-                document.body.appendChild(star);
-                setTimeout(() => star.remove(), 5000);
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+                confetti.style.animationDuration = Math.random() * 2 + 2 + 's';
+                document.body.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 5000);
             }, 200);
         }
 
         window.onload = () => {
             setupRealTime();
             loadOrderHistory();
-            createStars();
+            createConfetti();
             document.getElementById('waitAudio').play();
         };
     </script>
