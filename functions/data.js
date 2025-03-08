@@ -16,7 +16,9 @@ function logAction(action, details) {
 }
 
 function getDeviceFingerprint() {
-    return `${navigator.userAgent}-${Math.random().toString(36).substr(2, 9)}`;
+    // Since this is server-side, we can't access navigator.userAgent directly.
+    // We'll use a simple random ID for now. In a real application, you might want to pass device info from the client.
+    return Math.random().toString(36).substr(2, 9);
 }
 
 exports.handler = async (event, context) => {
@@ -25,13 +27,12 @@ exports.handler = async (event, context) => {
         const order = JSON.parse(event.body);
         if (!order.userId) {
             const deviceFingerprint = getDeviceFingerprint();
-            order.userId = localStorage.getItem(`userId-${deviceFingerprint}`) || `user-${Math.random().toString(36).substr(2, 9)}`;
-            localStorage.setItem(`userId-${deviceFingerprint}`, order.userId);
+            order.userId = `user-${deviceFingerprint}`;
         }
         order.id = orderIdCounter++;
         orders.push(order);
         logAction('Order Submitted', order);
-        orderEmitter.emit('orderUpdate');
+        orderEmitter.emit('orderUpdate', orders);
         return {
             statusCode: 200,
             body: JSON.stringify({ message: 'Order saved successfully', userId: order.userId }),
@@ -55,7 +56,7 @@ exports.handler = async (event, context) => {
         if (orderIndex !== -1) {
             orders[orderIndex].status = status;
             logAction(`Order ${status}`, { id, status });
-            orderEmitter.emit('orderUpdate', { id, status });
+            orderEmitter.emit('orderUpdate', orders);
             return {
                 statusCode: 200,
                 body: JSON.stringify({ message: 'Order updated successfully' }),
@@ -73,7 +74,7 @@ exports.handler = async (event, context) => {
         orders = [];
         orderIdCounter = 1;
         logAction('Orders Cleared', {});
-        orderEmitter.emit('orderUpdate');
+        orderEmitter.emit('orderUpdate', orders);
         return {
             statusCode: 200,
             body: JSON.stringify({ message: 'Orders cleared successfully' }),
@@ -89,27 +90,45 @@ exports.handler = async (event, context) => {
             'Connection': 'keep-alive',
         };
 
-        context.callbackWaitsForEmptyEventLoop = false;
-        const response = {
+        const responseStream = {
             statusCode: 200,
             headers,
             body: '',
+            isStream: true, // Indicate that this is a streaming response
         };
 
+        context.callbackWaitsForEmptyEventLoop = false;
+
         // Send initial data immediately
-        response.body += `data: ${JSON.stringify(orders)}\n\n`;
+        responseStream.body += `data: ${JSON.stringify(orders)}\n\n`;
+
+        // Stream updates to the client
+        const stream = {
+            write: (data) => {
+                responseStream.body += data;
+            },
+            end: () => {
+                responseStream.body += ': stream ended\n\n';
+            }
+        };
 
         // Listen for order updates and send immediately
-        orderEmitter.on('orderUpdate', (update) => {
-            response.body += `data: ${JSON.stringify(orders)}\n\n`;
+        orderEmitter.on('orderUpdate', (updatedOrders) => {
+            stream.write(`data: ${JSON.stringify(updatedOrders)}\n\n`);
         });
 
-        // Keep connection alive with shorter interval
-        setInterval(() => {
-            response.body += `: keep-alive\n\n`;
-        }, 10000); // 10 seconds interval for better real-time
+        // Keep connection alive with heartbeat
+        const keepAlive = setInterval(() => {
+            stream.write(': keep-alive\n\n');
+        }, 10000);
 
-        return response;
+        // Clean up on connection close
+        context.on('close', () => {
+            clearInterval(keepAlive);
+            stream.end();
+        });
+
+        return responseStream;
     }
 
     return {
