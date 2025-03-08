@@ -82,15 +82,11 @@
     </div>
 
     <script>
-        const supabase = Supabase.createClient(
-            'https://sjhtsviheycilmyzvbke.supabase.co', // Your Supabase URL
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqaHRzdmloZXljaWxteXp2YmtlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEzOTgyMDMsImV4cCI6MjA1Njk3NDIwM30.ZuxZhtdvkSbRb_dwQYdhdds6fJfkzlkkSp6GLhqeZkA' // Your Supabase Anon Key
-        );
-
         async function loadOrders() {
             try {
-                const { data: orders, error } = await supabase.from('orders').select('*');
-                if (error) throw error;
+                const response = await fetch('/api/data');
+                if (!response.ok) throw new Error('Failed to fetch orders');
+                const orders = await response.json();
                 const ordersDiv = document.getElementById('orders');
                 ordersDiv.innerHTML = '';
                 orders.forEach((order) => {
@@ -118,11 +114,14 @@
 
         async function approveOrder(orderId) {
             try {
-                const { error } = await supabase
-                    .from('orders')
-                    .update({ status: 'approved' })
-                    .eq('id', orderId);
-                if (error) throw error;
+                const response = await fetch('/api/data', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: orderId, status: 'approved' })
+                });
+                if (!response.ok) throw new Error('Failed to approve order');
+                const result = await response.json();
+                console.log(result.message);
             } catch (error) {
                 console.error('Error approving order:', error);
             }
@@ -130,11 +129,14 @@
 
         async function rejectOrder(orderId) {
             try {
-                const { error } = await supabase
-                    .from('orders')
-                    .update({ status: 'rejected' })
-                    .eq('id', orderId);
-                if (error) throw error;
+                const response = await fetch('/api/data', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id: orderId, status: 'rejected' })
+                });
+                if (!response.ok) throw new Error('Failed to reject order');
+                const result = await response.json();
+                console.log(result.message);
             } catch (error) {
                 console.error('Error rejecting order:', error);
             }
@@ -142,20 +144,26 @@
 
         async function clearData() {
             try {
-                const { error } = await supabase.from('orders').delete().neq('id', 0);
-                if (error) throw error;
+                const response = await fetch('/api/data', {
+                    method: 'DELETE'
+                });
+                if (!response.ok) throw new Error('Failed to clear orders');
+                const result = await response.json();
+                console.log(result.message);
             } catch (error) {
                 console.error('Error clearing data:', error);
             }
         }
 
         function setupRealTime() {
-            supabase
-                .channel('orders')
-                .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' }, () => {
-                    loadOrders();
-                })
-                .subscribe();
+            const eventSource = new EventSource('/api/stream-orders');
+            eventSource.onmessage = () => {
+                loadOrders();
+            };
+            eventSource.onerror = (error) => {
+                console.error('SSE Error:', error);
+                eventSource.close();
+            };
         }
 
         function createStars() {
