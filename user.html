@@ -5,155 +5,120 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Panel 🌟</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
             background-image: url('https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/telegram-logo.png');
             background-size: 100px;
             background-repeat: repeat;
-            opacity: 0.1;
-            text-align: center;
+            background-opacity: 0.1;
+            min-height: 100vh;
             padding: 20px;
-            margin: 0;
-            overflow-x: hidden;
-            position: relative;
-            animation: shimmer 3s infinite;
-        }
-        @keyframes shimmer {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
         }
         .container {
             max-width: 800px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.9);
+            background: white;
             padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-            position: relative;
-            z-index: 1;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         h1 {
-            color: #ff0000;
-            font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-            animation: gradientText 3s ease infinite;
-        }
-        @keyframes gradientText {
-            0% { color: #ff0000; }
-            50% { color: #ff4500; }
-            100% { color: #ff0000; }
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
         }
         .user {
-            background: #fff;
+            background: #f9f9f9;
             padding: 15px;
-            margin: 10px 0;
-            border: 2px solid #0288d1;
             border-radius: 10px;
-            animation: userGlow 2s infinite;
-        }
-        @keyframes userGlow {
-            0% { border-color: #ff0000; }
-            50% { border-color: #ff4500; }
-            100% { border-color: #ff0000; }
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
         button {
-            padding: 8px 16px;
-            margin: 5px;
-            background: linear-gradient(45deg, #0288d1, #03a9f4);
+            width: 100%;
+            padding: 10px;
+            background: #e74c3c;
             color: white;
             border: none;
-            border-radius: 25px;
-            cursor: pointer;
+            border-radius: 5px;
             font-size: 1em;
-            transition: transform 0.2s, background 0.3s;
-            animation: buttonGlow 2s infinite;
-        }
-        @keyframes buttonGlow {
-            0% { box-shadow: 0 0 5px #ff0000; }
-            50% { box-shadow: 0 0 10px #ff4500; }
-            100% { box-shadow: 0 0 5px #ff0000; }
+            cursor: pointer;
+            transition: background 0.3s;
         }
         button:hover {
-            transform: scale(1.1);
-            background: linear-gradient(45deg, #03a9f4, #0288d1);
-        }
-        .clear-data {
-            background: linear-gradient(45deg, #f44336, #d32f2f);
-        }
-        .clear-data:hover {
-            background: linear-gradient(45deg, #d32f2f, #f44336);
-        }
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: #ff0000;
-            opacity: 0.8;
-            border-radius: 50%;
-            animation: fallConfetti 3s linear infinite;
-        }
-        @keyframes fallConfetti {
-            0% { transform: translateY(-100vh) rotate(0deg); }
-            100% { transform: translateY(100vh) rotate(360deg); }
+            background: #c0392b;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>User Panel</h1>
-        <button class="clear-data" onclick="clearData()">Clear Data</button>
+        <button onclick="clearData()">Clear Data</button>
         <div id="users"></div>
     </div>
 
     <script>
-        let users = JSON.parse(localStorage.getItem('users')) || [];
-
-        function saveUsersToLocal() {
-            localStorage.setItem('users', JSON.stringify(users));
+        async function displayUsers() {
+            try {
+                const response = await fetch('/api/users');
+                if (!response.ok) throw new Error('Failed to fetch users');
+                const users = await response.json();
+                const usersDiv = document.getElementById('users');
+                usersDiv.innerHTML = '';
+                users.forEach(user => {
+                    const div = document.createElement('div');
+                    div.className = 'user';
+                    div.innerHTML = `
+                        <p><strong>User ID:</strong> ${user.userId}</p>
+                        <p><strong>Phone Number:</strong> ${user.phoneNumber}</p>
+                    `;
+                    usersDiv.appendChild(div);
+                });
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
         }
 
-        function displayUsers() {
-            const usersDiv = document.getElementById('users');
-            usersDiv.innerHTML = '';
-            users.forEach(user => {
-                const div = document.createElement('div');
-                div.className = 'user';
-                div.innerHTML = `
-                    <p>User ID: ${user.userId}</p>
-                    <p>Phone Number: ${user.phoneNumber}</p>
-                `;
-                usersDiv.appendChild(div);
-            });
+        async function clearData() {
+            try {
+                const response = await fetch('/api/users', {
+                    method: 'DELETE'
+                });
+                if (!response.ok) throw new Error('Failed to clear users');
+                const result = await response.json();
+                console.log(result.message);
+                await displayUsers();
+            } catch (error) {
+                console.error('Error clearing data:', error);
+            }
         }
 
-        function clearData() {
-            users = [];
-            saveUsersToLocal();
-            displayUsers();
-        }
-
-        function createConfetti() {
-            setInterval(() => {
-                const confetti = document.createElement('div');
-                confetti.className = 'confetti';
-                confetti.style.left = Math.random() * 100 + 'vw';
-                confetti.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
-                confetti.style.animationDuration = Math.random() * 2 + 2 + 's';
-                document.body.appendChild(confetti);
-                setTimeout(() => confetti.remove(), 5000);
-            }, 200);
+        function setupRealTime() {
+            const eventSource = new EventSource('/api/users-stream');
+            eventSource.onmessage = (event) => {
+                try {
+                    const users = JSON.parse(event.data);
+                    displayUsers();
+                } catch (error) {
+                    console.error('Error parsing SSE data:', error);
+                }
+            };
+            eventSource.onerror = (error) => {
+                console.error('SSE Error:', error);
+                eventSource.close();
+                setTimeout(setupRealTime, 5000);
+            };
         }
 
         window.onload = () => {
+            setupRealTime();
             displayUsers();
-            createConfetti();
-            // Offline mode with local data
-            if (!navigator.onLine) {
-                console.log('Offline mode: Using local user data');
-                displayUsers();
-            }
         };
     </script>
 </body>
