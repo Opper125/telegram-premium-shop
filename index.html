@@ -5,267 +5,331 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram Premium Shop ✨</title>
     <style>
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
-            text-align: center;
-            padding: 20px;
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            min-height: 100vh;
             overflow-x: hidden;
             position: relative;
-            animation: shimmer 3s infinite;
-        }
-        @keyframes shimmer {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
         }
         .container {
-            max-width: 600px;
+            max-width: 1200px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.9);
             padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-            position: relative;
-            z-index: 1;
         }
         h1 {
-            color: #ff0000;
+            color: #2c3e50;
+            text-align: center;
             font-size: 2.5em;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-            animation: gradientText 3s ease infinite;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
         }
-        @keyframes gradientText {
-            0% { color: #ff0000; }
-            50% { color: #ff4500; }
-            100% { color: #ff0000; }
-        }
-        .premium-option {
-            margin: 10px 0;
-            padding: 15px;
-            background: linear-gradient(45deg, #ffeb3b, #ff9800);
-            border: 2px solid #ff4500;
+        .signup-container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
             border-radius: 10px;
-            cursor: pointer;
-            font-size: 1.2em;
-            color: #d81b60;
-            transition: transform 0.3s, background 0.3s;
-            animation: gradientBg 3s ease infinite;
-            display: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-        @keyframes gradientBg {
-            0% { background: linear-gradient(45deg, #ffeb3b, #ff9800); }
-            50% { background: linear-gradient(45deg, #ff9800, #ffeb3b); }
-            100% { background: linear-gradient(45deg, #ffeb3b, #ff9800); }
+        .signup-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
         }
-        .premium-option:hover {
-            transform: scale(1.05);
-            background: #ffee58;
+        .signup-container input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
         }
-        .quantity {
-            margin: 15px 0;
-            display: none;
-        }
-        button {
-            padding: 10px 20px;
-            margin: 5px;
-            background: linear-gradient(45deg, #ff4081, #f50057);
+        .signup-container button {
+            width: 100%;
+            padding: 10px;
+            background: #3498db;
             color: white;
             border: none;
-            border-radius: 25px;
-            cursor: pointer;
+            border-radius: 5px;
             font-size: 1em;
-            transition: transform 0.2s, background 0.3s;
-            animation: buttonGlow 2s infinite;
+            cursor: pointer;
+            transition: background 0.3s;
         }
-        @keyframes buttonGlow {
-            0% { box-shadow: 0 0 5px #ff0000; }
-            50% { box-shadow: 0 0 10px #ff4500; }
-            100% { box-shadow: 0 0 5px #ff0000; }
+        .signup-container button:hover {
+            background: #2980b9;
         }
-        button:hover {
-            transform: scale(1.1);
-            background: linear-gradient(45deg, #f50057, #ff4081);
+        #dashboard {
+            display: none;
+        }
+        .navbar {
+            background: #2c3e50;
+            padding: 10px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .navbar h2 {
+            color: white;
+            text-align: center;
+            font-size: 1.5em;
+        }
+        .content {
+            padding: 20px 0;
+        }
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: #2c3e50;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .bottom-nav .nav-item {
+            text-align: center;
+            color: white;
+            cursor: pointer;
+            padding: 5px;
+            transition: background 0.3s;
+        }
+        .bottom-nav .nav-item:hover {
+            background: #34495e;
+        }
+        .bottom-nav .nav-item img {
+            width: 30px;
+            height: 30px;
+            margin-bottom: 5px;
+        }
+        .bottom-nav .nav-item p {
+            font-size: 0.9em;
+        }
+        .section {
+            display: none;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .post {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .post img {
+            max-width: 100%;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+        .premium-option {
+            background: #3498db;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .premium-option:hover {
+            transform: scale(1.02);
+        }
+        .quantity {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 15px 0;
+        }
+        .quantity button {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .quantity span {
+            margin: 0 10px;
+            font-size: 1.2em;
         }
         #totalPrice {
             font-size: 1.5em;
-            color: #ff5722;
+            color: #e74c3c;
+            text-align: center;
+        }
+        .payment-method {
             margin: 15px 0;
-            animation: gradientText 3s ease infinite;
-            display: none;
         }
-        #paymentMethod {
-            margin: 15px 0;
-            position: relative;
-            display: none;
-        }
-        select, input {
-            padding: 10px;
-            margin: 5px 0;
-            width: 80%;
-            border: 2px solid #ff4500;
-            border-radius: 10px;
-            font-size: 1em;
-            animation: inputGlow 2s infinite;
-            display: none;
-        }
-        @keyframes inputGlow {
-            0% { border-color: #ff0000; }
-            50% { border-color: #ff4500; }
-            100% { border-color: #ff0000; }
-        }
-        .payment-logo {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 20px;
-            height: 20px;
-            margin-left: 5px;
-        }
-        #status, #orderHistory {
-            margin-top: 20px;
-            color: #333;
-            display: none;
-        }
-        .order {
-            background: #fff;
-            padding: 15px;
-            margin: 10px 0;
-            border: 2px solid #ff4081;
-            border-radius: 10px;
-            animation: orderGlow 2s infinite;
-            display: none;
-        }
-        @keyframes orderGlow {
-            0% { border-color: #ff0000; }
-            50% { border-color: #ff4500; }
-            100% { border-color: #ff0000; }
-        }
-        .notification {
-            margin-top: 10px;
+        .payment-method select {
+            width: 100%;
             padding: 10px;
             border-radius: 5px;
-            display: none;
+            border: 1px solid #ddd;
         }
-        .approved {
-            background: #4caf50;
+        .order {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        .profile-container {
+            text-align: center;
+        }
+        .profile-container img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+        }
+        .me-container {
+            text-align: center;
+        }
+        .me-container .info-card {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+        .me-container .business-card {
+            background: #3498db;
             color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .rejected {
-            background: #f44336;
-            color: white;
-        }
-        .error-message {
-            color: red;
-            animation: blink 1s step-end infinite;
-            display: none;
+        .me-container .business-card img {
+            width: 50px;
+            height: 50px;
+            margin-right: 15px;
         }
         .phone-number {
             position: fixed;
             top: 50%;
-            left: -300px;
+            left: calc(50% - 150px);
             background: #4caf50;
             color: white;
             padding: 10px 20px;
             border-radius: 10px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-            animation: slideInPhone 1s forwards;
             z-index: 1000;
-        }
-        @keyframes slideInPhone {
-            0% { left: -300px; }
-            50% { left: calc(50% - 150px); }
-            100% { left: calc(50% - 150px); }
-        }
-        @keyframes blink {
-            50% { opacity: 0; }
-        }
-        .confetti {
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            background: #ff0000;
-            opacity: 0.8;
-            border-radius: 50%;
-            animation: fallConfetti 3s linear infinite;
-        }
-        @keyframes fallConfetti {
-            0% { transform: translateY(-100vh) rotate(0deg); }
-            100% { transform: translateY(100vh) rotate(360deg); }
-        }
-        .telegram-logo {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            width: 30px;
-            height: 30px;
-        }
-        .signup-container {
-            margin: 20px 0;
-        }
-        #signupButton, #loginButton {
-            background: linear-gradient(45deg, #4caf50, #66bb6a);
-            color: white;
-            padding: 10px;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        #signupButton:hover, #loginButton:hover {
-            transform: scale(1.05);
-        }
-        #shopSection {
-            display: none;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>TELEGRAM PREMIUM SHOP</h1>
-        <div class="signup-container" id="signupSection">
-            <h2>Sign Up / Login</h2>
-            <input type="text" id="phoneNumber" placeholder="Enter Phone Number" required>
-            <input type="password" id="password" placeholder="Enter Password" required>
-            <button id="signupButton" onclick="signup()">Sign Up</button>
-            <button id="loginButton" onclick="login()">Login</button>
+    <div id="signupSection" class="signup-container">
+        <h2>Sign Up / Login</h2>
+        <input type="text" id="phoneNumber" placeholder="Enter Phone Number" required>
+        <input type="password" id="password" placeholder="Enter Password" required>
+        <button id="signupButton" onclick="signup()">Sign Up</button>
+        <button id="loginButton" onclick="login()">Login</button>
+    </div>
+
+    <div id="dashboard">
+        <div class="navbar">
+            <h2>Telegram Premium Shop</h2>
         </div>
-        <div id="shopSection">
-            <div class="premium-option" onclick="selectPremium(3, 60000)">
-                Premium 3 Months - 60,000 MMK
-                <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/telegram-logo.png" alt="Telegram Logo" class="telegram-logo">
+        <div class="container">
+            <div id="homeSection" class="section">
+                <h2>Home</h2>
+                <a href="post.html" target="_blank">Create a Post</a>
+                <div id="posts"></div>
             </div>
-            <div class="premium-option" onclick="selectPremium(6, 135000)">
-                Premium 6 Months - 135,000 MMK
-                <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/telegram-logo.png" alt="Telegram Logo" class="telegram-logo">
+            <div id="shopSection" class="section">
+                <h2>Shop</h2>
+                <div class="premium-option" onclick="selectPremium(3, 60000)">
+                    Premium 3 Months - 60,000 MMK
+                </div>
+                <div class="premium-option" onclick="selectPremium(6, 135000)">
+                    Premium 6 Months - 135,000 MMK
+                </div>
+                <div class="premium-option" onclick="selectPremium(12, 210000)">
+                    Premium 1 Year - 210,000 MMK
+                </div>
+                <div class="quantity">
+                    <button onclick="decreaseQuantity()">-</button>
+                    <span id="quantity">1</span>
+                    <button onclick="increaseQuantity()">+</button>
+                </div>
+                <div id="totalPrice">Total: 60,000 MMK</div>
+                <div class="payment-method">
+                    <select id="paymentSelect" onchange="showPhoneNumber()">
+                        <option value="">Select Payment Method</option>
+                        <option value="kpay">Kpay</option>
+                        <option value="wave">Wave</option>
+                    </select>
+                </div>
+                <input type="text" id="transactionId" placeholder="Enter Transaction ID" required>
+                <input type="text" id="telegramUsername" placeholder="Enter Telegram Username" required>
+                <button onclick="submitOrder()">Submit Order</button>
+                <div id="status">Wait Admin Check <audio id="waitAudio" src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/wait_admin_check.mp3" preload="auto"></audio></div>
             </div>
-            <div class="premium-option" onclick="selectPremium(12, 210000)">
-                Premium 1 Year - 210,000 MMK
-                <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/telegram-logo.png" alt="Telegram Logo" class="telegram-logo">
+            <div id="hostSection" class="section">
+                <h2>Order History</h2>
+                <div id="orderHistory"></div>
             </div>
-            <div class="quantity">
-                <button onclick="decreaseQuantity()">-</button>
-                <span id="quantity">1</span>
-                <button onclick="increaseQuantity()">+</button>
+            <div id="profileSection" class="section">
+                <h2>Profile</h2>
+                <div class="profile-container">
+                    <img id="profilePic" src="https://via.placeholder.com/100" alt="Profile Picture">
+                    <input type="file" id="profilePicInput" accept="image/*" onchange="updateProfilePic()">
+                    <input type="text" id="profileName" placeholder="Enter Your Name">
+                    <button onclick="saveProfile()">Save Profile</button>
+                </div>
             </div>
-            <div id="totalPrice">Total: 60,000 MMK</div>
-            <div id="paymentMethod">
-                <select id="paymentSelect" onchange="showPhoneNumber()">
-                    <option value="">Select Payment Method</option>
-                    <option value="kpay">Kpay</option>
-                    <option value="wave">Wave</option>
-                </select>
-                <img id="paymentLogo" class="payment-logo" src="" alt="Payment Logo" style="display: none;">
+            <div id="meSection" class="section">
+                <h2>Me</h2>
+                <div class="me-container">
+                    <div class="info-card">
+                        <p><strong>User ID:</strong> <span id="userIdDisplay"></span></p>
+                        <p><strong>Phone Number:</strong> <span id="phoneNumberDisplay"></span></p>
+                        <p><strong>Current Time in Myanmar:</strong> <span id="currentTime"></span></p>
+                    </div>
+                    <div class="business-card">
+                        <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/telegram-logo.png" alt="Telegram Logo">
+                        <div>
+                            <p><strong>Owner:</strong> OPPER</p>
+                            <p><strong>Phone Number:</strong> +95 09983254678</p>
+                            <p><strong>Business Address:</strong> Yangon Dawbon, Tarkayta No '243'</p>
+                            <p><strong>Contact:</strong> <a href="https://t.me/YYT1u" target="_blank">Telegram</a></p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <input type="text" id="transactionId" placeholder="Enter Transaction ID" required>
-            <input type="text" id="telegramUsername" placeholder="Enter Telegram Username" required>
-            <button onclick="submitOrder()">Submit Order</button>
-            <div id="status">Wait Admin Check <audio id="waitAudio" src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/wait_admin_check.mp3" preload="auto"></audio></div>
-            <div id="notification" class="notification"></div>
-            <h2>Order History</h2>
-            <div id="orderHistory"></div>
-            <div id="errorMessage" class="error-message"></div>
+        </div>
+        <div class="bottom-nav">
+            <div class="nav-item" onclick="showSection('homeSection')">
+                <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/home-icon.png" alt="Home">
+                <p>Home</p>
+            </div>
+            <div class="nav-item" onclick="showSection('shopSection')">
+                <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/shop-icon.png" alt="Shop">
+                <p>Shop</p>
+            </div>
+            <div class="nav-item" onclick="showSection('hostSection')">
+                <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/host-icon.png" alt="Host">
+                <p>Host</p>
+            </div>
+            <div class="nav-item" onclick="showSection('profileSection')">
+                <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/profile-icon.png" alt="Profile">
+                <p>Profile</p>
+            </div>
+            <div class="nav-item" onclick="showSection('meSection')">
+                <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/me-icon.png" alt="Me">
+                <p>Me</p>
+            </div>
         </div>
     </div>
 
@@ -274,43 +338,50 @@
         let selectedPrice = 60000;
         let quantity = 1;
         let userId = localStorage.getItem('userId');
-        let users = JSON.parse(localStorage.getItem('users')) || [];
+        let users = [];
 
-        function generateUserId() {
-            return 'user-' + Math.random().toString(36).substr(2, 9);
+        async function fetchUsers() {
+            try {
+                const response = await fetch('/api/users');
+                if (!response.ok) throw new Error('Failed to fetch users');
+                users = await response.json();
+            } catch (error) {
+                console.error('Error fetching users:', error);
+            }
         }
 
-        function saveUsersToLocal() {
-            localStorage.setItem('users', JSON.stringify(users));
-        }
-
-        function signup() {
+        async function signup() {
             const phoneNumber = document.getElementById('phoneNumber').value;
             const password = document.getElementById('password').value;
             if (phoneNumber && password) {
+                await fetchUsers();
                 const existingUser = users.find(user => user.phoneNumber === phoneNumber);
                 if (existingUser) {
                     alert('This phone number is already registered! Please use a different number.');
                     return;
                 }
-                userId = generateUserId();
+                userId = 'user-' + Math.random().toString(36).substr(2, 9);
                 localStorage.setItem('userId', userId);
                 localStorage.setItem('phoneNumber', phoneNumber);
                 localStorage.setItem('password', password);
-                users.push({ userId, phoneNumber, password });
-                saveUsersToLocal();
+                const user = { userId, phoneNumber, password };
+                await saveUser(user);
                 alert('Account created successfully! User ID: ' + userId);
                 document.getElementById('signupSection').style.display = 'none';
-                document.getElementById('shopSection').style.display = 'block';
-                loadOrderHistory(); // Load order history after login
+                document.getElementById('dashboard').style.display = 'block';
+                showSection('homeSection');
+                updateMeSection();
+                loadOrderHistory();
+                loadPosts();
             } else {
                 alert('Please fill in phone number and password!');
             }
         }
 
-        function login() {
+        async function login() {
             const phoneNumber = document.getElementById('phoneNumber').value;
             const password = document.getElementById('password').value;
+            await fetchUsers();
             const user = users.find(user => user.phoneNumber === phoneNumber && user.password === password);
             if (user) {
                 userId = user.userId;
@@ -319,11 +390,40 @@
                 localStorage.setItem('password', password);
                 alert('Logged in successfully! User ID: ' + userId);
                 document.getElementById('signupSection').style.display = 'none';
-                document.getElementById('shopSection').style.display = 'block';
-                loadOrderHistory(); // Load order history after login
+                document.getElementById('dashboard').style.display = 'block';
+                showSection('homeSection');
+                updateMeSection();
+                loadOrderHistory();
+                loadPosts();
             } else {
                 alert('Invalid phone number or password!');
             }
+        }
+
+        async function saveUser(user) {
+            try {
+                const response = await fetch('/api/users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(user)
+                });
+                if (!response.ok) throw new Error('Failed to save user');
+                const result = await response.json();
+                console.log(result.message);
+            } catch (error) {
+                console.error('Error saving user:', error);
+            }
+        }
+
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.style.display = 'none';
+            });
+            document.getElementById(sectionId).style.display = 'block';
+            if (sectionId === 'homeSection') loadPosts();
+            if (sectionId === 'hostSection') loadOrderHistory();
+            if (sectionId === 'profileSection') loadProfile();
+            if (sectionId === 'meSection') updateMeSection();
         }
 
         function selectPremium(months, price) {
@@ -349,47 +449,21 @@
 
         function showPhoneNumber() {
             const method = document.getElementById('paymentSelect').value;
-            const paymentLogo = document.getElementById('paymentLogo');
-            if (method === 'kpay') {
-                paymentLogo.src = 'https://github.com/Opper125/telegram-premium-shop/blob/92f6aac8a5242653c44e1640d2b83f7a5bcfb226/kpay-logo.png?raw=true';
-                paymentLogo.style.display = 'inline';
+            if (method === 'kpay' || method === 'wave') {
                 const phoneDiv = document.createElement('div');
                 phoneDiv.className = 'phone-number';
                 phoneDiv.innerText = 'Pay to: 09786284670 (DHMK)';
                 document.body.appendChild(phoneDiv);
                 setTimeout(() => phoneDiv.remove(), 5000);
-            } else if (method === 'wave') {
-                paymentLogo.src = 'https://github.com/Opper125/telegram-premium-shop/blob/92f6aac8a5242653c44e1640d2b83f7a5bcfb226/wave-logo.png?raw=true';
-                paymentLogo.style.display = 'inline';
-                const phoneDiv = document.createElement('div');
-                phoneDiv.className = 'phone-number';
-                phoneDiv.innerText = 'Pay to: 09786284670 (DHMK)';
-                document.body.appendChild(phoneDiv);
-                setTimeout(() => phoneDiv.remove(), 5000);
-            } else {
-                paymentLogo.style.display = 'none';
             }
-        }
-
-        let orders = JSON.parse(localStorage.getItem('orders')) || [];
-
-        function saveOrdersToLocal() {
-            localStorage.setItem('orders', JSON.stringify(orders));
         }
 
         async function submitOrder() {
             const transactionId = document.getElementById('transactionId').value;
             const telegramUsername = document.getElementById('telegramUsername').value;
             const paymentMethod = document.getElementById('paymentSelect').value;
-            if (transactionId && telegramUsername && paymentMethod && localStorage.getItem('userId')) {
-                const duplicate = orders.find(o => o.transactionId === transactionId && o.userId === userId && o.status !== 'approved' && o.status !== 'rejected');
-                if (duplicate) {
-                    document.getElementById('errorMessage').style.display = 'block';
-                    document.getElementById('errorMessage').innerText = 'This Transaction ID is already in use! 🚫';
-                    return;
-                }
+            if (transactionId && telegramUsername && paymentMethod && userId) {
                 const order = {
-                    id: orders.length + 1,
                     userId: userId,
                     phoneNumber: localStorage.getItem('phoneNumber'),
                     months: selectedMonths,
@@ -401,88 +475,131 @@
                     status: 'pending',
                     timestamp: new Date().toISOString()
                 };
-                orders.push(order);
-                saveOrdersToLocal();
+                await saveOrder(order);
                 document.getElementById('status').innerText = 'Wait Admin Check';
                 document.getElementById('waitAudio').play();
                 loadOrderHistory();
-                // Simulate sending to orders.html
-                console.log('Order submitted to orders.html:', order);
             } else {
                 document.getElementById('status').innerText = 'Please fill all fields!';
             }
         }
 
-        function loadOrderHistory() {
-            const userOrders = orders.filter(order => order.userId === userId);
-            const orderHistoryDiv = document.getElementById('orderHistory');
-            orderHistoryDiv.innerHTML = '';
-            userOrders.forEach(order => {
-                const div = document.createElement('div');
-                div.className = 'order';
-                div.innerHTML = `
-                    <p>Months: ${order.months}</p>
-                    <p>Quantity: ${order.quantity}</p>
-                    <p>Total: ${order.total} MMK</p>
-                    <p>Status: ${order.status === 'approved' ? 'Approved! ✅' : order.status === 'rejected' ? 'Rejected! ❌' : 'Pending ⏳'}</p>
-                    <p>Transaction ID: ${order.transactionId}</p>
-                `;
-                orderHistoryDiv.appendChild(div);
-                updateStatus(order);
-            });
-        }
-
-        function updateStatus(order) {
-            const statusDiv = document.getElementById('status');
-            if (order.status === 'approved') {
-                statusDiv.innerText = 'Approved! ✅';
-                const notification = document.getElementById('notification');
-                notification.className = 'notification approved';
-                notification.innerText = 'Approved! 🎉';
-                notification.style.display = 'block';
-                setTimeout(() => notification.style.display = 'none', 3000);
-                const audio = new Audio('https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/approved.mp3');
-                audio.play();
-            } else if (order.status === 'rejected') {
-                statusDiv.innerText = 'Rejected! ❌';
-                const notification = document.getElementById('notification');
-                notification.className = 'notification rejected';
-                notification.innerText = 'Rejected! 🚫';
-                notification.style.display = 'block';
-                setTimeout(() => notification.style.display = 'none', 3000);
-                const audio = new Audio('https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/rejected.mp3');
-                audio.play();
+        async function saveOrder(order) {
+            try {
+                const response = await fetch('/api/data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(order)
+                });
+                if (!response.ok) throw new Error('Failed to save order');
+                const result = await response.json();
+                console.log(result.message);
+            } catch (error) {
+                console.error('Error saving order:', error);
+                document.getElementById('status').innerText = 'Error saving order!';
             }
         }
 
-        function createConfetti() {
-            setInterval(() => {
-                const confetti = document.createElement('div');
-                confetti.className = 'confetti';
-                confetti.style.left = Math.random() * 100 + 'vw';
-                confetti.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
-                confetti.style.animationDuration = Math.random() * 2 + 2 + 's';
-                document.body.appendChild(confetti);
-                setTimeout(() => confetti.remove(), 5000);
-            }, 200);
+        async function loadOrderHistory() {
+            try {
+                const response = await fetch('/api/data');
+                if (!response.ok) throw new Error('Failed to fetch orders');
+                const orders = await response.json();
+                const userOrders = orders.filter(order => order.userId === userId);
+                const orderHistoryDiv = document.getElementById('orderHistory');
+                orderHistoryDiv.innerHTML = '';
+                userOrders.forEach(order => {
+                    const div = document.createElement('div');
+                    div.className = 'order';
+                    div.innerHTML = `
+                        <p>Months: ${order.months}</p>
+                        <p>Quantity: ${order.quantity}</p>
+                        <p>Total: ${order.total} MMK</p>
+                        <p>Status: ${order.status === 'approved' ? 'Approved! ✅' : order.status === 'rejected' ? 'Rejected! ❌' : 'Pending ⏳'}</p>
+                        <p>Transaction ID: ${order.transactionId}</p>
+                    `;
+                    orderHistoryDiv.appendChild(div);
+                });
+            } catch (error) {
+                console.error('Error loading order history:', error);
+            }
+        }
+
+        async function loadPosts() {
+            try {
+                const response = await fetch('/api/posts');
+                if (!response.ok) throw new Error('Failed to fetch posts');
+                const posts = await response.json();
+                const postsDiv = document.getElementById('posts');
+                postsDiv.innerHTML = '';
+                posts.forEach(post => {
+                    const div = document.createElement('div');
+                    div.className = 'post';
+                    div.innerHTML = `
+                        <p><strong>${post.userId}</strong> - ${new Date(post.timestamp).toLocaleString()}</p>
+                        <p>${post.content}</p>
+                        ${post.image ? `<img src="${post.image}" alt="Post Image">` : ''}
+                    `;
+                    postsDiv.appendChild(div);
+                });
+            } catch (error) {
+                console.error('Error loading posts:', error);
+            }
+        }
+
+        function updateProfilePic() {
+            const file = document.getElementById('profilePicInput').files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('profilePic').src = e.target.result;
+                    localStorage.setItem('profilePic', e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function saveProfile() {
+            const name = document.getElementById('profileName').value;
+            if (name) {
+                localStorage.setItem('profileName', name);
+                alert('Profile updated successfully!');
+            } else {
+                alert('Please enter your name!');
+            }
+        }
+
+        function loadProfile() {
+            const profilePic = localStorage.getItem('profilePic');
+            const profileName = localStorage.getItem('profileName');
+            if (profilePic) document.getElementById('profilePic').src = profilePic;
+            if (profileName) document.getElementById('profileName').value = profileName;
+        }
+
+        function updateMeSection() {
+            document.getElementById('userIdDisplay').innerText = userId;
+            document.getElementById('phoneNumberDisplay').innerText = localStorage.getItem('phoneNumber');
+            updateTime();
+        }
+
+        function updateTime() {
+            const myanmarTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Yangon' });
+            document.getElementById('currentTime').innerText = myanmarTime;
+            setTimeout(updateTime, 1000);
         }
 
         window.onload = () => {
             if (!localStorage.getItem('userId')) {
                 document.getElementById('signupSection').style.display = 'block';
-                document.getElementById('shopSection').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'none';
             } else {
                 userId = localStorage.getItem('userId');
                 document.getElementById('signupSection').style.display = 'none';
-                document.getElementById('shopSection').style.display = 'block';
+                document.getElementById('dashboard').style.display = 'block';
+                showSection('homeSection');
+                updateMeSection();
                 loadOrderHistory();
-                createConfetti();
-                document.getElementById('waitAudio').play();
-            }
-            // Offline mode with mock data
-            if (!navigator.onLine) {
-                console.log('Offline mode: Using local mock data');
-                loadOrderHistory();
+                loadPosts();
             }
         };
     </script>
