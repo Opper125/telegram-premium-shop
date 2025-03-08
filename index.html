@@ -250,8 +250,6 @@
                 await saveOrder(order);
                 document.getElementById('status').innerText = 'Wait Admin Check';
                 document.getElementById('waitAudio').play();
-                loadOrderHistory();
-                checkTransactionId(transactionId);
             } else {
                 document.getElementById('status').innerText = 'Please fill all fields!';
             }
@@ -265,15 +263,18 @@
                     body: JSON.stringify(order)
                 });
                 if (!response.ok) throw new Error('Failed to save order');
+                const result = await response.json();
+                console.log(result.message);
             } catch (error) {
                 console.error('Error saving order:', error);
+                document.getElementById('status').innerText = 'Error saving order!';
             }
         }
 
-        async function loadOrderHistory() {
-            try {
-                const response = await fetch('/.netlify/functions/getOrders');
-                const orders = await response.json();
+        function setupSSE() {
+            const eventSource = new EventSource('/.netlify/functions/streamOrders');
+            eventSource.onmessage = (event) => {
+                const orders = JSON.parse(event.data);
                 const userOrders = orders.filter(order => order.userId === userId);
                 const orderHistoryDiv = document.getElementById('orderHistory');
                 orderHistoryDiv.innerHTML = '';
@@ -303,24 +304,22 @@
                         setTimeout(() => notification.style.display = 'none', 3000);
                     }
                 });
-            } catch (error) {
-                console.error('Error loading order history:', error);
-            }
+                checkTransactionId(orders);
+            };
+            eventSource.onerror = () => {
+                console.error('SSE connection error, retrying...');
+                setTimeout(setupSSE, 1000); // Retry on error
+            };
         }
 
-        async function checkTransactionId(transactionId) {
-            try {
-                const response = await fetch('/.netlify/functions/getOrders');
-                const orders = await response.json();
-                const duplicate = orders.filter(order => order.transactionId === transactionId && order.status !== 'approved' && order.status !== 'rejected');
-                if (duplicate.length > 1) {
-                    document.getElementById('errorMessage').style.display = 'block';
-                    document.getElementById('errorMessage').innerText = 'This Transaction ID is already in use! 🚫';
-                } else {
-                    document.getElementById('errorMessage').style.display = 'none';
-                }
-            } catch (error) {
-                console.error('Error checking transaction ID:', error);
+        async function checkTransactionId(orders) {
+            const transactionId = document.getElementById('transactionId').value;
+            const duplicate = orders.filter(order => order.transactionId === transactionId && order.status !== 'approved' && order.status !== 'rejected');
+            if (duplicate.length > 1) {
+                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('errorMessage').innerText = 'This Transaction ID is already in use! 🚫';
+            } else {
+                document.getElementById('errorMessage').style.display = 'none';
             }
         }
 
@@ -335,9 +334,8 @@
             }, 200);
         }
 
-        setInterval(loadOrderHistory, 5000); // Poll every 5 seconds for updates
         window.onload = () => {
-            loadOrderHistory();
+            setupSSE();
             createStars();
             document.getElementById('waitAudio').play();
         };
