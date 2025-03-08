@@ -209,63 +209,131 @@
         #signupButton:hover, #loginButton:hover {
             transform: scale(1.05);
         }
+        #shopSection {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>TELEGRAM PREMIUM SHOP</h1>
-        <div class="signup-container">
+        <div class="signup-container" id="signupSection">
             <h2>Sign Up / Login</h2>
             <input type="text" id="phoneNumber" placeholder="Enter Phone Number" required>
             <input type="password" id="password" placeholder="Enter Password" required>
             <button id="signupButton" onclick="signup()">Sign Up</button>
             <button id="loginButton" onclick="login()">Login</button>
         </div>
-        <div class="premium-option" onclick="selectPremium(3, 60000)">
-            Premium 3 Months - 60,000 MMK
-            <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/telegram-logo.png" alt="Telegram Logo" class="telegram-logo">
+        <div id="shopSection">
+            <div class="premium-option" onclick="selectPremium(3, 60000)">
+                Premium 3 Months - 60,000 MMK
+                <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/telegram-logo.png" alt="Telegram Logo" class="telegram-logo">
+            </div>
+            <div class="premium-option" onclick="selectPremium(6, 135000)">
+                Premium 6 Months - 135,000 MMK
+                <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/telegram-logo.png" alt="Telegram Logo" class="telegram-logo">
+            </div>
+            <div class="premium-option" onclick="selectPremium(12, 210000)">
+                Premium 1 Year - 210,000 MMK
+                <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/telegram-logo.png" alt="Telegram Logo" class="telegram-logo">
+            </div>
+            <div class="quantity">
+                <button onclick="decreaseQuantity()">-</button>
+                <span id="quantity">1</span>
+                <button onclick="increaseQuantity()">+</button>
+            </div>
+            <div id="totalPrice">Total: 60,000 MMK</div>
+            <div id="paymentMethod">
+                <select id="paymentSelect" onchange="showPhoneNumber()">
+                    <option value="">Select Payment Method</option>
+                    <option value="kpay">Kpay</option>
+                    <option value="wave">Wave</option>
+                </select>
+                <img id="paymentLogo" class="payment-logo" src="" alt="Payment Logo" style="display: none;">
+            </div>
+            <input type="text" id="transactionId" placeholder="Enter Transaction ID" required>
+            <input type="text" id="telegramUsername" placeholder="Enter Telegram Username" required>
+            <button onclick="submitOrder()">Submit Order</button>
+            <div id="status">Wait Admin Check <audio id="waitAudio" src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/wait_admin_check.mp3" preload="auto"></audio></div>
+            <div id="notification" class="notification"></div>
+            <h2>Order History</h2>
+            <div id="orderHistory"></div>
+            <div id="errorMessage" class="error-message"></div>
         </div>
-        <div class="premium-option" onclick="selectPremium(6, 135000)">
-            Premium 6 Months - 135,000 MMK
-            <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/telegram-logo.png" alt="Telegram Logo" class="telegram-logo">
-        </div>
-        <div class="premium-option" onclick="selectPremium(12, 210000)">
-            Premium 1 Year - 210,000 MMK
-            <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/telegram-logo.png" alt="Telegram Logo" class="telegram-logo">
-        </div>
-        <div class="quantity">
-            <button onclick="decreaseQuantity()">-</button>
-            <span id="quantity">1</span>
-            <button onclick="increaseQuantity()">+</button>
-        </div>
-        <div id="totalPrice">Total: 60,000 MMK</div>
-        <div id="paymentMethod">
-            <select id="paymentSelect" onchange="showPhoneNumber()">
-                <option value="">Select Payment Method</option>
-                <option value="kpay">Kpay</option>
-                <option value="wave">Wave</option>
-            </select>
-            <img id="paymentLogo" class="payment-logo" src="" alt="Payment Logo" style="display: none;">
-        </div>
-        <input type="text" id="transactionId" placeholder="Enter Transaction ID" required>
-        <input type="text" id="telegramUsername" placeholder="Enter Telegram Username" required>
-        <button onclick="submitOrder()">Submit Order</button>
-        <div id="status">Wait Admin Check <audio id="waitAudio" src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/wait_admin_check.mp3" preload="auto"></audio></div>
-        <div id="notification" class="notification"></div>
-        <h2>Order History</h2>
-        <div id="orderHistory"></div>
-        <div id="errorMessage" class="error-message"></div>
     </div>
 
     <script>
         let selectedMonths = 3;
         let selectedPrice = 60000;
         let quantity = 1;
-        let userId = localStorage.getItem('userId') || generateUserId();
-        localStorage.setItem('userId', userId);
+        let userId = localStorage.getItem('userId');
+        let users = [];
 
-        function generateUserId() {
-            return 'user-' + Math.random().toString(36).substr(2, 9);
+        async function fetchUsers() {
+            try {
+                const response = await fetch('/api/users');
+                if (!response.ok) throw new Error('Failed to fetch users');
+                users = await response.json();
+            } catch (error) {
+                console.error('Error fetching users:', error);
+            }
+        }
+
+        async function signup() {
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const password = document.getElementById('password').value;
+            if (phoneNumber && password) {
+                await fetchUsers();
+                const existingUser = users.find(user => user.phoneNumber === phoneNumber);
+                if (existingUser) {
+                    alert('This phone number is already registered! Please use a different number.');
+                    return;
+                }
+                userId = 'user-' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('userId', userId);
+                localStorage.setItem('phoneNumber', phoneNumber);
+                localStorage.setItem('password', password);
+                const user = { userId, phoneNumber, password };
+                await saveUser(user);
+                alert('Account created successfully! User ID: ' + userId);
+                document.getElementById('signupSection').style.display = 'none';
+                document.getElementById('shopSection').style.display = 'block';
+            } else {
+                alert('Please fill in phone number and password!');
+            }
+        }
+
+        async function login() {
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const password = document.getElementById('password').value;
+            await fetchUsers();
+            const user = users.find(user => user.phoneNumber === phoneNumber && user.password === password);
+            if (user) {
+                userId = user.userId;
+                localStorage.setItem('userId', userId);
+                localStorage.setItem('phoneNumber', phoneNumber);
+                localStorage.setItem('password', password);
+                alert('Logged in successfully! User ID: ' + userId);
+                document.getElementById('signupSection').style.display = 'none';
+                document.getElementById('shopSection').style.display = 'block';
+            } else {
+                alert('Invalid phone number or password!');
+            }
+        }
+
+        async function saveUser(user) {
+            try {
+                const response = await fetch('/api/users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(user)
+                });
+                if (!response.ok) throw new Error('Failed to save user');
+                const result = await response.json();
+                console.log(result.message);
+            } catch (error) {
+                console.error('Error saving user:', error);
+            }
         }
 
         function selectPremium(months, price) {
@@ -313,39 +381,11 @@
             }
         }
 
-        function signup() {
-            const phoneNumber = document.getElementById('phoneNumber').value;
-            const password = document.getElementById('password').value;
-            if (phoneNumber && password) {
-                userId = generateUserId();
-                localStorage.setItem('userId', userId);
-                localStorage.setItem('phoneNumber', phoneNumber);
-                localStorage.setItem('password', password);
-                alert('Account created anonymously! User ID: ' + userId);
-                document.getElementById('status').innerText = 'Account Created! Proceed to Order.';
-            } else {
-                alert('Please fill in phone number and password!');
-            }
-        }
-
-        function login() {
-            const phoneNumber = document.getElementById('phoneNumber').value;
-            const password = document.getElementById('password').value;
-            const storedPhone = localStorage.getItem('phoneNumber');
-            const storedPassword = localStorage.getItem('password');
-            if (phoneNumber === storedPhone && password === storedPassword) {
-                userId = localStorage.getItem('userId');
-                alert('Logged in successfully! User ID: ' + userId);
-                document.getElementById('status').innerText = 'Logged In! Proceed to Order.';
-            } else {
-                alert('Invalid phone number or password!');
-            }
-        }
-
         async function submitOrder() {
             const transactionId = document.getElementById('transactionId').value;
             const telegramUsername = document.getElementById('telegramUsername').value;
-            if (transactionId && telegramUsername && localStorage.getItem('userId')) {
+            const paymentMethod = document.getElementById('paymentSelect').value;
+            if (transactionId && telegramUsername && paymentMethod && localStorage.getItem('userId')) {
                 const order = {
                     userId: userId,
                     phoneNumber: localStorage.getItem('phoneNumber'),
@@ -354,6 +394,7 @@
                     total: selectedPrice * quantity,
                     transactionId: transactionId,
                     telegramUsername: telegramUsername,
+                    paymentMethod: paymentMethod,
                     status: 'pending',
                     timestamp: new Date().toISOString()
                 };
@@ -479,10 +520,15 @@
         }
 
         window.onload = () => {
-            setupRealTime();
-            loadOrderHistory();
-            createConfetti();
-            document.getElementById('waitAudio').play();
+            if (localStorage.getItem('userId')) {
+                userId = localStorage.getItem('userId');
+                document.getElementById('signupSection').style.display = 'none';
+                document.getElementById('shopSection').style.display = 'block';
+                setupRealTime();
+                loadOrderHistory();
+                createConfetti();
+                document.getElementById('waitAudio').play();
+            }
         };
     </script>
 </body>
