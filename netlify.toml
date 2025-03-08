@@ -15,3 +15,7 @@
     from = "/user"
     to = "/user.html"
     status = 200
+[[redirects]]
+    from = "/orders"
+    to = "/orders.html"
+    status = 200
