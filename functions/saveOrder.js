@@ -6,11 +6,11 @@ exports.handler = async (event, context) => {
   let orders = [];
 
   try {
-    // Read existing orders
     const data = await fs.readFile(ordersFilePath, 'utf8');
     orders = JSON.parse(data || '[]');
   } catch (error) {
     console.error('Error reading orders file:', error);
+    await fs.writeFile(ordersFilePath, '[]', 'utf8'); // Create file if it doesn't exist
   }
 
   if (event.httpMethod === 'POST') {
@@ -19,7 +19,7 @@ exports.handler = async (event, context) => {
     await fs.writeFile(ordersFilePath, JSON.stringify(orders, null, 2));
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: 'Order saved' }),
+      body: JSON.stringify({ message: 'Order saved successfully' }),
     };
   } else if (event.httpMethod === 'GET') {
     return {
