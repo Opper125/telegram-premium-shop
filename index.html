@@ -52,6 +52,7 @@
             color: #d81b60;
             transition: transform 0.3s, background 0.3s;
             animation: gradientBg 3s ease infinite;
+            display: none;
         }
         @keyframes gradientBg {
             0% { background: linear-gradient(45deg, #ffeb3b, #ff9800); }
@@ -64,6 +65,7 @@
         }
         .quantity {
             margin: 15px 0;
+            display: none;
         }
         button {
             padding: 10px 20px;
@@ -91,10 +93,12 @@
             color: #ff5722;
             margin: 15px 0;
             animation: gradientText 3s ease infinite;
+            display: none;
         }
         #paymentMethod {
             margin: 15px 0;
             position: relative;
+            display: none;
         }
         select, input {
             padding: 10px;
@@ -104,6 +108,7 @@
             border-radius: 10px;
             font-size: 1em;
             animation: inputGlow 2s infinite;
+            display: none;
         }
         @keyframes inputGlow {
             0% { border-color: #ff0000; }
@@ -121,6 +126,7 @@
         #status, #orderHistory {
             margin-top: 20px;
             color: #333;
+            display: none;
         }
         .order {
             background: #fff;
@@ -129,6 +135,7 @@
             border: 2px solid #ff4081;
             border-radius: 10px;
             animation: orderGlow 2s infinite;
+            display: none;
         }
         @keyframes orderGlow {
             0% { border-color: #ff0000; }
@@ -267,46 +274,43 @@
         let selectedPrice = 60000;
         let quantity = 1;
         let userId = localStorage.getItem('userId');
-        let users = [];
+        let users = JSON.parse(localStorage.getItem('users')) || [];
 
-        async function fetchUsers() {
-            try {
-                const response = await fetch('/api/users');
-                if (!response.ok) throw new Error('Failed to fetch users');
-                users = await response.json();
-            } catch (error) {
-                console.error('Error fetching users:', error);
-            }
+        function generateUserId() {
+            return 'user-' + Math.random().toString(36).substr(2, 9);
         }
 
-        async function signup() {
+        function saveUsersToLocal() {
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+
+        function signup() {
             const phoneNumber = document.getElementById('phoneNumber').value;
             const password = document.getElementById('password').value;
             if (phoneNumber && password) {
-                await fetchUsers();
                 const existingUser = users.find(user => user.phoneNumber === phoneNumber);
                 if (existingUser) {
                     alert('This phone number is already registered! Please use a different number.');
                     return;
                 }
-                userId = 'user-' + Math.random().toString(36).substr(2, 9);
+                userId = generateUserId();
                 localStorage.setItem('userId', userId);
                 localStorage.setItem('phoneNumber', phoneNumber);
                 localStorage.setItem('password', password);
-                const user = { userId, phoneNumber, password };
-                await saveUser(user);
+                users.push({ userId, phoneNumber, password });
+                saveUsersToLocal();
                 alert('Account created successfully! User ID: ' + userId);
                 document.getElementById('signupSection').style.display = 'none';
                 document.getElementById('shopSection').style.display = 'block';
+                loadOrderHistory(); // Load order history after login
             } else {
                 alert('Please fill in phone number and password!');
             }
         }
 
-        async function login() {
+        function login() {
             const phoneNumber = document.getElementById('phoneNumber').value;
             const password = document.getElementById('password').value;
-            await fetchUsers();
             const user = users.find(user => user.phoneNumber === phoneNumber && user.password === password);
             if (user) {
                 userId = user.userId;
@@ -316,23 +320,9 @@
                 alert('Logged in successfully! User ID: ' + userId);
                 document.getElementById('signupSection').style.display = 'none';
                 document.getElementById('shopSection').style.display = 'block';
+                loadOrderHistory(); // Load order history after login
             } else {
                 alert('Invalid phone number or password!');
-            }
-        }
-
-        async function saveUser(user) {
-            try {
-                const response = await fetch('/api/users', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(user)
-                });
-                if (!response.ok) throw new Error('Failed to save user');
-                const result = await response.json();
-                console.log(result.message);
-            } catch (error) {
-                console.error('Error saving user:', error);
             }
         }
 
@@ -381,12 +371,25 @@
             }
         }
 
+        let orders = JSON.parse(localStorage.getItem('orders')) || [];
+
+        function saveOrdersToLocal() {
+            localStorage.setItem('orders', JSON.stringify(orders));
+        }
+
         async function submitOrder() {
             const transactionId = document.getElementById('transactionId').value;
             const telegramUsername = document.getElementById('telegramUsername').value;
             const paymentMethod = document.getElementById('paymentSelect').value;
             if (transactionId && telegramUsername && paymentMethod && localStorage.getItem('userId')) {
+                const duplicate = orders.find(o => o.transactionId === transactionId && o.userId === userId && o.status !== 'approved' && o.status !== 'rejected');
+                if (duplicate) {
+                    document.getElementById('errorMessage').style.display = 'block';
+                    document.getElementById('errorMessage').innerText = 'This Transaction ID is already in use! 🚫';
+                    return;
+                }
                 const order = {
+                    id: orders.length + 1,
                     userId: userId,
                     phoneNumber: localStorage.getItem('phoneNumber'),
                     months: selectedMonths,
@@ -398,56 +401,35 @@
                     status: 'pending',
                     timestamp: new Date().toISOString()
                 };
-                await saveOrder(order);
+                orders.push(order);
+                saveOrdersToLocal();
                 document.getElementById('status').innerText = 'Wait Admin Check';
                 document.getElementById('waitAudio').play();
-                logAction('Order Submitted', order);
+                loadOrderHistory();
+                // Simulate sending to orders.html
+                console.log('Order submitted to orders.html:', order);
             } else {
-                document.getElementById('status').innerText = 'Please sign up/login and fill all fields!';
+                document.getElementById('status').innerText = 'Please fill all fields!';
             }
         }
 
-        async function saveOrder(order) {
-            try {
-                const response = await fetch('/api/data', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(order)
-                });
-                if (!response.ok) throw new Error('Failed to save order');
-                const result = await response.json();
-                console.log(result.message);
-            } catch (error) {
-                console.error('Error saving order:', error);
-                document.getElementById('status').innerText = 'Error saving order!';
-            }
-        }
-
-        async function loadOrderHistory() {
-            try {
-                const response = await fetch('/api/data');
-                if (!response.ok) throw new Error('Failed to fetch orders');
-                const orders = await response.json();
-                const userOrders = orders.filter(order => order.userId === userId);
-                const orderHistoryDiv = document.getElementById('orderHistory');
-                orderHistoryDiv.innerHTML = '';
-                userOrders.forEach(order => {
-                    const div = document.createElement('div');
-                    div.className = 'order';
-                    div.innerHTML = `
-                        <p>Months: ${order.months}</p>
-                        <p>Quantity: ${order.quantity}</p>
-                        <p>Total: ${order.total} MMK</p>
-                        <p>Status: ${order.status === 'approved' ? 'Approved! ✅' : order.status === 'rejected' ? 'Rejected! ❌' : 'Pending ⏳'}</p>
-                        <p>Transaction ID: ${order.transactionId}</p>
-                    `;
-                    orderHistoryDiv.appendChild(div);
-                    updateStatus(order);
-                });
-                checkTransactionId(userOrders);
-            } catch (error) {
-                console.error('Error loading order history:', error);
-            }
+        function loadOrderHistory() {
+            const userOrders = orders.filter(order => order.userId === userId);
+            const orderHistoryDiv = document.getElementById('orderHistory');
+            orderHistoryDiv.innerHTML = '';
+            userOrders.forEach(order => {
+                const div = document.createElement('div');
+                div.className = 'order';
+                div.innerHTML = `
+                    <p>Months: ${order.months}</p>
+                    <p>Quantity: ${order.quantity}</p>
+                    <p>Total: ${order.total} MMK</p>
+                    <p>Status: ${order.status === 'approved' ? 'Approved! ✅' : order.status === 'rejected' ? 'Rejected! ❌' : 'Pending ⏳'}</p>
+                    <p>Transaction ID: ${order.transactionId}</p>
+                `;
+                orderHistoryDiv.appendChild(div);
+                updateStatus(order);
+            });
         }
 
         function updateStatus(order) {
@@ -473,40 +455,6 @@
             }
         }
 
-        async function checkTransactionId(orders) {
-            const transactionId = document.getElementById('transactionId').value;
-            const duplicate = orders.filter(order => order.transactionId === transactionId && order.status !== 'approved' && order.status !== 'rejected');
-            if (duplicate.length > 1) {
-                document.getElementById('errorMessage').style.display = 'block';
-                document.getElementById('errorMessage').innerText = 'This Transaction ID is already in use! 🚫';
-            } else {
-                document.getElementById('errorMessage').style.display = 'none';
-            }
-        }
-
-        function logAction(action, details) {
-            console.log(`${new Date().toISOString()} - ${action}:`, details);
-        }
-
-        function setupRealTime() {
-            const eventSource = new EventSource('/api/data-stream');
-            eventSource.onmessage = (event) => {
-                try {
-                    const orders = JSON.parse(event.data);
-                    const userOrders = orders.filter(order => order.userId === userId);
-                    loadOrderHistory();
-                    console.log('Received orders for user:', userOrders);
-                } catch (error) {
-                    console.error('Error parsing SSE data:', error);
-                }
-            };
-            eventSource.onerror = (error) => {
-                console.error('SSE Error:', error);
-                eventSource.close();
-                setTimeout(setupRealTime, 5000);
-            };
-        }
-
         function createConfetti() {
             setInterval(() => {
                 const confetti = document.createElement('div');
@@ -520,14 +468,21 @@
         }
 
         window.onload = () => {
-            if (localStorage.getItem('userId')) {
+            if (!localStorage.getItem('userId')) {
+                document.getElementById('signupSection').style.display = 'block';
+                document.getElementById('shopSection').style.display = 'none';
+            } else {
                 userId = localStorage.getItem('userId');
                 document.getElementById('signupSection').style.display = 'none';
                 document.getElementById('shopSection').style.display = 'block';
-                setupRealTime();
                 loadOrderHistory();
                 createConfetti();
                 document.getElementById('waitAudio').play();
+            }
+            // Offline mode with mock data
+            if (!navigator.onLine) {
+                console.log('Offline mode: Using local mock data');
+                loadOrderHistory();
             }
         };
     </script>
