@@ -184,8 +184,7 @@
             eventSource.onerror = (error) => {
                 console.error('SSE Error:', error);
                 eventSource.close();
-                // Attempt to reconnect after 5 seconds
-                setTimeout(setupRealTime, 5000);
+                setTimeout(setupRealTime, 5000); // Reconnect after 5 seconds
             };
         }
 
