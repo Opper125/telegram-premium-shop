@@ -104,34 +104,27 @@
     </div>
 
     <script>
-        async function loadOrders() {
-            try {
-                const response = await fetch('/api/data');
-                if (!response.ok) throw new Error('Failed to fetch orders');
-                const orders = await response.json();
-                const ordersDiv = document.getElementById('orders');
-                ordersDiv.innerHTML = '';
-                orders.forEach((order) => {
-                    if (order.status === 'pending') {
-                        const div = document.createElement('div');
-                        div.className = 'order';
-                        div.innerHTML = `
-                            <p>User ID: ${order.userId}</p>
-                            <p>Months: ${order.months}</p>
-                            <p>Quantity: ${order.quantity}</p>
-                            <p>Total: ${order.total} MMK</p>
-                            <p>Transaction ID: ${order.transactionId}</p>
-                            <p>Telegram Username: ${order.telegramUsername}</p>
-                            <p>Status: ${order.status}</p>
-                            <button onclick="approveOrder(${order.id})">Approve</button>
-                            <button onclick="rejectOrder(${order.id})">Reject</button>
-                        `;
-                        ordersDiv.appendChild(div);
-                    }
-                });
-            } catch (error) {
-                console.error('Error loading orders:', error);
-            }
+        function displayOrders(orders) {
+            const ordersDiv = document.getElementById('orders');
+            ordersDiv.innerHTML = '';
+            orders.forEach((order) => {
+                if (order.status === 'pending') {
+                    const div = document.createElement('div');
+                    div.className = 'order';
+                    div.innerHTML = `
+                        <p>User ID: ${order.userId}</p>
+                        <p>Months: ${order.months}</p>
+                        <p>Quantity: ${order.quantity}</p>
+                        <p>Total: ${order.total} MMK</p>
+                        <p>Transaction ID: ${order.transactionId}</p>
+                        <p>Telegram Username: ${order.telegramUsername}</p>
+                        <p>Status: ${order.status}</p>
+                        <button onclick="approveOrder(${order.id})">Approve</button>
+                        <button onclick="rejectOrder(${order.id})">Reject</button>
+                    `;
+                    ordersDiv.appendChild(div);
+                }
+            });
         }
 
         async function approveOrder(orderId) {
@@ -180,31 +173,19 @@
         function setupRealTime() {
             const eventSource = new EventSource('/api/data-stream');
             eventSource.onmessage = (event) => {
-                const orders = JSON.parse(event.data);
-                const ordersDiv = document.getElementById('orders');
-                ordersDiv.innerHTML = '';
-                orders.forEach((order) => {
-                    if (order.status === 'pending') {
-                        const div = document.createElement('div');
-                        div.className = 'order';
-                        div.innerHTML = `
-                            <p>User ID: ${order.userId}</p>
-                            <p>Months: ${order.months}</p>
-                            <p>Quantity: ${order.quantity}</p>
-                            <p>Total: ${order.total} MMK</p>
-                            <p>Transaction ID: ${order.transactionId}</p>
-                            <p>Telegram Username: ${order.telegramUsername}</p>
-                            <p>Status: ${order.status}</p>
-                            <button onclick="approveOrder(${order.id})">Approve</button>
-                            <button onclick="rejectOrder(${order.id})">Reject</button>
-                        `;
-                        ordersDiv.appendChild(div);
-                    }
-                });
+                try {
+                    const orders = JSON.parse(event.data);
+                    displayOrders(orders);
+                    console.log('Received orders:', orders);
+                } catch (error) {
+                    console.error('Error parsing SSE data:', error);
+                }
             };
             eventSource.onerror = (error) => {
                 console.error('SSE Error:', error);
                 eventSource.close();
+                // Attempt to reconnect after 5 seconds
+                setTimeout(setupRealTime, 5000);
             };
         }
 
