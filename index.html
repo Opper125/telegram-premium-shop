@@ -194,11 +194,33 @@
             width: 30px;
             height: 30px;
         }
+        .signup-container {
+            margin: 20px 0;
+        }
+        #signupButton, #loginButton {
+            background: linear-gradient(45deg, #4caf50, #66bb6a);
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        #signupButton:hover, #loginButton:hover {
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>TELEGRAM PREMIUM SHOP</h1>
+        <div class="signup-container">
+            <h2>Sign Up / Login</h2>
+            <input type="text" id="phoneNumber" placeholder="Enter Phone Number" required>
+            <input type="password" id="password" placeholder="Enter Password" required>
+            <button id="signupButton" onclick="signup()">Sign Up</button>
+            <button id="loginButton" onclick="login()">Login</button>
+        </div>
         <div class="premium-option" onclick="selectPremium(3, 60000)">
             Premium 3 Months - 60,000 MMK
             <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/telegram-logo.png" alt="Telegram Logo" class="telegram-logo">
@@ -291,12 +313,42 @@
             }
         }
 
+        function signup() {
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const password = document.getElementById('password').value;
+            if (phoneNumber && password) {
+                userId = generateUserId();
+                localStorage.setItem('userId', userId);
+                localStorage.setItem('phoneNumber', phoneNumber);
+                localStorage.setItem('password', password);
+                alert('Account created anonymously! User ID: ' + userId);
+                document.getElementById('status').innerText = 'Account Created! Proceed to Order.';
+            } else {
+                alert('Please fill in phone number and password!');
+            }
+        }
+
+        function login() {
+            const phoneNumber = document.getElementById('phoneNumber').value;
+            const password = document.getElementById('password').value;
+            const storedPhone = localStorage.getItem('phoneNumber');
+            const storedPassword = localStorage.getItem('password');
+            if (phoneNumber === storedPhone && password === storedPassword) {
+                userId = localStorage.getItem('userId');
+                alert('Logged in successfully! User ID: ' + userId);
+                document.getElementById('status').innerText = 'Logged In! Proceed to Order.';
+            } else {
+                alert('Invalid phone number or password!');
+            }
+        }
+
         async function submitOrder() {
             const transactionId = document.getElementById('transactionId').value;
             const telegramUsername = document.getElementById('telegramUsername').value;
-            if (transactionId && telegramUsername) {
+            if (transactionId && telegramUsername && localStorage.getItem('userId')) {
                 const order = {
                     userId: userId,
+                    phoneNumber: localStorage.getItem('phoneNumber'),
                     months: selectedMonths,
                     quantity: quantity,
                     total: selectedPrice * quantity,
@@ -310,7 +362,7 @@
                 document.getElementById('waitAudio').play();
                 logAction('Order Submitted', order);
             } else {
-                document.getElementById('status').innerText = 'Please fill all fields!';
+                document.getElementById('status').innerText = 'Please sign up/login and fill all fields!';
             }
         }
 
@@ -349,34 +401,34 @@
                         <p>Transaction ID: ${order.transactionId}</p>
                     `;
                     orderHistoryDiv.appendChild(div);
-
-                    // Update status dynamically
-                    const statusDiv = document.getElementById('status');
-                    if (order.status === 'approved') {
-                        statusDiv.innerText = 'Approved! ✅';
-                        const notification = document.getElementById('notification');
-                        notification.className = 'notification approved';
-                        notification.innerText = 'Approved! 🎉';
-                        notification.style.display = 'block';
-                        setTimeout(() => notification.style.display = 'none', 3000);
-                        const audio = new Audio('https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/approved.mp3');
-                        audio.play();
-                    } else if (order.status === 'rejected') {
-                        statusDiv.innerText = 'Rejected! ❌';
-                        const notification = document.getElementById('notification');
-                        notification.className = "notification rejected";
-                        notification.innerText = 'Rejected! 🚫';
-                        notification.style.display = 'block';
-                        setTimeout(() => notification.style.display = 'none', 3000);
-                        const audio = new Audio('https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/rejected.mp3');
-                        audio.play();
-                    } else {
-                        statusDiv.innerText = 'Wait Admin Check';
-                    }
+                    updateStatus(order);
                 });
                 checkTransactionId(userOrders);
             } catch (error) {
                 console.error('Error loading order history:', error);
+            }
+        }
+
+        function updateStatus(order) {
+            const statusDiv = document.getElementById('status');
+            if (order.status === 'approved') {
+                statusDiv.innerText = 'Approved! ✅';
+                const notification = document.getElementById('notification');
+                notification.className = 'notification approved';
+                notification.innerText = 'Approved! 🎉';
+                notification.style.display = 'block';
+                setTimeout(() => notification.style.display = 'none', 3000);
+                const audio = new Audio('https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/approved.mp3');
+                audio.play();
+            } else if (order.status === 'rejected') {
+                statusDiv.innerText = 'Rejected! ❌';
+                const notification = document.getElementById('notification');
+                notification.className = 'notification rejected';
+                notification.innerText = 'Rejected! 🚫';
+                notification.style.display = 'block';
+                setTimeout(() => notification.style.display = 'none', 3000);
+                const audio = new Audio('https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/rejected.mp3');
+                audio.play();
             }
         }
 
@@ -401,7 +453,7 @@
                 try {
                     const orders = JSON.parse(event.data);
                     const userOrders = orders.filter(order => order.userId === userId);
-                    loadOrderHistory(); // Update order history and status
+                    loadOrderHistory();
                     console.log('Received orders for user:', userOrders);
                 } catch (error) {
                     console.error('Error parsing SSE data:', error);
@@ -410,7 +462,7 @@
             eventSource.onerror = (error) => {
                 console.error('SSE Error:', error);
                 eventSource.close();
-                setTimeout(setupRealTime, 5000); // Reconnect after 5 seconds
+                setTimeout(setupRealTime, 5000);
             };
         }
 
