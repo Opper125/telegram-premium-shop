@@ -4,7 +4,8 @@
     "description": "Telegram Premium Shop Functions",
     "main": "index.js",
     "dependencies": {
-        "events": "^3.3.0"
+        "events": "^3.3.0",
+        "twilio": "^3.84.2"
     },
     "devDependencies": {},
     "scripts": {
