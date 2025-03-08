@@ -81,70 +81,117 @@
     </div>
 
     <script>
-        function loadOrders() {
-            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
-            const ordersDiv = document.getElementById('orders');
-            ordersDiv.innerHTML = '';
-            orders.forEach((order, index) => {
-                if (order.status === 'pending') {
-                    const div = document.createElement('div');
-                    div.className = 'order';
-                    div.innerHTML = `
-                        <p>User ID: ${order.userId}</p>
-                        <p>Months: ${order.months}</p>
-                        <p>Quantity: ${order.quantity}</p>
-                        <p>Total: ${order.total} MMK</p>
-                        <p>Transaction ID: ${order.transactionId}</p>
-                        <p>Telegram Username: ${order.telegramUsername}</p>
-                        <p>Status: ${order.status}</p>
-                        <button onclick="approveOrder(${index})">Approve</button>
-                        <button onclick="rejectOrder(${index})">Reject</button>
-                    `;
-                    ordersDiv.appendChild(div);
-                }
-            });
+        async function loadOrders() {
+            try {
+                const response = await fetch('/.netlify/functions/getOrders');
+                const orders = await response.json();
+                const ordersDiv = document.getElementById('orders');
+                ordersDiv.innerHTML = '';
+                orders.forEach((order, index) => {
+                    if (order.status === 'pending') {
+                        const div = document.createElement('div');
+                        div.className = 'order';
+                        div.innerHTML = `
+                            <p>User ID: ${order.userId}</p>
+                            <p>Months: ${order.months}</p>
+                            <p>Quantity: ${order.quantity}</p>
+                            <p>Total: ${order.total} MMK</p>
+                            <p>Transaction ID: ${order.transactionId}</p>
+                            <p>Telegram Username: ${order.telegramUsername}</p>
+                            <p>Status: ${order.status}</p>
+                            <button onclick="approveOrder(${index})">Approve</button>
+                            <button onclick="rejectOrder(${index})">Reject</button>
+                        `;
+                        ordersDiv.appendChild(div);
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading orders:', error);
+            }
         }
 
-        function approveOrder(index) {
-            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
-            orders[index].status = 'approved';
-            localStorage.setItem('orders', JSON.stringify(orders));
-            removeProcessedOrder(index);
-            loadOrders();
+        async function approveOrder(index) {
+            try {
+                const response = await fetch('/.netlify/functions/getOrders');
+                const orders = await response.json();
+                orders[index].status = 'approved';
+                await fetch('/.netlify/functions/saveOrders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orders)
+                });
+                removeProcessedOrder(index);
+                loadOrders();
+            } catch (error) {
+                console.error('Error approving order:', error);
+            }
         }
 
-        function rejectOrder(index) {
-            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
-            orders[index].status = 'rejected';
-            localStorage.setItem('orders', JSON.stringify(orders));
-            removeProcessedOrder(index);
-            loadOrders();
+        async function rejectOrder(index) {
+            try {
+                const response = await fetch('/.netlify/functions/getOrders');
+                const orders = await response.json();
+                orders[index].status = 'rejected';
+                await fetch('/.netlify/functions/saveOrders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orders)
+                });
+                removeProcessedOrder(index);
+                loadOrders();
+            } catch (error) {
+                console.error('Error rejecting order:', error);
+            }
         }
 
-        function removeProcessedOrder(index) {
-            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
-            orders.splice(index, 1);
-            localStorage.setItem('orders', JSON.stringify(orders));
-            checkDuplicateTransaction(orders);
+        async function removeProcessedOrder(index) {
+            try {
+                const response = await fetch('/.netlify/functions/getOrders');
+                const orders = await response.json();
+                orders.splice(index, 1);
+                await fetch('/.netlify/functions/saveOrders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orders)
+                });
+                checkDuplicateTransaction();
+            } catch (error) {
+                console.error('Error removing order:', error);
+            }
         }
 
-        function checkDuplicateTransaction(orders) {
-            const transactionIds = {};
-            orders.forEach(order => {
-                if (transactionIds[order.transactionId]) {
-                    const index = orders.findIndex(o => o.transactionId === order.transactionId && o.status !== 'approved' && o.status !== 'rejected');
-                    if (index !== -1) orders.splice(index, 1);
-                }
-                transactionIds[order.transactionId] = true;
-            });
-            localStorage.setItem('orders', JSON.stringify(orders));
+        async function checkDuplicateTransaction() {
+            try {
+                const response = await fetch('/.netlify/functions/getOrders');
+                const orders = await response.json();
+                const transactionIds = {};
+                orders.forEach((order, index) => {
+                    if (transactionIds[order.transactionId] && order.status !== 'approved' && order.status !== 'rejected') {
+                        orders.splice(index, 1);
+                    }
+                    transactionIds[order.transactionId] = true;
+                });
+                await fetch('/.netlify/functions/saveOrders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orders)
+                });
+            } catch (error) {
+                console.error('Error checking duplicates:', error);
+            }
         }
 
-        function clearData() {
-            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
-            orders = orders.filter(order => false); // Clear all orders
-            localStorage.setItem('orders', JSON.stringify(orders));
-            loadOrders();
+        async function clearData() {
+            try {
+                await fetch('/.netlify/functions/saveOrders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify([])
+                });
+                loadOrders();
+            } catch (error) {
+                console.error('Error clearing data:', error);
+            }
         }
 
         function createStars() {
@@ -158,7 +205,7 @@
             }, 200);
         }
 
-        setInterval(loadOrders, 1000); // Check for updates every second
+        setInterval(loadOrders, 5000); // Poll every 5 seconds for updates
         window.onload = () => {
             loadOrders();
             createStars();
