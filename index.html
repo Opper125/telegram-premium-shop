@@ -200,15 +200,15 @@
     <div class="container">
         <h1>TELEGRAM PREMIUM SHOP</h1>
         <div class="premium-option" onclick="selectPremium(3, 60000)">
-            💷 𝐩𝐫𝐞𝐦𝐢𝐮𝐦 3 𝐦𝐨𝐮𝐧𝐭𝐡 - 60000 𝐦𝐦𝐤
+            Premium 3 Months - 60,000 MMK
             <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/telegram-logo.png" alt="Telegram Logo" class="telegram-logo">
         </div>
         <div class="premium-option" onclick="selectPremium(6, 135000)">
-            💷 𝐩𝐫𝐞𝐦𝐢𝐮𝐦 3 𝐦𝐨𝐮𝐧𝐭𝐡 - 135,000 𝐦𝐦𝐤
+            Premium 6 Months - 135,000 MMK
             <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/telegram-logo.png" alt="Telegram Logo" class="telegram-logo">
         </div>
         <div class="premium-option" onclick="selectPremium(12, 210000)">
-            💷 𝐩𝐫𝐞𝐦𝐢𝐮𝐦 3 𝐦𝐨𝐮𝐧𝐭𝐡 - 210,000 𝐦𝐦𝐤
+            Premium 1 Year - 210,000 MMK
             <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/telegram-logo.png" alt="Telegram Logo" class="telegram-logo">
         </div>
         <div class="quantity">
@@ -350,7 +350,10 @@
                     `;
                     orderHistoryDiv.appendChild(div);
 
+                    // Update status dynamically
+                    const statusDiv = document.getElementById('status');
                     if (order.status === 'approved') {
+                        statusDiv.innerText = 'Approved! ✅';
                         const notification = document.getElementById('notification');
                         notification.className = 'notification approved';
                         notification.innerText = 'Approved! 🎉';
@@ -359,13 +362,16 @@
                         const audio = new Audio('https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/approved.mp3');
                         audio.play();
                     } else if (order.status === 'rejected') {
+                        statusDiv.innerText = 'Rejected! ❌';
                         const notification = document.getElementById('notification');
-                        notification.className = 'notification rejected';
+                        notification.className = "notification rejected";
                         notification.innerText = 'Rejected! 🚫';
                         notification.style.display = 'block';
                         setTimeout(() => notification.style.display = 'none', 3000);
                         const audio = new Audio('https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/rejected.mp3');
                         audio.play();
+                    } else {
+                        statusDiv.innerText = 'Wait Admin Check';
                     }
                 });
                 checkTransactionId(userOrders);
@@ -391,12 +397,20 @@
 
         function setupRealTime() {
             const eventSource = new EventSource('/api/data-stream');
-            eventSource.onmessage = () => {
-                loadOrderHistory();
+            eventSource.onmessage = (event) => {
+                try {
+                    const orders = JSON.parse(event.data);
+                    const userOrders = orders.filter(order => order.userId === userId);
+                    loadOrderHistory(); // Update order history and status
+                    console.log('Received orders for user:', userOrders);
+                } catch (error) {
+                    console.error('Error parsing SSE data:', error);
+                }
             };
             eventSource.onerror = (error) => {
                 console.error('SSE Error:', error);
                 eventSource.close();
+                setTimeout(setupRealTime, 5000); // Reconnect after 5 seconds
             };
         }
 
