@@ -29,9 +29,10 @@ exports.handler = async (event, context) => {
       };
     } catch (error) {
       console.error('Error reading orders file:', error);
+      await fs.writeFile(ordersFilePath, '[]', 'utf8'); // Create file if it doesn't exist
       return {
-        statusCode: 500,
-        body: JSON.stringify({ error: 'Failed to read orders' }),
+        statusCode: 200,
+        body: '[]',
       };
     }
   }
