@@ -11,7 +11,7 @@
             background-image: url('https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/telegram-logo.png');
             background-size: 100px;
             background-repeat: repeat;
-            background-opacity: 0.1;
+            opacity: 0.1;
             text-align: center;
             padding: 20px;
             margin: 0;
@@ -108,57 +108,30 @@
     </div>
 
     <script>
-        async function displayUsers() {
-            try {
-                const response = await fetch('/api/users');
-                if (!response.ok) throw new Error('Failed to fetch users');
-                const users = await response.json();
-                const usersDiv = document.getElementById('users');
-                usersDiv.innerHTML = '';
-                users.forEach(user => {
-                    const div = document.createElement('div');
-                    div.className = 'user';
-                    div.innerHTML = `
-                        <p>User ID: ${user.userId}</p>
-                        <p>Phone Number: ${user.phoneNumber}</p>
-                    `;
-                    usersDiv.appendChild(div);
-                });
-            } catch (error) {
-                console.error('Error loading users:', error);
-            }
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+
+        function saveUsersToLocal() {
+            localStorage.setItem('users', JSON.stringify(users));
         }
 
-        async function clearData() {
-            try {
-                const response = await fetch('/api/users', {
-                    method: 'DELETE'
-                });
-                if (!response.ok) throw new Error('Failed to clear users');
-                const result = await response.json();
-                console.log(result.message);
-                await displayUsers();
-            } catch (error) {
-                console.error('Error clearing data:', error);
-            }
+        function displayUsers() {
+            const usersDiv = document.getElementById('users');
+            usersDiv.innerHTML = '';
+            users.forEach(user => {
+                const div = document.createElement('div');
+                div.className = 'user';
+                div.innerHTML = `
+                    <p>User ID: ${user.userId}</p>
+                    <p>Phone Number: ${user.phoneNumber}</p>
+                `;
+                usersDiv.appendChild(div);
+            });
         }
 
-        function setupRealTime() {
-            const eventSource = new EventSource('/api/users-stream');
-            eventSource.onmessage = (event) => {
-                try {
-                    const users = JSON.parse(event.data);
-                    displayUsers();
-                    console.log('Received users:', users);
-                } catch (error) {
-                    console.error('Error parsing SSE data:', error);
-                }
-            };
-            eventSource.onerror = (error) => {
-                console.error('SSE Error:', error);
-                eventSource.close();
-                setTimeout(setupRealTime, 5000);
-            };
+        function clearData() {
+            users = [];
+            saveUsersToLocal();
+            displayUsers();
         }
 
         function createConfetti() {
@@ -174,9 +147,13 @@
         }
 
         window.onload = () => {
-            setupRealTime();
             displayUsers();
             createConfetti();
+            // Offline mode with local data
+            if (!navigator.onLine) {
+                console.log('Offline mode: Using local user data');
+                displayUsers();
+            }
         };
     </script>
 </body>
