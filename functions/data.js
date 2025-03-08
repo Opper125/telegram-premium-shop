@@ -6,37 +6,49 @@ let orderIdCounter = 1;
 const EventEmitter = require('events');
 const orderEmitter = new EventEmitter();
 
+// Optimize performance with caching and minimal processing
+const cache = new Map();
+
 exports.handler = async (event, context) => {
   // Handle POST request to save a new order
   if (event.httpMethod === 'POST') {
     const order = JSON.parse(event.body);
+    if (!order.userId) {
+      order.userId = 'user-' + Math.random().toString(36).substr(2, 9);
+    }
     order.id = orderIdCounter++;
     orders.push(order);
+    cache.set('orders', [...orders]); // Update cache
     orderEmitter.emit('orderUpdate');
     return {
       statusCode: 200,
-      body: JSON.stringify({ message: 'Order saved successfully' }),
+      body: JSON.stringify({ message: 'Order saved successfully', userId: order.userId }),
+      headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' },
     };
   }
 
   // Handle GET request to fetch all orders
   else if (event.httpMethod === 'GET') {
+    const cachedOrders = cache.get('orders') || orders;
     return {
       statusCode: 200,
-      body: JSON.stringify(orders),
+      body: JSON.stringify(cachedOrders),
+      headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' },
     };
   }
 
   // Handle PUT request to update order status
   else if (event.httpMethod === 'PUT') {
     const { id, status } = JSON.parse(event.body);
-    const order = orders.find(o => o.id === id);
-    if (order) {
-      order.status = status;
-      orderEmitter.emit('orderUpdate');
+    const orderIndex = orders.findIndex(o => o.id === id);
+    if (orderIndex !== -1) {
+      orders[orderIndex].status = status;
+      cache.set('orders', [...orders]); // Update cache
+      orderEmitter.emit('orderUpdate', { id, status });
       return {
         statusCode: 200,
         body: JSON.stringify({ message: 'Order updated successfully' }),
+        headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' },
       };
     }
     return {
@@ -49,10 +61,12 @@ exports.handler = async (event, context) => {
   else if (event.httpMethod === 'DELETE') {
     orders = [];
     orderIdCounter = 1;
+    cache.clear();
     orderEmitter.emit('orderUpdate');
     return {
       statusCode: 200,
       body: JSON.stringify({ message: 'Orders cleared successfully' }),
+      headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' },
     };
   }
 
@@ -71,15 +85,19 @@ exports.handler = async (event, context) => {
       body: '',
     };
 
-    // Send updates to client on order changes
-    orderEmitter.on('orderUpdate', () => {
-      response.body += `data: ${JSON.stringify(orders)}\n\n`;
+    // Send initial data
+    response.body += `data: ${JSON.stringify(orders)}\n\n`;
+
+    // Listen for order updates
+    orderEmitter.on('orderUpdate', (update) => {
+      const updatedOrders = cache.get('orders') || orders;
+      response.body += `data: ${JSON.stringify(updatedOrders)}\n\n`;
     });
 
-    // Keep the connection alive
+    // Keep connection alive
     setInterval(() => {
       response.body += ': keep-alive\n\n';
-    }, 25000);
+    }, 15000); // Reduced interval for better responsiveness
 
     return response;
   }
