@@ -120,7 +120,7 @@ exports.handler = async (event, context) => {
         // Keep connection alive with heartbeat
         const keepAlive = setInterval(() => {
             stream.write(': keep-alive\n\n');
-        }, 10000);
+        }, 5000); // Reduced to 5 seconds for faster response
 
         // Clean up on connection close
         context.on('close', () => {
