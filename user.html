@@ -39,9 +39,12 @@
             border-radius: 10px;
             margin-bottom: 15px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
         button {
-            width: 100%;
+            width: 48%;
             padding: 10px;
             background: #e74c3c;
             color: white;
@@ -54,11 +57,18 @@
         button:hover {
             background: #c0392b;
         }
+        .update-btn {
+            background: #3498db;
+        }
+        .update-btn:hover {
+            background: #2980b9;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>User Panel</h1>
+        <button class="update-btn" onclick="updateServer()">Update Server</button>
         <button onclick="clearData()">Clear Data</button>
         <div id="users"></div>
     </div>
@@ -75,13 +85,31 @@
                     const div = document.createElement('div');
                     div.className = 'user';
                     div.innerHTML = `
-                        <p><strong>User ID:</strong> ${user.userId}</p>
-                        <p><strong>Phone Number:</strong> ${user.phoneNumber}</p>
+                        <div>
+                            <p><strong>User ID:</strong> ${user.userId}</p>
+                            <p><strong>Phone Number:</strong> ${user.phoneNumber}</p>
+                        </div>
+                        <button onclick="deleteUser('${user.userId}')">Delete</button>
                     `;
                     usersDiv.appendChild(div);
                 });
             } catch (error) {
                 console.error('Error loading users:', error);
+            }
+        }
+
+        async function updateServer() {
+            try {
+                const response = await fetch('/api/users/update', {
+                    method: 'POST'
+                });
+                if (!response.ok) throw new Error('Failed to update server');
+                const result = await response.json();
+                console.log(result.message);
+                alert('Server updated successfully! All users logged out but accounts preserved.');
+                displayUsers();
+            } catch (error) {
+                console.error('Error updating server:', error);
             }
         }
 
@@ -96,6 +124,20 @@
                 await displayUsers();
             } catch (error) {
                 console.error('Error clearing data:', error);
+            }
+        }
+
+        async function deleteUser(userId) {
+            try {
+                const response = await fetch(`/api/users/${userId}`, {
+                    method: 'DELETE'
+                });
+                if (!response.ok) throw new Error('Failed to delete user');
+                const result = await response.json();
+                console.log(result.message);
+                await displayUsers();
+            } catch (error) {
+                console.error('Error deleting user:', error);
             }
         }
 
