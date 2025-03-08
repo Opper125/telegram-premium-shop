@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel 🌟</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
@@ -77,7 +76,7 @@
 <body>
     <div class="container">
         <h1>Admin Panel</h1>
-        <button class="clear-data" onclick="clearData()">Clear Data</button>
+        <button class="clear-data" onclick="clearData()">Clear Data</button විස්තර: Telegram Premium Shop Admin Panel
         <div id="orders"></div>
     </div>
 
@@ -156,7 +155,7 @@
         }
 
         function setupRealTime() {
-            const eventSource = new EventSource('/api/stream-orders');
+            const eventSource = new EventSource('/api/data-stream');
             eventSource.onmessage = () => {
                 loadOrders();
             };
