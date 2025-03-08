@@ -2,7 +2,7 @@
   "name": "telegram-premium-shop",
   "version": "1.0.0",
   "description": "Telegram Premium Shop Functions",
-  "main": "index.js",
+  "main": "index.html",
   "dependencies": {},
   "devDependencies": {},
   "scripts": {
