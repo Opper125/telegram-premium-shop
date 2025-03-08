@@ -2,9 +2,11 @@
   command = "echo 'No build required'"
   publish = "/"
   functions = "functions"
+  environment = { NODE_VERSION = "18" } # Specify Node.js version
 
 [functions]
   node_bundler = "esbuild"
+  external_node_modules = ["@supabase/supabase-js"] # Mark as external
 
 [[redirects]]
   from = "/api/*"
