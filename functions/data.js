@@ -16,28 +16,46 @@ function logAction(action, details) {
 }
 
 function getDeviceFingerprint() {
-    // Since this is server-side, we can't access navigator.userAgent directly.
-    // We'll use a simple random ID for now. In a real application, you might want to pass device info from the client.
-    return Math.random().toString(36).substr(2, 9);
+    return Math.random().toString(36).substr(2, 9); // Simple server-side fingerprint
+}
+
+// Simple AI-like validation (e.g., checking for duplicate transaction IDs)
+function validateOrder(order) {
+    const duplicate = orders.find(o => o.transactionId === order.transactionId && o.status !== 'approved' && o.status !== 'rejected');
+    if (duplicate) {
+        throw new Error('Duplicate Transaction ID detected!');
+    }
+    return true;
 }
 
 exports.handler = async (event, context) => {
     // Handle POST request to save a new order
     if (event.httpMethod === 'POST') {
-        const order = JSON.parse(event.body);
-        if (!order.userId) {
-            const deviceFingerprint = getDeviceFingerprint();
-            order.userId = `user-${deviceFingerprint}`;
+        let order;
+        try {
+            order = JSON.parse(event.body);
+            if (!order.userId) {
+                const deviceFingerprint = getDeviceFingerprint();
+                order.userId = `user-${deviceFingerprint}`;
+                order.phoneNumber = order.phoneNumber || 'Anonymous';
+            }
+            validateOrder(order);
+            order.id = orderIdCounter++;
+            orders.push(order);
+            logAction('Order Submitted', order);
+            orderEmitter.emit('orderUpdate', orders);
+            return {
+                statusCode: 200,
+                body: JSON.stringify({ message: 'Order saved successfully', userId: order.userId }),
+                headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' },
+            };
+        } catch (error) {
+            console.error('Validation Error:', error.message);
+            return {
+                statusCode: 400,
+                body: JSON.stringify({ error: error.message }),
+            };
         }
-        order.id = orderIdCounter++;
-        orders.push(order);
-        logAction('Order Submitted', order);
-        orderEmitter.emit('orderUpdate', orders);
-        return {
-            statusCode: 200,
-            body: JSON.stringify({ message: 'Order saved successfully', userId: order.userId }),
-            headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' },
-        };
     }
 
     // Handle GET request to fetch all orders
@@ -94,7 +112,7 @@ exports.handler = async (event, context) => {
             statusCode: 200,
             headers,
             body: '',
-            isStream: true, // Indicate that this is a streaming response
+            isStream: true,
         };
 
         context.callbackWaitsForEmptyEventLoop = false;
@@ -102,7 +120,6 @@ exports.handler = async (event, context) => {
         // Send initial data immediately
         responseStream.body += `data: ${JSON.stringify(orders)}\n\n`;
 
-        // Stream updates to the client
         const stream = {
             write: (data) => {
                 responseStream.body += data;
@@ -112,17 +129,14 @@ exports.handler = async (event, context) => {
             }
         };
 
-        // Listen for order updates and send immediately
         orderEmitter.on('orderUpdate', (updatedOrders) => {
             stream.write(`data: ${JSON.stringify(updatedOrders)}\n\n`);
         });
 
-        // Keep connection alive with heartbeat
         const keepAlive = setInterval(() => {
             stream.write(': keep-alive\n\n');
-        }, 5000); // Reduced to 5 seconds for faster response
+        }, 3000); // Increased frequency for better real-time
 
-        // Clean up on connection close
         context.on('close', () => {
             clearInterval(keepAlive);
             stream.end();
