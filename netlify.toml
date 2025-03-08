@@ -11,3 +11,25 @@
         description = "Daily server maintenance"
         schedule = "0 0 * * *" # နေ့စဉ် ည 12:00 (UTC) တွင် အလုပ်လုပ်မည်
         to = "/.netlify/functions/data?reset=true"
+
+[[redirects]]
+    from = "/api/*"
+    to = "/.netlify/functions/:splat"
+    status = 200
+[[redirects]]
+    from = "/user"
+    to = "/user.html"
+    status = 200
+[[redirects]]
+    from = "/orders"
+    to = "/orders.html"
+    status = 200
+
+[dev]
+    targetPort = 8888
+    port = 8888
+
+[context.production.environment]
+    TWILIO_ACCOUNT_SID = "your_twilio_account_sid"
+    TWILIO_AUTH_TOKEN = "your_twilio_auth_token"
+    TWILIO_PHONE_NUMBER = "your_twilio_phone_number"
