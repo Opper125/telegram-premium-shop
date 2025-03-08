@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel 🌟</title>
+    <title>User Panel 🌟</title>
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
@@ -21,7 +21,7 @@
             100% { background-position: 0% 50%; }
         }
         .container {
-            max-width: 600px;
+            max-width: 800px;
             margin: 0 auto;
             background: rgba(255, 255, 255, 0.9);
             padding: 20px;
@@ -48,6 +48,7 @@
             border: 2px solid #0288d1;
             border-radius: 10px;
             animation: orderGlow 2s infinite;
+            position: relative;
         }
         @keyframes orderGlow {
             0% { border-color: #ff0000; }
@@ -55,7 +56,7 @@
             100% { border-color: #ff0000; }
         }
         button {
-            padding: 10px 20px;
+            padding: 8px 16px;
             margin: 5px;
             background: linear-gradient(45deg, #0288d1, #03a9f4);
             color: white;
@@ -94,11 +95,17 @@
             0% { transform: translateY(-100vh) rotate(0deg); }
             100% { transform: translateY(100vh) rotate(360deg); }
         }
+        .action-buttons {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Admin Panel</h1>
+        <h1>User Panel</h1>
         <button class="clear-data" onclick="clearData()">Clear Data</button>
         <div id="orders"></div>
     </div>
@@ -108,22 +115,29 @@
             const ordersDiv = document.getElementById('orders');
             ordersDiv.innerHTML = '';
             orders.forEach((order) => {
+                const div = document.createElement('div');
+                div.className = 'order';
+                div.innerHTML = `
+                    <p>User ID: ${order.userId}</p>
+                    <p>Phone Number: ${order.phoneNumber}</p>
+                    <p>Months: ${order.months}</p>
+                    <p>Quantity: ${order.quantity}</p>
+                    <p>Total: ${order.total} MMK</p>
+                    <p>Transaction ID: ${order.transactionId}</p>
+                    <p>Telegram Username: ${order.telegramUsername}</p>
+                    <p>Timestamp: ${order.timestamp}</p>
+                    <p>Status: ${order.status === 'approved' ? 'Approved! ✅' : order.status === 'rejected' ? 'Rejected! ❌' : 'Pending ⏳'}</p>
+                `;
+                const actionButtons = document.createElement('div');
+                actionButtons.className = 'action-buttons';
                 if (order.status === 'pending') {
-                    const div = document.createElement('div');
-                    div.className = 'order';
-                    div.innerHTML = `
-                        <p>User ID: ${order.userId}</p>
-                        <p>Months: ${order.months}</p>
-                        <p>Quantity: ${order.quantity}</p>
-                        <p>Total: ${order.total} MMK</p>
-                        <p>Transaction ID: ${order.transactionId}</p>
-                        <p>Telegram Username: ${order.telegramUsername}</p>
-                        <p>Status: ${order.status}</p>
+                    actionButtons.innerHTML = `
                         <button onclick="approveOrder(${order.id})">Approve</button>
                         <button onclick="rejectOrder(${order.id})">Reject</button>
                     `;
-                    ordersDiv.appendChild(div);
                 }
+                div.appendChild(actionButtons);
+                ordersDiv.appendChild(div);
             });
         }
 
@@ -184,7 +198,7 @@
             eventSource.onerror = (error) => {
                 console.error('SSE Error:', error);
                 eventSource.close();
-                setTimeout(setupRealTime, 5000); // Reconnect after 5 seconds
+                setTimeout(setupRealTime, 5000);
             };
         }
 
