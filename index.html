@@ -39,6 +39,7 @@
             font-size: 1.2em;
             color: #d81b60;
             transition: transform 0.3s, background 0.3s;
+            position: relative;
         }
         .premium-option:hover {
             transform: scale(1.05);
@@ -144,25 +145,27 @@
         }
         .telegram-logo {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 50px;
-            height: 50px;
+            top: 5px;
+            right: 5px;
+            width: 30px;
+            height: 30px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <img src="https://github.com/Opper125/telegram-premium-shop/blob/287f123c3205f0868b0220f2938f8493823e8d66/telegram-logo.png" alt="Telegram Logo" class="telegram-logo">
         <h1>TELEGRAM PREMIUM SHOP</h1>
         <div class="premium-option" onclick="selectPremium(3, 60000)">
             Premium 3 Months - 60,000 MMK
+            <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/6a878199abb2e5d3bac07d83bd30afddc5e9968a/telegram-logo.png" alt="Telegram Logo" class="telegram-logo">
         </div>
         <div class="premium-option" onclick="selectPremium(6, 135000)">
             Premium 6 Months - 135,000 MMK
+            <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/6a878199abb2e5d3bac07d83bd30afddc5e9968a/telegram-logo.png" alt="Telegram Logo" class="telegram-logo">
         </div>
         <div class="premium-option" onclick="selectPremium(12, 210000)">
             Premium 1 Year - 210,000 MMK
+            <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/6a878199abb2e5d3bac07d83bd30afddc5e9968a/telegram-logo.png" alt="Telegram Logo" class="telegram-logo">
         </div>
         <div class="quantity">
             <button onclick="decreaseQuantity()">-</button>
@@ -230,7 +233,7 @@
             }
         }
 
-        function submitOrder() {
+        async function submitOrder() {
             const transactionId = document.getElementById('transactionId').value;
             const telegramUsername = document.getElementById('telegramUsername').value;
             if (transactionId && telegramUsername) {
@@ -244,7 +247,7 @@
                     status: 'pending',
                     timestamp: new Date().toISOString()
                 };
-                saveOrder(order);
+                await saveOrder(order);
                 document.getElementById('status').innerText = 'Wait Admin Check';
                 document.getElementById('waitAudio').play();
                 loadOrderHistory();
@@ -254,54 +257,70 @@
             }
         }
 
-        function saveOrder(order) {
-            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
-            orders.push(order);
-            localStorage.setItem('orders', JSON.stringify(orders));
+        async function saveOrder(order) {
+            try {
+                const response = await fetch('/.netlify/functions/saveOrder', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(order)
+                });
+                if (!response.ok) throw new Error('Failed to save order');
+            } catch (error) {
+                console.error('Error saving order:', error);
+            }
         }
 
-        function loadOrderHistory() {
-            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
-            const userOrders = orders.filter(order => order.userId === userId);
-            const orderHistoryDiv = document.getElementById('orderHistory');
-            orderHistoryDiv.innerHTML = '';
-            userOrders.forEach(order => {
-                const div = document.createElement('div');
-                div.className = 'order';
-                div.innerHTML = `
-                    <p>Months: ${order.months}</p>
-                    <p>Quantity: ${order.quantity}</p>
-                    <p>Total: ${order.total} MMK</p>
-                    <p>Status: ${order.status === 'approved' ? 'Approved! ✅' : order.status === 'rejected' ? 'Rejected! ❌' : 'Pending ⏳'}</p>
-                    <p>Transaction ID: ${order.transactionId}</p>
-                `;
-                orderHistoryDiv.appendChild(div);
+        async function loadOrderHistory() {
+            try {
+                const response = await fetch('/.netlify/functions/getOrders');
+                const orders = await response.json();
+                const userOrders = orders.filter(order => order.userId === userId);
+                const orderHistoryDiv = document.getElementById('orderHistory');
+                orderHistoryDiv.innerHTML = '';
+                userOrders.forEach(order => {
+                    const div = document.createElement('div');
+                    div.className = 'order';
+                    div.innerHTML = `
+                        <p>Months: ${order.months}</p>
+                        <p>Quantity: ${order.quantity}</p>
+                        <p>Total: ${order.total} MMK</p>
+                        <p>Status: ${order.status === 'approved' ? 'Approved! ✅' : order.status === 'rejected' ? 'Rejected! ❌' : 'Pending ⏳'}</p>
+                        <p>Transaction ID: ${order.transactionId}</p>
+                    `;
+                    orderHistoryDiv.appendChild(div);
 
-                // Check for status updates
-                if (order.status === 'approved') {
-                    const notification = document.getElementById('notification');
-                    notification.className = 'notification approved';
-                    notification.innerText = 'Approved! 🎉';
-                    notification.style.display = 'block';
-                    setTimeout(() => notification.style.display = 'none', 3000);
-                } else if (order.status === 'rejected') {
-                    const notification = document.getElementById('notification');
-                    notification.className = 'notification rejected';
-                    notification.innerText = 'Rejected! 🚫';
-                    notification.style.display = 'block';
-                    setTimeout(() => notification.style.display = 'none', 3000);
+                    if (order.status === 'approved') {
+                        const notification = document.getElementById('notification');
+                        notification.className = 'notification approved';
+                        notification.innerText = 'Approved! 🎉';
+                        notification.style.display = 'block';
+                        setTimeout(() => notification.style.display = 'none', 3000);
+                    } else if (order.status === 'rejected') {
+                        const notification = document.getElementById('notification');
+                        notification.className = 'notification rejected';
+                        notification.innerText = 'Rejected! 🚫';
+                        notification.style.display = 'block';
+                        setTimeout(() => notification.style.display = 'none', 3000);
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading order history:', error);
+            }
+        }
+
+        async function checkTransactionId(transactionId) {
+            try {
+                const response = await fetch('/.netlify/functions/getOrders');
+                const orders = await response.json();
+                const duplicate = orders.filter(order => order.transactionId === transactionId && order.status !== 'approved' && order.status !== 'rejected');
+                if (duplicate.length > 1) {
+                    document.getElementById('errorMessage').style.display = 'block';
+                    document.getElementById('errorMessage').innerText = 'This Transaction ID is already in use! 🚫';
+                } else {
+                    document.getElementById('errorMessage').style.display = 'none';
                 }
-            });
-        }
-
-        function checkTransactionId(transactionId) {
-            let orders = JSON.parse(localStorage.getItem('orders') || '[]');
-            const duplicate = orders.filter(order => order.transactionId === transactionId && order.status !== 'approved' && order.status !== 'rejected');
-            if (duplicate.length > 1) {
-                document.getElementById('errorMessage').style.display = 'block';
-                document.getElementById('errorMessage').innerText = 'This Transaction ID is already in use! 🚫';
-            } else {
-                document.getElementById('errorMessage').style.display = 'none';
+            } catch (error) {
+                console.error('Error checking transaction ID:', error);
             }
         }
 
@@ -316,7 +335,7 @@
             }, 200);
         }
 
-        setInterval(loadOrderHistory, 1000); // Check for updates every second
+        setInterval(loadOrderHistory, 5000); // Poll every 5 seconds for updates
         window.onload = () => {
             loadOrderHistory();
             createStars();
