@@ -1,7 +1,13 @@
 {
-  "name": "telegram-premium-functions",
+  "name": "telegram-premium-shop",
   "version": "1.0.0",
-  "dependencies": {
-    "@supabase/supabase-js": "^2.0.0"
-  }
+  "description": "Telegram Premium Shop Functions",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
 }
