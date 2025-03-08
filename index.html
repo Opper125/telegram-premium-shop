@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram Premium Shop ✨</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
@@ -191,6 +192,11 @@
     </div>
 
     <script>
+        const supabase = Supabase.createClient(
+            'https://sjhtsviheycilmyzvbke.supabase.co', // Your Supabase URL
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqaHRzdmloZXljaWxteXp2YmtlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEzOTgyMDMsImV4cCI6MjA1Njk3NDIwM30.ZuxZhtdvkSbRb_dwQYdhdds6fJfkzlkkSp6GLhqeZkA' // Your Supabase Anon Key
+        );
+
         let selectedMonths = 3;
         let selectedPrice = 60000;
         let quantity = 1;
@@ -257,28 +263,22 @@
 
         async function saveOrder(order) {
             try {
-                const response = await fetch('/.netlify/functions/saveOrder', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(order)
-                });
-                if (!response.ok) throw new Error('Failed to save order');
-                const result = await response.json();
-                console.log(result.message);
+                const { error } = await supabase.from('orders').insert([order]);
+                if (error) throw error;
+                console.log('Order saved successfully');
             } catch (error) {
                 console.error('Error saving order:', error);
                 document.getElementById('status').innerText = 'Error saving order!';
             }
         }
 
-        function setupSSE() {
-            const eventSource = new EventSource('/.netlify/functions/streamOrders');
-            eventSource.onmessage = (event) => {
-                const orders = JSON.parse(event.data);
-                const userOrders = orders.filter(order => order.userId === userId);
+        async function loadOrderHistory() {
+            try {
+                const { data: orders, error } = await supabase.from('orders').select('*').eq('userId', userId);
+                if (error) throw error;
                 const orderHistoryDiv = document.getElementById('orderHistory');
                 orderHistoryDiv.innerHTML = '';
-                userOrders.forEach(order => {
+                orders.forEach(order => {
                     const div = document.createElement('div');
                     div.className = 'order';
                     div.innerHTML = `
@@ -305,11 +305,9 @@
                     }
                 });
                 checkTransactionId(orders);
-            };
-            eventSource.onerror = () => {
-                console.error('SSE connection error, retrying...');
-                setTimeout(setupSSE, 1000); // Retry on error
-            };
+            } catch (error) {
+                console.error('Error loading order history:', error);
+            }
         }
 
         async function checkTransactionId(orders) {
@@ -321,6 +319,15 @@
             } else {
                 document.getElementById('errorMessage').style.display = 'none';
             }
+        }
+
+        function setupRealTime() {
+            supabase
+                .channel('orders')
+                .on('postgres_changes', { event: '*', schema: 'public', table: 'orders', filter: `userId=eq.${userId}` }, () => {
+                    loadOrderHistory();
+                })
+                .subscribe();
         }
 
         function createStars() {
@@ -335,7 +342,8 @@
         }
 
         window.onload = () => {
-            setupSSE();
+            setupRealTime();
+            loadOrderHistory();
             createStars();
             document.getElementById('waitAudio').play();
         };
