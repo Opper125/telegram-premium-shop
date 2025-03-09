@@ -175,6 +175,15 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            transition: transform 0.3s;
+        }
+        .post-card:hover {
+            transform: translateY(-5px);
+        }
+        .post-card img, .post-card video, .post-card audio {
+            max-width: 100%;
+            border-radius: 10px;
+            margin-top: 10px;
         }
         .premium-option {
             background: #3498db;
@@ -189,7 +198,38 @@
             transform: scale(1.05);
             background: #2980b9;
         }
-        /* Other styles remain similar to original */
+        .quantity {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .quantity button {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 5px;
+        }
+        #totalPrice {
+            text-align: center;
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+        .payment-method select, .payment-method input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        #status {
+            text-align: center;
+            margin-top: 10px;
+            color: #2ecc71;
+        }
     </style>
 </head>
 <body>
@@ -212,6 +252,11 @@
             <button id="logoutButton" onclick="logout()">Logout</button>
         </div>
         <div class="container">
+            <div id="homeSection" class="section">
+                <h2>Home</h2>
+                <a href="/post.html" target="_blank">Create a Post</a>
+                <div id="posts"></div>
+            </div>
             <div id="shopSection" class="section">
                 <h2>Shop</h2>
                 <div class="premium-option" onclick="selectPremium(3, 60000)">
@@ -241,7 +286,19 @@
                 <button onclick="submitOrder()">Submit Order</button>
                 <div id="status">Wait Admin Check <audio id="waitAudio" src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/wait_admin_check.mp3" preload="auto"></audio></div>
             </div>
-            <!-- Other sections (Home, Profile, etc.) with original design -->
+            <div id="hostSection" class="section">
+                <h2>Host</h2>
+                <p>Host your events or join as a host!</p>
+            </div>
+            <div id="profileSection" class="section">
+                <h2>Profile</h2>
+                <p>User ID: <span id="userIdDisplay"></span></p>
+                <p>Phone: <span id="phoneDisplay"></span></p>
+            </div>
+            <div id="meSection" class="section">
+                <h2>Me</h2>
+                <p>Manage your account settings here.</p>
+            </div>
         </div>
         <div class="bottom-nav">
             <div class="nav-item" onclick="showSection('homeSection')">
@@ -280,7 +337,11 @@
             document.getElementById('dashboard').style.display = 'none';
         } else {
             document.getElementById('dashboard').style.display = 'block';
-            showSection('shopSection');
+            showSection('homeSection');
+            loadPosts();
+            setupRealTimePosts();
+            document.getElementById('userIdDisplay').innerText = userId;
+            document.getElementById('phoneDisplay').innerText = localStorage.getItem('phoneNumber');
         }
 
         async function requestVerificationCode() {
@@ -313,7 +374,11 @@
                 localStorage.setItem('phoneNumber', document.getElementById('phoneNumber').value);
                 document.getElementById('verificationSection').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
-                showSection('shopSection');
+                showSection('homeSection');
+                loadPosts();
+                setupRealTimePosts();
+                document.getElementById('userIdDisplay').innerText = userId;
+                document.getElementById('phoneDisplay').innerText = localStorage.getItem('phoneNumber');
             } else {
                 alert('Invalid verification code!');
             }
@@ -330,8 +395,49 @@
         function showSection(sectionId) {
             document.querySelectorAll('.section').forEach(section => section.style.display = 'none');
             document.getElementById(sectionId).style.display = 'block';
+            if (sectionId === 'homeSection') {
+                loadPosts();
+            }
         }
 
+        // Post-related functions
+        async function loadPosts() {
+            try {
+                const response = await fetch('/.netlify/functions/get-posts');
+                const posts = await response.json();
+                const postsDiv = document.getElementById('posts');
+                postsDiv.innerHTML = posts.map(post => `
+                    <div class="post-card">
+                        <p><strong>${post.userId}</strong> - ${new Date(post.timestamp).toLocaleString()}</p>
+                        <p>${post.content || 'No content'}</p>
+                        ${post.photo ? `<img src="${post.photo}" alt="Post Photo">` : ''}
+                        ${post.video ? `<video src="${post.video}" controls></video>` : ''}
+                        ${post.audio ? `<audio src="${post.audio}" controls></audio>` : ''}
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading posts:', error);
+                document.getElementById('posts').innerHTML = '<p>Error loading posts. Please try again later.</p>';
+            }
+        }
+
+        function setupRealTimePosts() {
+            const eventSource = new EventSource('/.netlify/functions/posts-stream');
+            eventSource.onmessage = (event) => {
+                try {
+                    loadPosts();
+                } catch (error) {
+                    console.error('Error parsing SSE data:', error);
+                }
+            };
+            eventSource.onerror = (error) => {
+                console.error('SSE Error:', error);
+                eventSource.close();
+                setTimeout(setupRealTimePosts, 5000);
+            };
+        }
+
+        // Shop-related functions
         function selectPremium(months, price) {
             selectedMonths = months;
             selectedPrice = price;
@@ -340,26 +446,34 @@
 
         function increaseQuantity() { quantity++; updateTotal(); }
         function decreaseQuantity() { if (quantity > 1) quantity--; updateTotal(); }
-        function updateTotal() { document.getElementById('totalPrice').innerText = `Total: ${selectedPrice * quantity} MMK`; }
+        function updateTotal() { document.getElementById('quantity').innerText = quantity; document.getElementById('totalPrice').innerText = `Total: ${selectedPrice * quantity} MMK`; }
         function showPhoneNumber() { /* Same as original */ }
 
         async function submitOrder() {
             const order = {
-                userId, phoneNumber: localStorage.getItem('phoneNumber'),
-                months: selectedMonths, quantity, total: selectedPrice * quantity,
+                userId,
+                phoneNumber: localStorage.getItem('phoneNumber'),
+                months: selectedMonths,
+                quantity,
+                total: selectedPrice * quantity,
                 transactionId: document.getElementById('transactionId').value,
                 telegramUsername: document.getElementById('telegramUsername').value,
                 paymentMethod: document.getElementById('paymentSelect').value,
-                status: 'pending', timestamp: new Date().toISOString()
+                status: 'pending',
+                timestamp: new Date().toISOString()
             };
             try {
                 const response = await fetch('/.netlify/functions/submit-order', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(order)
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(order)
                 });
                 const result = await response.json();
                 document.getElementById('status').innerText = 'Order submitted! Waiting for approval.';
                 fetch('https://opeer-telegram-good.netlify.app/.netlify/functions/update-orders', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(order)
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(order)
                 });
             } catch (error) {
                 document.getElementById('status').innerText = 'Error submitting order.';
