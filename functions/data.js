@@ -3,11 +3,6 @@ const orderEmitter = new EventEmitter();
 const userEmitter = new EventEmitter();
 const postEmitter = new EventEmitter();
 
-const twilio = require('twilio');
-const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken = process.env.TWILIO_AUTH_TOKEN;
-const twilioClient = new twilio(accountSid, authToken);
-
 let orders = [];
 let users = [];
 let posts = [];
@@ -34,16 +29,6 @@ function resetData() {
     posts = [];
     orderIdCounter = 1;
     logAction('Data Reset', {});
-}
-
-async function sendVerificationCode(phoneNumber) {
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
-    await twilioClient.messages.create({
-        body: `Your verification code is ${code}`,
-        from: process.env.TWILIO_PHONE_NUMBER,
-        to: phoneNumber
-    });
-    return code;
 }
 
 exports.handler = async (event, context) => {
@@ -116,27 +101,13 @@ exports.handler = async (event, context) => {
 
     if (event.path === '/.netlify/functions/users') {
         if (event.httpMethod === 'POST') {
-            const { userId, phoneNumber, password, verificationCode } = JSON.parse(event.body);
-            const storedCode = await sendVerificationCode(phoneNumber);
-            if (verificationCode !== storedCode) {
-                return {
-                    statusCode: 400,
-                    body: JSON.stringify({ error: 'Invalid verification code' }),
-                };
-            }
-            const existingUser = users.find(user => user.phoneNumber === phoneNumber);
-            if (existingUser) {
-                return {
-                    statusCode: 400,
-                    body: JSON.stringify({ error: 'Phone number already registered' }),
-                };
-            }
-            users.push({ userId, phoneNumber, password });
-            logAction('User Registered', { userId, phoneNumber });
+            const user = JSON.parse(event.body);
+            users.push(user);
+            logAction('User Registered', user);
             userEmitter.emit('userUpdate', users);
             return {
                 statusCode: 200,
-                body: JSON.stringify({ message: 'User saved successfully', userId }),
+                body: JSON.stringify({ message: 'User saved successfully' }),
                 headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' },
             };
         } else if (event.httpMethod === 'GET') {
@@ -152,21 +123,6 @@ exports.handler = async (event, context) => {
             return {
                 statusCode: 200,
                 body: JSON.stringify({ message: 'Users cleared successfully' }),
-                headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' },
-            };
-        }
-    }
-
-    if (event.path === '/.netlify/functions/users/update') {
-        if (event.httpMethod === 'POST') {
-            logAction('Server Updated', {});
-            users.forEach(user => {
-                localStorage.setItem(`user_${user.userId}`, JSON.stringify(user));
-            });
-            userEmitter.emit('userUpdate', users);
-            return {
-                statusCode: 200,
-                body: JSON.stringify({ message: 'Server updated, user accounts preserved' }),
                 headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' },
             };
         }
