@@ -1,21 +1,25 @@
 [build]
-    command = "echo 'No build required'"
+    command = "npm install && tsc"
     publish = "/"
     functions = "functions"
-    environment = { NODE_VERSION = "18" }
 
-[functions]
-    node_bundler = "esbuild"
+[dev]
+    framework = "#custom"
+    command = "echo 'Custom static site development'"
 
-[[redirects]]
-    from = "/api/*"
-    to = "/.netlify/functions/:splat"
-    status = 200
-[[redirects]]
-    from = "/post"
-    to = "/post.html"
-    status = 200
 [[redirects]]
     from = "/*"
     to = "/index.html"
     status = 200
+
+[[redirects]]
+    from = "/post"
+    to = "/post.html"
+    status = 200
+
+[[headers]]
+    for = "/functions/*"
+    [headers.values]
+        Access-Control-Allow-Origin = "*"
+        Access-Control-Allow-Methods = "GET, POST, PUT, OPTIONS"
+        Access-Control-Allow-Headers = "Content-Type"
