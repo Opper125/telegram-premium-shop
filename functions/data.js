@@ -3,11 +3,17 @@ const orderEmitter = new EventEmitter();
 const userEmitter = new EventEmitter();
 const postEmitter = new EventEmitter();
 
+const twilio = require('twilio');
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const twilioClient = new twilio(accountSid, authToken);
+
 let orders = [];
 let users = [];
 let posts = [];
 let orderIdCounter = 1;
 let logs = [];
+let verificationCodes = new Map();
 
 function logAction(action, details) {
     const logEntry = `${new Date().toISOString()} - ${action}: ${JSON.stringify(details)}`;
@@ -29,6 +35,24 @@ function resetData() {
     posts = [];
     orderIdCounter = 1;
     logAction('Data Reset', {});
+}
+
+async function sendVerificationCode(phoneNumber) {
+    const code = Math.floor(100000 + Math.random() * 900000).toString(); // 6-digit code
+    verificationCodes.set(phoneNumber, code);
+    setTimeout(() => verificationCodes.delete(phoneNumber), 300000); // Code expires after 5 minutes
+
+    try {
+        await twilioClient.messages.create({
+            body: `Your verification code is ${code}`,
+            from: process.env.TWILIO_PHONE_NUMBER,
+            to: phoneNumber
+        });
+        return { success: true, code };
+    } catch (error) {
+        console.error('Error sending SMS:', error);
+        return { success: false, error: 'Failed to send verification code' };
+    }
 }
 
 exports.handler = async (event, context) => {
@@ -101,9 +125,16 @@ exports.handler = async (event, context) => {
 
     if (event.path === '/.netlify/functions/users') {
         if (event.httpMethod === 'POST') {
-            const user = JSON.parse(event.body);
-            users.push(user);
-            logAction('User Registered', user);
+            const { userId, phoneNumber } = JSON.parse(event.body);
+            const existingUser = users.find(user => user.phoneNumber === phoneNumber);
+            if (existingUser) {
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({ error: 'Phone number already registered' }),
+                };
+            }
+            users.push({ userId, phoneNumber });
+            logAction('User Registered', { userId, phoneNumber });
             userEmitter.emit('userUpdate', users);
             return {
                 statusCode: 200,
@@ -125,6 +156,25 @@ exports.handler = async (event, context) => {
                 body: JSON.stringify({ message: 'Users cleared successfully' }),
                 headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' },
             };
+        }
+    }
+
+    if (event.path === '/.netlify/functions/send-verification-code') {
+        if (event.httpMethod === 'POST') {
+            const { phoneNumber } = JSON.parse(event.body);
+            const result = await sendVerificationCode(phoneNumber);
+            if (result.success) {
+                return {
+                    statusCode: 200,
+                    body: JSON.stringify({ message: 'Verification code sent', code: result.code }),
+                    headers: { 'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate' },
+                };
+            } else {
+                return {
+                    statusCode: 500,
+                    body: JSON.stringify({ error: result.error }),
+                };
+            }
         }
     }
 
