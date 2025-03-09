@@ -2,7 +2,7 @@
     "name": "telegram-premium-shop",
     "version": "1.0.0",
     "description": "Telegram Premium Shop Functions",
-    "main": "index.mjs",
+    "main": "index.js",
     "dependencies": {
         "events": "^3.3.0",
         "twilio": "^5.4.5",
