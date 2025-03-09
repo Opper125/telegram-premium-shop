@@ -5,7 +5,7 @@
     "main": "index.js",
     "dependencies": {
         "events": "^3.3.0",
-        "twilio": "^3.84.2"
+        "twilio": "^5.4.5"  // Updated to the latest stable version as of March 2025
     },
     "devDependencies": {},
     "scripts": {
