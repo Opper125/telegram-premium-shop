@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create a Post 📝</title>
+    <title>Create Post - Telegram Premium Shop</title>
     <style>
         * {
             margin: 0;
@@ -17,144 +17,124 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
         }
         .container {
             max-width: 600px;
-            width: 100%;
+            margin: 20px auto;
             background: white;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
         h2 {
+            color: #2c3e50;
             text-align: center;
             margin-bottom: 20px;
-            color: #2c3e50;
         }
-        textarea {
-            width: 100%;
-            height: 150px;
-            padding: 10px;
+        .form-group {
             margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            color: #34495e;
+            margin-bottom: 5px;
+        }
+        .form-group input[type="text"], .form-group textarea {
+            width: 100%;
+            padding: 10px;
             border: 1px solid #ddd;
-            border-radius: 5px;
-            resize: none;
+            border-radius: 8px;
             font-size: 1em;
         }
-        input[type="file"] {
-            margin-bottom: 15px;
-            display: block;
-        }
-        .preview {
-            max-width: 100%;
-            border-radius: 10px;
-            margin-top: 10px;
-            display: none;
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 10px 0;
         }
         button {
             width: 100%;
-            padding: 10px;
+            padding: 12px;
             background: #3498db;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             font-size: 1em;
             cursor: pointer;
-            transition: background 0.3s;
+            transition: background 0.3s, transform 0.2s;
         }
         button:hover {
             background: #2980b9;
+            transform: scale(1.05);
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>Create a Post</h2>
-        <textarea id="postContent" placeholder="Write your post here..."></textarea>
-        <label for="postImage">Upload Image:</label>
-        <input type="file" id="postImage" accept="image/*" onchange="previewMedia('image')">
-        <img id="previewImage" class="preview" alt="Image Preview">
-        
-        <label for="postVideo">Upload Video:</label>
-        <input type="file" id="postVideo" accept="video/*" onchange="previewMedia('video')">
-        <video id="previewVideo" class="preview" controls></video>
-        
-        <label for="postAudio">Upload Audio:</label>
-        <input type="file" id="postAudio" accept="audio/*" onchange="previewMedia('audio')">
-        <audio id="previewAudio" class="preview" controls></audio>
-        
-        <button onclick="submitPost()">Post</button>
+        <div class="form-group">
+            <label for="content">Post Content:</label>
+            <textarea id="content" rows="4" placeholder="Write your post here..."></textarea>
+        </div>
+        <div class="form-group">
+            <label for="photo">Upload Photo:</label>
+            <input type="file" id="photo" accept="image/*">
+        </div>
+        <div class="form-group">
+            <label for="video">Upload Video:</label>
+            <input type="file" id="video" accept="video/*">
+        </div>
+        <div class="form-group">
+            <label for="audio">Upload Audio:</label>
+            <input type="file" id="audio" accept="audio/*">
+        </div>
+        <button onclick="submitPost()">Submit Post</button>
     </div>
 
     <script>
-        let imageData = null;
-        let videoData = null;
-        let audioData = null;
-
-        function previewMedia(type) {
-            let file;
-            let previewElement;
-            let reader = new FileReader();
-
-            if (type === 'image') {
-                file = document.getElementById('postImage').files[0];
-                previewElement = document.getElementById('previewImage');
-                imageData = null;
-            } else if (type === 'video') {
-                file = document.getElementById('postVideo').files[0];
-                previewElement = document.getElementById('previewVideo');
-                videoData = null;
-            } else if (type === 'audio') {
-                file = document.getElementById('postAudio').files[0];
-                previewElement = document.getElementById('previewAudio');
-                audioData = null;
-            }
-
-            if (file) {
-                reader.readAsDataURL(file);
-                reader.onload = function(e) {
-                    previewElement.src = e.target.result;
-                    previewElement.style.display = 'block';
-                    if (type === 'image') imageData = e.target.result;
-                    if (type === 'video') videoData = e.target.result;
-                    if (type === 'audio') audioData = e.target.result;
-                };
-            } else {
-                previewElement.style.display = 'none';
-            }
-        }
+        let userId = localStorage.getItem('userId');
 
         async function submitPost() {
-            const content = document.getElementById('postContent').value;
-            if (!content) {
-                alert('Please write something to post!');
+            if (!userId) {
+                alert('Please log in first!');
+                window.location.href = '/';
                 return;
             }
 
-            const post = {
-                userId: localStorage.getItem('userId'),
-                content: content,
-                image: imageData,
-                video: videoData,
-                audio: audioData,
-                timestamp: new Date().toISOString()
-            };
+            const content = document.getElementById('content').value;
+            const photo = document.getElementById('photo').files[0];
+            const video = document.getElementById('video').files[0];
+            const audio = document.getElementById('audio').files[0];
+
+            if (!content && !photo && !video && !audio) {
+                alert('Please provide content or media!');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('userId', userId);
+            formData.append('content', content);
+            if (photo) formData.append('photo', photo);
+            if (video) formData.append('video', video);
+            if (audio) formData.append('audio', audio);
+            formData.append('timestamp', new Date().toISOString());
 
             try {
-                const response = await fetch('/api/posts', {
+                const response = await fetch('/.netlify/functions/submit-post', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(post)
+                    body: formData
                 });
-                if (!response.ok) throw new Error('Failed to save post');
                 const result = await response.json();
-                console.log(result.message);
-                alert('Post submitted successfully!');
-                window.close();
+                if (result.success) {
+                    alert('Post submitted successfully!');
+                    document.getElementById('content').value = '';
+                    document.getElementById('photo').value = '';
+                    document.getElementById('video').value = '';
+                    document.getElementById('audio').value = '';
+                } else {
+                    alert('Error submitting post.');
+                }
             } catch (error) {
-                console.error('Error saving post:', error);
-                alert('Error saving post: ' + error.message);
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
             }
         }
     </script>
