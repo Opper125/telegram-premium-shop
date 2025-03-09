@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Telegram Premium Shop ✨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,139 +13,114 @@
             font-family: 'Poppins', sans-serif;
         }
         body {
-            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: #fff;
             min-height: 100vh;
             overflow-x: hidden;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
-        .signup-container {
-            max-width: 400px;
-            margin: 50px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            transition: transform 0.3s;
-        }
-        .signup-container:hover {
-            transform: translateY(-5px);
-        }
-        .signup-container h2 {
-            color: #2c3e50;
-            margin-bottom: 20px;
-        }
-        .signup-container button {
-            width: 100%;
-            padding: 12px;
-            background: #3498db;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1em;
-            cursor: pointer;
-            transition: background 0.3s, transform 0.2s;
-        }
-        .signup-container button:hover {
-            background: #2980b9;
-            transform: scale(1.05);
-        }
-        #dashboard {
-            display: none;
-        }
         .navbar {
-            background: linear-gradient(90deg, #2c3e50, #34495e);
-            padding: 15px 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
-        .navbar h2 {
-            color: white;
-            text-align: center;
-            font-size: 1.8em;
+        .navbar .logo {
             display: flex;
             align-items: center;
-            justify-content: center;
         }
-        .navbar h2 img {
-            width: 40px;
-            height: 40px;
+        .navbar .logo img {
+            width: 50px;
+            height: 50px;
             margin-right: 10px;
         }
-        .navbar button {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            transition: background 0.3s;
+        .navbar .logo h1 {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #fff;
         }
-        .navbar button:hover {
-            background: #c0392b;
-        }
-        .content {
-            padding: 20px 0;
-        }
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: #2c3e50;
+        .navbar .menu {
             display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            gap: 20px;
         }
-        .bottom-nav .nav-item {
-            text-align: center;
-            color: white;
-            cursor: pointer;
-            padding: 5px;
-            transition: transform 0.3s;
+        .navbar .menu a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
         }
-        .bottom-nav .nav-item:hover {
-            transform: scale(1.1);
+        .navbar .menu a:hover {
+            color: #00aaff;
         }
-        .bottom-nav .nav-item img {
+        .navbar .notification {
+            position: relative;
+        }
+        .navbar .notification img {
             width: 30px;
             height: 30px;
-            margin-bottom: 5px;
         }
-        .bottom-nav .nav-item p {
-            font-size: 0.9em;
+        .navbar .notification .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4d4d;
+            color: #fff;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.8em;
         }
-        .section {
-            display: none;
-            padding: 20px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        .hero {
+            text-align: center;
+            padding: 50px 20px;
+            background: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c') no-repeat center center/cover;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
+        .hero h2 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+        }
+        .hero p {
+            font-size: 1.2em;
+            font-weight: 300;
             margin-bottom: 20px;
         }
+        .section {
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+        }
+        .section h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #00aaff;
+        }
+        .posts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
         .post-card {
-            background: #f9f9f9;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s;
         }
         .post-card:hover {
@@ -155,18 +131,21 @@
             border-radius: 10px;
             margin-top: 10px;
         }
+        .premium-options, .order-history {
+            margin-bottom: 30px;
+        }
         .premium-option {
-            background: #3498db;
-            color: white;
+            background: #ff4d4d;
             padding: 15px;
             border-radius: 10px;
             margin-bottom: 15px;
             cursor: pointer;
             transition: transform 0.3s, background 0.3s;
+            text-align: center;
         }
         .premium-option:hover {
             transform: scale(1.05);
-            background: #2980b9;
+            background: #e60000;
         }
         .quantity {
             display: flex;
@@ -175,52 +154,139 @@
             margin: 10px 0;
         }
         .quantity button {
-            background: #3498db;
-            color: white;
+            background: #00aaff;
             border: none;
-            padding: 5px 10px;
+            padding: 5px 15px;
             border-radius: 5px;
+            color: #fff;
             cursor: pointer;
-            margin: 0 5px;
+            margin: 0 10px;
         }
         #totalPrice {
             text-align: center;
-            font-size: 1.2em;
-            margin: 10px 0;
+            font-size: 1.5em;
+            margin: 15px 0;
+            color: #ff4d4d;
         }
-        .payment-method select, .payment-method input {
+        .payment-method {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .payment-method img {
+            width: 60px;
+            height: 40px;
+            object-fit: contain;
+            cursor: pointer;
+            border: 2px solid transparent;
+            border-radius: 5px;
+            transition: border 0.3s;
+        }
+        .payment-method img.selected {
+            border: 2px solid #00aaff;
+        }
+        .payment-method input {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
         }
         #status {
             text-align: center;
             margin-top: 10px;
             color: #2ecc71;
+            font-weight: 600;
+        }
+        .contact-section {
+            text-align: center;
+        }
+        .contact-section a {
+            color: #00aaff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .contact-section a:hover {
+            text-decoration: underline;
+        }
+        .create-post-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 12px 30px;
+            background: #00aaff;
+            border: none;
+            border-radius: 50px;
+            color: #fff;
+            font-size: 1em;
+            cursor: pointer;
+            transition: transform 0.3s, background 0.3s;
+        }
+        .create-post-btn:hover {
+            transform: scale(1.05);
+            background: #0077cc;
+        }
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .navbar .menu {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+            .hero h2 {
+                font-size: 1.8em;
+            }
+            .hero p {
+                font-size: 1em;
+            }
+            .section {
+                padding: 20px;
+            }
+            .posts {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="loginSection" class="signup-container">
-        <h2>Anonymous Login</h2>
-        <button id="loginButton" onclick="anonymousLogin()">Login</button>
+    <div class="navbar">
+        <div class="logo">
+            <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/telegram-logo.png" alt="Logo">
+            <h1>Telegram Premium Shop</h1>
+        </div>
+        <div class="menu">
+            <a href="#homeSection" onclick="showSection('homeSection')">Home</a>
+            <a href="#shopSection" onclick="showSection('shopSection')">Shop</a>
+            <a href="#hostSection" onclick="showSection('hostSection')">Host</a>
+            <a href="#meSection" onclick="showSection('meSection')">Me</a>
+            <div class="notification">
+                <img src="https://img.icons8.com/ios-filled/50/ffffff/bell.png" alt="Notification">
+                <span id="notificationBadge" class="badge">0</span>
+            </div>
+        </div>
     </div>
 
-    <div id="dashboard">
-        <div class="navbar">
-            <h2><img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/telegram-logo.png" alt="Logo"> Telegram Premium Shop</h2>
-            <button id="logoutButton" onclick="logout()">Logout</button>
+    <div class="hero">
+        <h2>Welcome to Telegram Premium Shop ✨</h2>
+        <p>Unlock the best Telegram features with our premium plans!</p>
+    </div>
+
+    <div class="container">
+        <div id="homeSection" class="section">
+            <h2>Home</h2>
+            <button class="create-post-btn" onclick="window.location.href='post.html'">Create a Post</button>
+            <div class="posts" id="posts"></div>
         </div>
-        <div class="container">
-            <div id="homeSection" class="section">
-                <h2>Home</h2>
-                <a href="/post.html" target="_blank">Create a Post</a>
-                <div id="posts"></div>
-            </div>
-            <div id="shopSection" class="section">
-                <h2>Shop</h2>
+
+        <div id="shopSection" class="section">
+            <h2>Shop</h2>
+            <div class="premium-options">
                 <div class="premium-option" onclick="selectPremium(3, 60000)">
                     Premium 3 Months - 60,000 MMK
                 </div>
@@ -230,142 +296,87 @@
                 <div class="premium-option" onclick="selectPremium(12, 210000)">
                     Premium 1 Year - 210,000 MMK
                 </div>
-                <div class="quantity">
-                    <button onclick="decreaseQuantity()">-</button>
-                    <span id="quantity">1</span>
-                    <button onclick="increaseQuantity()">+</button>
-                </div>
-                <div id="totalPrice">Total: 60,000 MMK</div>
-                <div class="payment-method">
-                    <select id="paymentSelect" onchange="showPhoneNumber()">
-                        <option value="">Select Payment Method</option>
-                        <option value="kpay">Kpay</option>
-                        <option value="wave">Wave</option>
-                    </select>
-                </div>
-                <input type="text" id="transactionId" placeholder="Enter Transaction ID" required>
-                <input type="text" id="telegramUsername" placeholder="Enter Telegram Username" required>
-                <button onclick="submitOrder()">Submit Order</button>
-                <div id="status">Wait Admin Check <audio id="waitAudio" src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/wait_admin_check.mp3" preload="auto"></audio></div>
             </div>
-            <div id="hostSection" class="section">
-                <h2>Host</h2>
-                <p>Host your events or join as a host!</p>
+            <div class="quantity">
+                <button onclick="decreaseQuantity()">-</button>
+                <span id="quantity">1</span>
+                <button onclick="increaseQuantity()">+</button>
             </div>
-            <div id="profileSection" class="section">
-                <h2>Profile</h2>
-                <p>User ID: <span id="userIdDisplay"></span></p>
-                <p>Phone: N/A (Anonymous)</p>
+            <div id="totalPrice">Total: 60,000 MMK</div>
+            <div class="payment-method">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/8/84/Kpay_Logo.png" alt="Kpay" onclick="selectPayment('kpay')" class="payment-option">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Wave_Money_Logo.png" alt="Wave" onclick="selectPayment('wave')" class="payment-option">
             </div>
-            <div id="meSection" class="section">
-                <h2>Me</h2>
-                <p>Manage your account settings here.</p>
+            <input type="text" id="transactionId" placeholder="Enter Transaction ID" required>
+            <input type="text" id="telegramUsername" placeholder="Enter Telegram Username" required>
+            <button onclick="submitOrder()">Submit Order</button>
+            <div id="status"></div>
+        </div>
+
+        <div id="hostSection" class="section">
+            <h2>Host</h2>
+            <p>Host your events or join as a host!</p>
+        </div>
+
+        <div id="meSection" class="section">
+            <h2>Me</h2>
+            <div class="contact-section">
+                <p>Contact us for more information!</p>
+                <p>Telegram: <a href="https://t.me/OPPERN" target="_blank">@OPPERN</a></p>
+                <p>Address: 123 Premium Street, Yangon, Myanmar</p>
+                <p>Email: support@telegrampremium.shop</p>
             </div>
         </div>
-        <div class="bottom-nav">
-            <div class="nav-item" onclick="showSection('homeSection')">
-                <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/home-icon.png" alt="Home">
-                <p>Home</p>
-            </div>
-            <div class="nav-item" onclick="showSection('shopSection')">
-                <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/shop-icon.png" alt="Shop">
-                <p>Shop</p>
-            </div>
-            <div class="nav-item" onclick="showSection('hostSection')">
-                <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/host-icon.png" alt="Host">
-                <p>Host</p>
-            </div>
-            <div class="nav-item" onclick="showSection('profileSection')">
-                <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/profile-icon.png" alt="Profile">
-                <p>Profile</p>
-            </div>
-            <div class="nav-item" onclick="showSection('meSection')">
-                <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/main/me-icon.png" alt="Me">
-                <p>Me</p>
-            </div>
+
+        <div id="orderHistorySection" class="section order-history">
+            <h2>Your Order History</h2>
+            <div class="orders" id="orders"></div>
         </div>
     </div>
 
+    <script src="data.js"></script>
     <script>
+        let userId = localStorage.getItem('userId') || `user-${Math.random().toString(36).substr(2, 9)}`;
+        localStorage.setItem('userId', userId);
+
         let selectedMonths = 3;
         let selectedPrice = 60000;
         let quantity = 1;
-        let userId = localStorage.getItem('userId');
+        let selectedPaymentMethod = '';
+        let notificationCount = 0;
 
-        if (!userId) {
-            document.getElementById('loginSection').style.display = 'block';
-            document.getElementById('dashboard').style.display = 'none';
-        } else {
-            document.getElementById('dashboard').style.display = 'block';
+        window.onload = () => {
             showSection('homeSection');
             loadPosts();
-            setupRealTimePosts();
-            document.getElementById('userIdDisplay').innerText = userId;
-        }
-
-        function anonymousLogin() {
-            userId = 'anon-' + Math.random().toString(36).substr(2, 9);
-            localStorage.setItem('userId', userId);
-            document.getElementById('loginSection').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'block';
-            showSection('homeSection');
-            loadPosts();
-            setupRealTimePosts();
-            document.getElementById('userIdDisplay').innerText = userId;
-        }
-
-        function logout() {
-            localStorage.removeItem('userId');
-            document.getElementById('dashboard').style.display = 'none';
-            document.getElementById('loginSection').style.display = 'block';
-        }
+            loadOrders();
+            updateNotificationBadge();
+            // Auto-refresh posts every 5 seconds
+            setInterval(loadPosts, 5000);
+        };
 
         function showSection(sectionId) {
             document.querySelectorAll('.section').forEach(section => section.style.display = 'none');
             document.getElementById(sectionId).style.display = 'block';
-            if (sectionId === 'homeSection') {
-                loadPosts();
-            }
+            if (sectionId === 'homeSection') loadPosts();
+            if (sectionId === 'orderHistorySection') loadOrders();
         }
 
-        // Post-related functions
-        async function loadPosts() {
-            try {
-                const response = await fetch('/.netlify/functions/get-posts');
-                const posts = await response.json();
-                const postsDiv = document.getElementById('posts');
-                postsDiv.innerHTML = posts.map(post => `
-                    <div class="post-card">
-                        <p><strong>${post.userId}</strong> - ${new Date(post.timestamp).toLocaleString()}</p>
-                        <p>${post.content || 'No content'}</p>
-                        ${post.photo ? `<img src="${post.photo}" alt="Post Photo">` : ''}
-                        ${post.video ? `<video src="${post.video}" controls></video>` : ''}
-                        ${post.audio ? `<audio src="${post.audio}" controls></audio>` : ''}
-                    </div>
-                `).join('');
-            } catch (error) {
-                console.error('Error loading posts:', error);
-                document.getElementById('posts').innerHTML = '<p>Error loading posts. Please try again later.</p>';
-            }
+        function loadPosts() {
+            const posts = getPosts();
+            const postsDiv = document.getElementById('posts');
+            postsDiv.innerHTML = posts.map(post => `
+                <div class="post-card">
+                    <p><strong>${post.userId}</strong> - ${new Date(post.timestamp).toLocaleString()}</p>
+                    ${post.content ? `<p>${post.content}</p>` : ''}
+                    ${post.media ? `
+                        ${post.mediaType === 'image' ? `<img src="${post.media}" alt="Post Media">` :
+                          post.mediaType === 'video' ? `<video src="${post.media}" controls></video>` :
+                          post.mediaType === 'audio' ? `<audio src="${post.media}" controls></audio>` : ''}
+                    ` : ''}
+                </div>
+            `).join('');
         }
 
-        function setupRealTimePosts() {
-            const eventSource = new EventSource('/.netlify/functions/posts-stream');
-            eventSource.onmessage = (event) => {
-                try {
-                    loadPosts();
-                } catch (error) {
-                    console.error('Error parsing SSE data:', error);
-                }
-            };
-            eventSource.onerror = (error) => {
-                console.error('SSE Error:', error);
-                eventSource.close();
-                setTimeout(setupRealTimePosts, 5000);
-            };
-        }
-
-        // Shop-related functions
         function selectPremium(months, price) {
             selectedMonths = months;
             selectedPrice = price;
@@ -374,38 +385,64 @@
 
         function increaseQuantity() { quantity++; updateTotal(); }
         function decreaseQuantity() { if (quantity > 1) quantity--; updateTotal(); }
-        function updateTotal() { document.getElementById('quantity').innerText = quantity; document.getElementById('totalPrice').innerText = `Total: ${selectedPrice * quantity} MMK`; }
-        function showPhoneNumber() { /* Same as original */ }
+        function updateTotal() {
+            document.getElementById('quantity').innerText = quantity;
+            document.getElementById('totalPrice').innerText = `Total: ${selectedPrice * quantity} MMK`;
+        }
 
-        async function submitOrder() {
+        function selectPayment(method) {
+            selectedPaymentMethod = method;
+            document.querySelectorAll('.payment-option').forEach(option => option.classList.remove('selected'));
+            document.querySelector(`img[alt="${method.charAt(0).toUpperCase() + method.slice(1)}"]`).classList.add('selected');
+        }
+
+        function submitOrder() {
+            if (!selectedPaymentMethod) {
+                alert('Please select a payment method!');
+                return;
+            }
+            if (!document.getElementById('transactionId').value || !document.getElementById('telegramUsername').value) {
+                alert('Please fill in all fields!');
+                return;
+            }
             const order = {
                 userId,
-                phoneNumber: 'N/A (Anonymous)',
                 months: selectedMonths,
                 quantity,
                 total: selectedPrice * quantity,
                 transactionId: document.getElementById('transactionId').value,
                 telegramUsername: document.getElementById('telegramUsername').value,
-                paymentMethod: document.getElementById('paymentSelect').value,
-                status: 'approved', // Auto-approve for anonymous
+                paymentMethod: selectedPaymentMethod,
+                status: 'approved',
                 timestamp: new Date().toISOString()
             };
-            try {
-                const response = await fetch('/.netlify/functions/submit-order', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(order)
-                });
-                const result = await response.json();
-                document.getElementById('status').innerText = 'Order submitted and approved!';
-                fetch('https://opeer-telegram-good.netlify.app/.netlify/functions/update-orders', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(order)
-                });
-            } catch (error) {
-                document.getElementById('status').innerText = 'Error submitting order.';
-            }
+            saveOrder(order);
+            notificationCount++;
+            updateNotificationBadge();
+            document.getElementById('status').innerText = 'Order submitted and approved!';
+            document.getElementById('transactionId').value = '';
+            document.getElementById('telegramUsername').value = '';
+            loadOrders();
+        }
+
+        function loadOrders() {
+            const orders = getOrders().filter(order => order.userId === userId);
+            const ordersDiv = document.getElementById('orders');
+            ordersDiv.innerHTML = orders.map(order => `
+                <div class="order-card">
+                    <p><strong>Months:</strong> ${order.months}</p>
+                    <p><strong>Quantity:</strong> ${order.quantity}</p>
+                    <p><strong>Total:</strong> ${order.total} MMK</p>
+                    <p><strong>Transaction ID:</strong> ${order.transactionId}</p>
+                    <p><strong>Telegram:</strong> ${order.telegramUsername}</p>
+                    <p><strong>Payment:</strong> ${order.paymentMethod}</p>
+                    <p><strong>Time:</strong> ${new Date(order.timestamp).toLocaleString()}</p>
+                </div>
+            `).join('');
+        }
+
+        function updateNotificationBadge() {
+            document.getElementById('notificationBadge').innerText = notificationCount;
         }
     </script>
 </body>
