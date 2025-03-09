@@ -1,5 +1,5 @@
 [build]
-    command = "go mod download && npm install && tsc"
+    command = "npm install && tsc"
     publish = "/"
     functions = "functions"
 
