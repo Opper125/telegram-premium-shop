@@ -6,10 +6,10 @@
     "scripts": {
         "start": "echo 'No server required for static site'",
         "test": "echo 'No tests specified'",
-        "build": "tsc"
+        "build": "go mod download && tsc"
     },
     "dependencies": {
-  "go": "1.24.1"
+        "@netlify/functions": "^1.0.0"
     },
     "devDependencies": {
         "typescript": "^4.9.5"
