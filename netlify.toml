@@ -6,11 +6,6 @@
 
 [functions]
     node_bundler = "esbuild"
-    [[functions.schedules]]
-        name = "daily-maintenance"
-        description = "Daily server maintenance"
-        schedule = "0 0 * * *" # နေ့စဉ် ည 12:00 (UTC) တွင် အလုပ်လုပ်မည်
-        to = "/.netlify/functions/data?reset=true"
 
 [[redirects]]
     from = "/api/*"
@@ -24,12 +19,16 @@
     from = "/orders"
     to = "/orders.html"
     status = 200
-
-[dev]
-    targetPort = 8888
-    port = 8888
+[[redirects]]
+    from = "/post"
+    to = "/post.html"
+    status = 200
 
 [context.production.environment]
     TWILIO_ACCOUNT_SID = "your_twilio_account_sid"
     TWILIO_AUTH_TOKEN = "your_twilio_auth_token"
     TWILIO_PHONE_NUMBER = "your_twilio_phone_number"
+
+[dev]
+    targetPort = 8888
+    port = 8888
