@@ -25,13 +25,6 @@
             margin: 0 auto;
             padding: 20px;
         }
-        h1 {
-            color: #2c3e50;
-            text-align: center;
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
-        }
         .signup-container {
             max-width: 400px;
             margin: 50px auto;
@@ -49,19 +42,6 @@
             color: #2c3e50;
             margin-bottom: 20px;
         }
-        .signup-container input {
-            width: 100%;
-            padding: 12px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 1em;
-            transition: border-color 0.3s;
-        }
-        .signup-container input:focus {
-            border-color: #3498db;
-            outline: none;
-        }
         .signup-container button {
             width: 100%;
             padding: 12px;
@@ -76,16 +56,6 @@
         .signup-container button:hover {
             background: #2980b9;
             transform: scale(1.05);
-        }
-        .verification-container {
-            display: none;
-            max-width: 400px;
-            margin: 50px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            text-align: center;
         }
         #dashboard {
             display: none;
@@ -234,16 +204,8 @@
 </head>
 <body>
     <div id="loginSection" class="signup-container">
-        <h2>Phone Verification</h2>
-        <input type="text" id="phoneNumber" placeholder="Enter Phone Number (e.g., +959123456789)" required>
-        <button id="requestCodeButton" onclick="requestVerificationCode()">Request Code</button>
-    </div>
-
-    <div id="verificationSection" class="verification-container">
-        <h2>Verify Your Phone</h2>
-        <p>Enter the code sent to your phone.</p>
-        <input type="text" id="verificationCode" placeholder="Enter Verification Code" required>
-        <button id="verifyButton" onclick="verifyCode()">Verify</button>
+        <h2>Anonymous Login</h2>
+        <button id="loginButton" onclick="anonymousLogin()">Login</button>
     </div>
 
     <div id="dashboard">
@@ -293,7 +255,7 @@
             <div id="profileSection" class="section">
                 <h2>Profile</h2>
                 <p>User ID: <span id="userIdDisplay"></span></p>
-                <p>Phone: <span id="phoneDisplay"></span></p>
+                <p>Phone: N/A (Anonymous)</p>
             </div>
             <div id="meSection" class="section">
                 <h2>Me</h2>
@@ -329,11 +291,9 @@
         let selectedPrice = 60000;
         let quantity = 1;
         let userId = localStorage.getItem('userId');
-        let verificationCode = null;
 
         if (!userId) {
             document.getElementById('loginSection').style.display = 'block';
-            document.getElementById('verificationSection').style.display = 'none';
             document.getElementById('dashboard').style.display = 'none';
         } else {
             document.getElementById('dashboard').style.display = 'block';
@@ -341,55 +301,23 @@
             loadPosts();
             setupRealTimePosts();
             document.getElementById('userIdDisplay').innerText = userId;
-            document.getElementById('phoneDisplay').innerText = localStorage.getItem('phoneNumber');
         }
 
-        async function requestVerificationCode() {
-            const phoneNumber = document.getElementById('phoneNumber').value;
-            if (!phoneNumber.match(/^\+95\d{9}$/)) {
-                alert('Invalid Myanmar phone number!');
-                return;
-            }
-            try {
-                const response = await fetch('/.netlify/functions/send-verification-code', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phoneNumber })
-                });
-                const result = await response.json();
-                verificationCode = result.code;
-                document.getElementById('loginSection').style.display = 'none';
-                document.getElementById('verificationSection').style.display = 'block';
-                alert('Verification code sent to your phone!');
-            } catch (error) {
-                alert('Error sending code. Try again.');
-            }
-        }
-
-        async function verifyCode() {
-            const enteredCode = document.getElementById('verificationCode').value;
-            if (enteredCode === verificationCode) {
-                userId = 'user-' + Math.random().toString(36).substr(2, 9);
-                localStorage.setItem('userId', userId);
-                localStorage.setItem('phoneNumber', document.getElementById('phoneNumber').value);
-                document.getElementById('verificationSection').style.display = 'none';
-                document.getElementById('dashboard').style.display = 'block';
-                showSection('homeSection');
-                loadPosts();
-                setupRealTimePosts();
-                document.getElementById('userIdDisplay').innerText = userId;
-                document.getElementById('phoneDisplay').innerText = localStorage.getItem('phoneNumber');
-            } else {
-                alert('Invalid verification code!');
-            }
+        function anonymousLogin() {
+            userId = 'anon-' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('userId', userId);
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            showSection('homeSection');
+            loadPosts();
+            setupRealTimePosts();
+            document.getElementById('userIdDisplay').innerText = userId;
         }
 
         function logout() {
             localStorage.removeItem('userId');
-            localStorage.removeItem('phoneNumber');
             document.getElementById('dashboard').style.display = 'none';
             document.getElementById('loginSection').style.display = 'block';
-            document.getElementById('phoneNumber').value = '';
         }
 
         function showSection(sectionId) {
@@ -452,14 +380,14 @@
         async function submitOrder() {
             const order = {
                 userId,
-                phoneNumber: localStorage.getItem('phoneNumber'),
+                phoneNumber: 'N/A (Anonymous)',
                 months: selectedMonths,
                 quantity,
                 total: selectedPrice * quantity,
                 transactionId: document.getElementById('transactionId').value,
                 telegramUsername: document.getElementById('telegramUsername').value,
                 paymentMethod: document.getElementById('paymentSelect').value,
-                status: 'pending',
+                status: 'approved', // Auto-approve for anonymous
                 timestamp: new Date().toISOString()
             };
             try {
@@ -469,7 +397,7 @@
                     body: JSON.stringify(order)
                 });
                 const result = await response.json();
-                document.getElementById('status').innerText = 'Order submitted! Waiting for approval.';
+                document.getElementById('status').innerText = 'Order submitted and approved!';
                 fetch('https://opeer-telegram-good.netlify.app/.netlify/functions/update-orders', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
