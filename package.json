@@ -6,7 +6,7 @@
     "scripts": {
         "start": "echo 'No server required for static site'",
         "test": "echo 'No tests specified'",
-        "build": "go mod download && tsc"
+        "build": "tsc"
     },
     "dependencies": {
         "@netlify/functions": "^1.0.0"
