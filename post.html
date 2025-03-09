@@ -44,6 +44,13 @@
         }
         input[type="file"] {
             margin-bottom: 15px;
+            display: block;
+        }
+        .preview {
+            max-width: 100%;
+            border-radius: 10px;
+            margin-top: 10px;
+            display: none;
         }
         button {
             width: 100%;
@@ -59,74 +66,95 @@
         button:hover {
             background: #2980b9;
         }
-        #previewImage {
-            max-width: 100%;
-            border-radius: 10px;
-            margin-top: 10px;
-            display: none;
-        }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>Create a Post</h2>
         <textarea id="postContent" placeholder="Write your post here..."></textarea>
-        <input type="file" id="postImage" accept="image/*" onchange="previewImage()">
-        <img id="previewImage" alt="Preview">
+        <label for="postImage">Upload Image:</label>
+        <input type="file" id="postImage" accept="image/*" onchange="previewMedia('image')">
+        <img id="previewImage" class="preview" alt="Image Preview">
+        
+        <label for="postVideo">Upload Video:</label>
+        <input type="file" id="postVideo" accept="video/*" onchange="previewMedia('video')">
+        <video id="previewVideo" class="preview" controls></video>
+        
+        <label for="postAudio">Upload Audio:</label>
+        <input type="file" id="postAudio" accept="audio/*" onchange="previewMedia('audio')">
+        <audio id="previewAudio" class="preview" controls></audio>
+        
         <button onclick="submitPost()">Post</button>
     </div>
 
     <script>
-        function previewImage() {
-            const file = document.getElementById('postImage').files[0];
+        let imageData = null;
+        let videoData = null;
+        let audioData = null;
+
+        function previewMedia(type) {
+            let file;
+            let previewElement;
+            let reader = new FileReader();
+
+            if (type === 'image') {
+                file = document.getElementById('postImage').files[0];
+                previewElement = document.getElementById('previewImage');
+                imageData = null;
+            } else if (type === 'video') {
+                file = document.getElementById('postVideo').files[0];
+                previewElement = document.getElementById('previewVideo');
+                videoData = null;
+            } else if (type === 'audio') {
+                file = document.getElementById('postAudio').files[0];
+                previewElement = document.getElementById('previewAudio');
+                audioData = null;
+            }
+
             if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const preview = document.getElementById('previewImage');
-                    preview.src = e.target.result;
-                    preview.style.display = 'block';
-                };
                 reader.readAsDataURL(file);
+                reader.onload = function(e) {
+                    previewElement.src = e.target.result;
+                    previewElement.style.display = 'block';
+                    if (type === 'image') imageData = e.target.result;
+                    if (type === 'video') videoData = e.target.result;
+                    if (type === 'audio') audioData = e.target.result;
+                };
+            } else {
+                previewElement.style.display = 'none';
             }
         }
 
         async function submitPost() {
             const content = document.getElementById('postContent').value;
-            const file = document.getElementById('postImage').files[0];
-            let imageData = null;
-
-            if (file) {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                imageData = await new Promise(resolve => {
-                    reader.onload = () => resolve(reader.result);
-                });
+            if (!content) {
+                alert('Please write something to post!');
+                return;
             }
 
-            if (content) {
-                const post = {
-                    userId: localStorage.getItem('userId'),
-                    content: content,
-                    image: imageData,
-                    timestamp: new Date().toISOString()
-                };
-                try {
-                    const response = await fetch('/api/posts', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(post)
-                    });
-                    if (!response.ok) throw new Error('Failed to save post');
-                    const result = await response.json();
-                    console.log(result.message);
-                    alert('Post submitted successfully!');
-                    window.close();
-                } catch (error) {
-                    console.error('Error saving post:', error);
-                    alert('Error saving post!');
-                }
-            } else {
-                alert('Please write something to post!');
+            const post = {
+                userId: localStorage.getItem('userId'),
+                content: content,
+                image: imageData,
+                video: videoData,
+                audio: audioData,
+                timestamp: new Date().toISOString()
+            };
+
+            try {
+                const response = await fetch('/api/posts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(post)
+                });
+                if (!response.ok) throw new Error('Failed to save post');
+                const result = await response.json();
+                console.log(result.message);
+                alert('Post submitted successfully!');
+                window.close();
+            } catch (error) {
+                console.error('Error saving post:', error);
+                alert('Error saving post: ' + error.message);
             }
         }
     </script>
