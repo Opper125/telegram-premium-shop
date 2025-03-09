@@ -16,6 +16,9 @@
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .container {
             max-width: 1200px;
@@ -36,6 +39,7 @@
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
         .signup-container h2 {
             text-align: center;
@@ -63,6 +67,16 @@
         }
         .signup-container button:hover {
             background: #2980b9;
+        }
+        .verification-container {
+            display: none;
+            max-width: 400px;
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
         #dashboard {
             display: none;
@@ -246,11 +260,16 @@
 </head>
 <body>
     <div id="signupSection" class="signup-container">
-        <h2>Sign Up / Login</h2>
-        <input type="text" id="phoneNumber" placeholder="Enter Phone Number" required>
-        <input type="password" id="password" placeholder="Enter Password" required>
-        <button id="signupButton" onclick="signup()">Sign Up</button>
-        <button id="loginButton" onclick="login()">Login</button>
+        <h2>Phone Verification</h2>
+        <input type="text" id="phoneNumber" placeholder="Enter Phone Number (e.g., +959123456789)" required>
+        <button id="requestCodeButton" onclick="requestVerificationCode()">Request Code</button>
+    </div>
+
+    <div id="verificationSection" class="verification-container">
+        <h2>Verify Your Phone</h2>
+        <p>Enter the code sent to your phone.</p>
+        <input type="text" id="verificationCode" placeholder="Enter Verification Code" required>
+        <button id="verifyButton" onclick="verifyCode()">Verify</button>
     </div>
 
     <div id="dashboard">
@@ -353,74 +372,84 @@
         let selectedMonths = 3;
         let selectedPrice = 60000;
         let quantity = 1;
-        let userId = localStorage.getItem('userId');
-        let users = [];
+        let userId = null;
+        let verificationCode = null;
 
         async function fetchUsers() {
             try {
                 const response = await fetch('/api/users');
                 if (!response.ok) throw new Error('Failed to fetch users');
-                users = await response.json();
+                return await response.json();
             } catch (error) {
                 console.error('Error fetching users:', error);
+                return [];
             }
         }
 
-        async function signup() {
+        async function requestVerificationCode() {
             const phoneNumber = document.getElementById('phoneNumber').value;
-            const password = document.getElementById('password').value;
-            if (phoneNumber && password) {
-                await fetchUsers();
+            if (!phoneNumber || !phoneNumber.match(/^\+95\d{9}$/)) {
+                alert('Please enter a valid Myanmar phone number (e.g., +959123456789)');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/send-verification-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phoneNumber })
+                });
+                if (!response.ok) throw new Error('Failed to request code');
+                const result = await response.json();
+                verificationCode = result.code; // Store the generated code temporarily
+                document.getElementById('signupSection').style.display = 'none';
+                document.getElementById('verificationSection').style.display = 'block';
+                alert('Verification code sent to your phone!');
+            } catch (error) {
+                console.error('Error requesting verification code:', error);
+                alert('Error sending verification code. Please try again.');
+            }
+        }
+
+        async function verifyCode() {
+            const enteredCode = document.getElementById('verificationCode').value;
+            if (!enteredCode) {
+                alert('Please enter the verification code!');
+                return;
+            }
+
+            if (enteredCode === verificationCode) {
+                const phoneNumber = document.getElementById('phoneNumber').value;
+                const users = await fetchUsers();
                 const existingUser = users.find(user => user.phoneNumber === phoneNumber);
+
                 if (existingUser) {
-                    alert('This phone number is already registered! Please use a different number.');
-                    return;
+                    userId = existingUser.userId;
+                } else {
+                    userId = 'user-' + Math.random().toString(36).substr(2, 9);
+                    await saveUser(phoneNumber);
                 }
-                userId = 'user-' + Math.random().toString(36).substr(2, 9);
+
                 localStorage.setItem('userId', userId);
                 localStorage.setItem('phoneNumber', phoneNumber);
-                localStorage.setItem('password', password);
-                await saveUser(phoneNumber, password);
-                alert('Account created successfully! User ID: ' + userId);
-                document.getElementById('signupSection').style.display = 'none';
+                document.getElementById('verificationSection').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
                 showSection('homeSection');
                 updateMeSection();
                 loadOrderHistory();
                 loadPosts();
+                setupRealTimePosts();
             } else {
-                alert('Please fill in phone number and password!');
+                alert('Invalid verification code! Please try again.');
             }
         }
 
-        async function login() {
-            const phoneNumber = document.getElementById('phoneNumber').value;
-            const password = document.getElementById('password').value;
-            await fetchUsers();
-            const user = users.find(user => user.phoneNumber === phoneNumber && user.password === password);
-            if (user) {
-                userId = user.userId;
-                localStorage.setItem('userId', userId);
-                localStorage.setItem('phoneNumber', phoneNumber);
-                localStorage.setItem('password', password);
-                alert('Logged in successfully! User ID: ' + userId);
-                document.getElementById('signupSection').style.display = 'none';
-                document.getElementById('dashboard').style.display = 'block';
-                showSection('homeSection');
-                updateMeSection();
-                loadOrderHistory();
-                loadPosts();
-            } else {
-                alert('Invalid phone number or password!');
-            }
-        }
-
-        async function saveUser(phoneNumber, password) {
+        async function saveUser(phoneNumber) {
             try {
                 const response = await fetch('/api/users', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId, phoneNumber, password })
+                    body: JSON.stringify({ userId, phoneNumber })
                 });
                 if (!response.ok) throw new Error('Failed to save user');
                 const result = await response.json();
@@ -635,10 +664,12 @@
         window.onload = () => {
             if (!localStorage.getItem('userId')) {
                 document.getElementById('signupSection').style.display = 'block';
+                document.getElementById('verificationSection').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'none';
             } else {
                 userId = localStorage.getItem('userId');
                 document.getElementById('signupSection').style.display = 'none';
+                document.getElementById('verificationSection').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
                 showSection('homeSection');
                 updateMeSection();
