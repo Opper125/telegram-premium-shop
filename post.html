@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Post - Telegram Premium Shop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,7 +13,8 @@
             font-family: 'Poppins', sans-serif;
         }
         body {
-            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: #fff;
             min-height: 100vh;
             display: flex;
             justify-content: center;
@@ -20,50 +22,64 @@
         }
         .container {
             max-width: 600px;
-            margin: 20px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
         }
         h2 {
-            color: #2c3e50;
-            text-align: center;
+            font-size: 1.8em;
             margin-bottom: 20px;
+            color: #00aaff;
+            text-align: center;
         }
         .form-group {
             margin-bottom: 15px;
         }
         .form-group label {
             display: block;
-            color: #34495e;
+            color: #fff;
             margin-bottom: 5px;
         }
-        .form-group input[type="text"], .form-group textarea {
+        .form-group textarea {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            padding: 15px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
             font-size: 1em;
+            resize: none;
         }
         .form-group input[type="file"] {
             width: 100%;
             padding: 10px 0;
+            color: #fff;
         }
         button {
             width: 100%;
-            padding: 12px;
-            background: #3498db;
-            color: white;
+            padding: 12px 30px;
+            background: #00aaff;
             border: none;
-            border-radius: 8px;
+            border-radius: 50px;
+            color: #fff;
             font-size: 1em;
             cursor: pointer;
-            transition: background 0.3s, transform 0.2s;
+            transition: transform 0.3s, background 0.3s;
         }
         button:hover {
-            background: #2980b9;
             transform: scale(1.05);
+            background: #0077cc;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            h2 {
+                font-size: 1.5em;
+            }
         }
     </style>
 </head>
@@ -71,71 +87,34 @@
     <div class="container">
         <h2>Create a Post</h2>
         <div class="form-group">
-            <label for="content">Post Content:</label>
+            <label for="content">Post Content (Optional):</label>
             <textarea id="content" rows="4" placeholder="Write your post here..."></textarea>
         </div>
         <div class="form-group">
-            <label for="photo">Upload Photo:</label>
-            <input type="file" id="photo" accept="image/*">
-        </div>
-        <div class="form-group">
-            <label for="video">Upload Video:</label>
-            <input type="file" id="video" accept="video/*">
-        </div>
-        <div class="form-group">
-            <label for="audio">Upload Audio:</label>
-            <input type="file" id="audio" accept="audio/*">
+            <label for="media">Upload Media (Optional - Image, Video, or Audio):</label>
+            <input type="file" id="media" accept="image/*,video/*,audio/*">
         </div>
         <button onclick="submitPost()">Submit Post</button>
     </div>
 
+    <script src="data.js"></script>
     <script>
-        let userId = localStorage.getItem('userId');
+        let userId = localStorage.getItem('userId') || `user-${Math.random().toString(36).substr(2, 9)}`;
+        localStorage.setItem('userId', userId);
 
-        async function submitPost() {
-            if (!userId) {
-                alert('Please log in first!');
-                window.location.href = '/';
-                return;
-            }
-
+        function submitPost() {
             const content = document.getElementById('content').value;
-            const photo = document.getElementById('photo').files[0];
-            const video = document.getElementById('video').files[0];
-            const audio = document.getElementById('audio').files[0];
-
-            if (!content && !photo && !video && !audio) {
-                alert('Please provide content or media!');
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('userId', userId);
-            formData.append('content', content);
-            if (photo) formData.append('photo', photo);
-            if (video) formData.append('video', video);
-            if (audio) formData.append('audio', audio);
-            formData.append('timestamp', new Date().toISOString());
-
-            try {
-                const response = await fetch('/.netlify/functions/submit-post', {
-                    method: 'POST',
-                    body: formData
-                });
-                const result = await response.json();
-                if (result.success) {
-                    alert('Post submitted successfully!');
-                    document.getElementById('content').value = '';
-                    document.getElementById('photo').value = '';
-                    document.getElementById('video').value = '';
-                    document.getElementById('audio').value = '';
-                } else {
-                    alert('Error submitting post.');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('An error occurred. Please try again.');
-            }
+            const media = document.getElementById('media').files[0];
+            const post = {
+                userId,
+                content: content || '',
+                media: media ? URL.createObjectURL(media) : null,
+                mediaType: media ? media.type.split('/')[0] : null,
+                timestamp: new Date().toISOString()
+            };
+            savePost(post);
+            alert('Post submitted successfully!');
+            window.location.href = 'index.html';
         }
     </script>
 </body>
