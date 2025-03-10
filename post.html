@@ -1,121 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Post - Telegram Premium Shop</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-        body {
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        .container {
-            max-width: 600px;
-            margin: 20px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(5px);
-        }
-        h2 {
-            font-size: 1.8em;
-            margin-bottom: 20px;
-            color: #00aaff;
-            text-align: center;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            color: #fff;
-            margin-bottom: 5px;
-        }
-        .form-group textarea {
-            width: 100%;
-            padding: 15px;
-            border-radius: 10px;
-            border: none;
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
-            font-size: 1em;
-            resize: none;
-        }
-        .form-group input[type="file"] {
-            width: 100%;
-            padding: 10px 0;
-            color: #fff;
-        }
-        button {
-            width: 100%;
-            padding: 12px 30px;
-            background: #00aaff;
-            border: none;
-            border-radius: 50px;
-            color: #fff;
-            font-size: 1em;
-            cursor: pointer;
-            transition: transform 0.3s, background 0.3s;
-        }
-        button:hover {
-            transform: scale(1.05);
-            background: #0077cc;
-        }
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-            h2 {
-                font-size: 1.5em;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Post</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .container { max-width: 800px; margin: 0 auto; }
+    form { display: flex; flex-direction: column; gap: 10px; max-width: 400px; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Create a Post</h2>
-        <div class="form-group">
-            <label for="content">Post Content (Optional):</label>
-            <textarea id="content" rows="4" placeholder="Write your post here..."></textarea>
-        </div>
-        <div class="form-group">
-            <label for="media">Upload Media (Optional - Image, Video, or Audio):</label>
-            <input type="file" id="media" accept="image/*,video/*,audio/*">
-        </div>
-        <button onclick="submitPost()">Submit Post</button>
-    </div>
-
-    <script src="data.js"></script>
-    <script>
-        let userId = localStorage.getItem('userId') || `user-${Math.random().toString(36).substr(2, 9)}`;
-        localStorage.setItem('userId', userId);
-
-        function submitPost() {
-            const content = document.getElementById('content').value;
-            const media = document.getElementById('media').files[0];
-            const post = {
-                userId,
-                content: content || '',
-                media: media ? URL.createObjectURL(media) : null,
-                mediaType: media ? media.type.split('/')[0] : null,
-                timestamp: new Date().toISOString()
-            };
-            savePost(post);
-            alert('Post submitted successfully!');
-            window.location.href = 'index.html';
-        }
-    </script>
+  <div class="container">
+    <h1>Create a Post</h1>
+    <form id="post-form">
+      <input type="text" name="userId" placeholder="User ID" required>
+      <textarea name="content" placeholder="Content" required></textarea>
+      <button type="submit">Submit</button>
+    </form>
+    <a href="/index.html">Back to Home</a>
+  </div>
+  <script>
+    document.getElementById('post-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const postData = {
+        userId: formData.get('userId'),
+        content: formData.get('content'),
+        timestamp: new Date().toISOString(),
+      };
+      try {
+        const response = await fetch('/.netlify/functions/data/posts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(postData),
+        });
+        const result = await response.json();
+        alert(result.message);
+        e.target.reset();
+      } catch (error) {
+        console.error('Error submitting post:', error);
+        alert('Failed to submit post');
+      }
+    });
+  </script>
 </body>
 </html>
