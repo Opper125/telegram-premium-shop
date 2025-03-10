@@ -73,6 +73,17 @@
             transform: scale(1.05);
             background: #0077cc;
         }
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            color: #00aaff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
         @media (max-width: 768px) {
             .container {
                 padding: 20px;
@@ -95,9 +106,9 @@
             <input type="file" id="media" accept="image/*,video/*,audio/*">
         </div>
         <button onclick="submitPost()">Submit Post</button>
+        <a href="/index.html">Back to Home</a>
     </div>
 
-    <script src="data.js"></script>
     <script>
         let userId = localStorage.getItem('userId') || `user-${Math.random().toString(36).substr(2, 9)}`;
         localStorage.setItem('userId', userId);
@@ -105,16 +116,31 @@
         function submitPost() {
             const content = document.getElementById('content').value;
             const media = document.getElementById('media').files[0];
-            const post = {
+            const postData = {
                 userId,
                 content: content || '',
-                media: media ? URL.createObjectURL(media) : null,
-                mediaType: media ? media.type.split('/')[0] : null,
+                media: media ? URL.createObjectURL(media) : '',
+                mediaType: media ? media.type.split('/')[0] : '',
                 timestamp: new Date().toISOString()
             };
-            savePost(post);
-            alert('Post submitted successfully!');
-            window.location.href = 'index.html';
+            fetch('/.netlify/functions/data/posts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(postData)
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to submit post');
+                return response.json();
+            })
+            .then(result => {
+                alert(result.message);
+                document.getElementById('content').value = '';
+                document.getElementById('media').value = '';
+            })
+            .catch(error => {
+                console.error('Error submitting post:', error);
+                alert('Failed to submit post. Please try again.');
+            });
         }
     </script>
 </body>
