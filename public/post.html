@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Post - Telegram Premium Shop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 600px;
+            margin: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+        }
+        h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #00aaff;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            color: #fff;
+            margin-bottom: 5px;
+        }
+        .form-group textarea {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 1em;
+            resize: none;
+        }
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 10px 0;
+            color: #fff;
+        }
+        button {
+            width: 100%;
+            padding: 12px 30px;
+            background: #00aaff;
+            border: none;
+            border-radius: 50px;
+            color: #fff;
+            font-size: 1em;
+            cursor: pointer;
+            transition: transform 0.3s, background 0.3s;
+        }
+        button:hover {
+            transform: scale(1.05);
+            background: #0077cc;
+        }
+        a {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            color: #00aaff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            h2 {
+                font-size: 1.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Create a Post</h2>
+        <div class="form-group">
+            <label for="content">Post Content (Optional):</label>
+            <textarea id="content" rows="4" placeholder="Write your post here..."></textarea>
+        </div>
+        <div class="form-group">
+            <label for="media">Upload Media (Optional - Image, Video, or Audio):</label>
+            <input type="file" id="media" accept="image/*,video/*,audio/*">
+        </div>
+        <button onclick="submitPost()">Submit Post</button>
+        <a href="/index.html">Back to Home</a>
+    </div>
+
+    <script>
+        let userId = localStorage.getItem('userId') || `user-${Math.random().toString(36).substr(2, 9)}`;
+        localStorage.setItem('userId', userId);
+
+        function submitPost() {
+            const content = document.getElementById('content').value;
+            const media = document.getElementById('media').files[0];
+            const postData = {
+                userId,
+                content: content || '',
+                media: media ? URL.createObjectURL(media) : '',
+                mediaType: media ? media.type.split('/')[0] : '',
+                timestamp: new Date().toISOString()
+            };
+            fetch('/.netlify/functions/data/posts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(postData)
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to submit post');
+                return response.json();
+            })
+            .then(result => {
+                alert(result.message);
+                document.getElementById('content').value = '';
+                document.getElementById('media').value = '';
+            })
+            .catch(error => {
+                console.error('Error submitting post:', error);
+                alert('Failed to submit post. Please try again.');
+            });
+        }
+    </script>
+</body>
+</html>
