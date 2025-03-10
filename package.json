@@ -6,14 +6,12 @@
     "scripts": {
         "start": "echo 'No server required for static site'",
         "test": "echo 'No tests specified'",
-        "build": "tsc"
+        "build": "echo 'No build step required'"
     },
     "dependencies": {
         "@netlify/functions": "^1.0.0"
     },
-    "devDependencies": {
-        "typescript": "^4.9.5"
-    },
+    "devDependencies": {},
     "author": "",
     "license": "ISC"
 }
