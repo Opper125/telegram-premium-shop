@@ -229,6 +229,15 @@
             transform: scale(1.05);
             background: #0077cc;
         }
+        #event-log {
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
         @media (max-width: 768px) {
             .navbar {
                 flex-direction: column;
@@ -282,6 +291,7 @@
             <h2>Home</h2>
             <button class="create-post-btn" onclick="window.location.href='post.html'">Create a Post</button>
             <div class="posts" id="posts"></div>
+            <div id="event-log"></div>
         </div>
 
         <div id="shopSection" class="section">
@@ -324,7 +334,7 @@
                 <p>Contact us for more information!</p>
                 <p>Telegram: <a href="https://t.me/OPPERN" target="_blank">@OPPERN</a></p>
                 <p>Address: 424 တာမွေ Street, 3 Yangon, Myanmar</p>
-                <p>Email: wechatopper@gmail.com</p>
+                <p>Email: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="780f1d1b10191c0d1612091c0b391e14181015571a1614">[email&#160;protected]</a></p>
             </div>
         </div>
 
@@ -334,7 +344,6 @@
         </div>
     </div>
 
-    <script src="data.js"></script>
     <script>
         let userId = localStorage.getItem('userId') || `user-${Math.random().toString(36).substr(2, 9)}`;
         localStorage.setItem('userId', userId);
@@ -349,9 +358,8 @@
             showSection('homeSection');
             loadPosts();
             loadOrders();
+            setupRealTimeUpdates();
             updateNotificationBadge();
-            // Auto-refresh posts every 5 seconds
-            setInterval(loadPosts, 5000);
         };
 
         function showSection(sectionId) {
@@ -362,19 +370,31 @@
         }
 
         function loadPosts() {
-            const posts = getPosts();
-            const postsDiv = document.getElementById('posts');
-            postsDiv.innerHTML = posts.map(post => `
-                <div class="post-card">
-                    <p><strong>${post.userId}</strong> - ${new Date(post.timestamp).toLocaleString()}</p>
-                    ${post.content ? `<p>${post.content}</p>` : ''}
-                    ${post.media ? `
-                        ${post.mediaType === 'image' ? `<img src="${post.media}" alt="Post Media">` :
-                          post.mediaType === 'video' ? `<video src="${post.media}" controls></video>` :
-                          post.mediaType === 'audio' ? `<audio src="${post.media}" controls></audio>` : ''}
-                    ` : ''}
-                </div>
-            `).join('');
+            fetch('/.netlify/functions/data/posts')
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to fetch posts');
+                    return response.json();
+                })
+                .then(data => {
+                    const postsDiv = document.getElementById('posts');
+                    postsDiv.innerHTML = data.length === 0
+                        ? '<p>No posts available.</p>'
+                        : data.map(post => `
+                            <div class="post-card">
+                                <p><strong>${post.userId}</strong> - ${new Date(post.timestamp).toLocaleString()}</p>
+                                ${post.content ? `<p>${post.content}</p>` : ''}
+                                ${post.media ? `
+                                    ${post.mediaType === 'image' ? `<img src="${post.media}" alt="Post Media">` :
+                                        post.mediaType === 'video' ? `<video src="${post.media}" controls></video>` :
+                                        post.mediaType === 'audio' ? `<audio src="${post.media}" controls></audio>` : ''}
+                                ` : ''}
+                            </div>
+                        `).join('');
+                })
+                .catch(error => {
+                    console.error('Error fetching posts:', error);
+                    document.getElementById('posts').innerHTML = '<p>Error loading posts.</p>';
+                });
         }
 
         function selectPremium(months, price) {
@@ -413,36 +433,81 @@
                 transactionId: document.getElementById('transactionId').value,
                 telegramUsername: document.getElementById('telegramUsername').value,
                 paymentMethod: selectedPaymentMethod,
-                status: 'approved',
+                status: 'pending',
                 timestamp: new Date().toISOString()
             };
-            saveOrder(order);
-            notificationCount++;
-            updateNotificationBadge();
-            document.getElementById('status').innerText = 'Order submitted and approved!';
-            document.getElementById('transactionId').value = '';
-            document.getElementById('telegramUsername').value = '';
-            loadOrders();
+            fetch('/.netlify/functions/data/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(order)
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Failed to submit order');
+                return response.json();
+            })
+            .then(result => {
+                notificationCount++;
+                updateNotificationBadge();
+                document.getElementById('status').innerText = result.message;
+                document.getElementById('transactionId').value = '';
+                document.getElementById('telegramUsername').value = '';
+                loadOrders();
+            })
+            .catch(error => {
+                console.error('Error submitting order:', error);
+                alert('Failed to submit order. Please try again.');
+            });
         }
 
         function loadOrders() {
-            const orders = getOrders().filter(order => order.userId === userId);
-            const ordersDiv = document.getElementById('orders');
-            ordersDiv.innerHTML = orders.map(order => `
-                <div class="order-card">
-                    <p><strong>Months:</strong> ${order.months}</p>
-                    <p><strong>Quantity:</strong> ${order.quantity}</p>
-                    <p><strong>Total:</strong> ${order.total} MMK</p>
-                    <p><strong>Transaction ID:</strong> ${order.transactionId}</p>
-                    <p><strong>Telegram:</strong> ${order.telegramUsername}</p>
-                    <p><strong>Payment:</strong> ${order.paymentMethod}</p>
-                    <p><strong>Time:</strong> ${new Date(order.timestamp).toLocaleString()}</p>
-                </div>
-            `).join('');
+            fetch('/.netlify/functions/data/orders')
+                .then(response => {
+                    if (!response.ok) throw new Error('Failed to fetch orders');
+                    return response.json();
+                })
+                .then(data => {
+                    const ordersDiv = document.getElementById('orders');
+                    const userOrders = data.filter(order => order.userId === userId);
+                    ordersDiv.innerHTML = userOrders.length === 0
+                        ? '<p>No orders available.</p>'
+                        : userOrders.map(order => `
+                            <div class="post-card">
+                                <p><strong>Months:</strong> ${order.months}</p>
+                                <p><strong>Quantity:</strong> ${order.quantity}</p>
+                                <p><strong>Total:</strong> ${order.total} MMK</p>
+                                <p><strong>Transaction ID:</strong> ${order.transactionId}</p>
+                                <p><strong>Telegram:</strong> ${order.telegramUsername}</p>
+                                <p><strong>Payment:</strong> ${order.paymentMethod}</p>
+                                <p><strong>Time:</strong> ${new Date(order.timestamp).toLocaleString()}</p>
+                            </div>
+                        `).join('');
+                })
+                .catch(error => {
+                    console.error('Error fetching orders:', error);
+                    document.getElementById('orders').innerHTML = '<p>Error loading orders.</p>';
+                });
         }
 
         function updateNotificationBadge() {
             document.getElementById('notificationBadge').innerText = notificationCount;
+        }
+
+        function setupRealTimeUpdates() {
+            const eventSource = new EventSource('/.netlify/functions/data/events');
+            eventSource.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.type === 'initial' || data.type === 'update') {
+                    loadPosts();
+                    loadOrders();
+                    const eventLog = document.getElementById('event-log');
+                    eventLog.innerHTML += `<p>[${new Date().toLocaleTimeString()}] Updated: ${data.posts.length} posts, ${data.orders.length} orders</p>`;
+                    eventLog.scrollTop = eventLog.scrollHeight;
+                }
+            };
+            eventSource.onerror = () => {
+                console.error('EventSource failed');
+                eventSource.close();
+            };
         }
     </script>
 </body>
