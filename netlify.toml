@@ -1,6 +1,6 @@
 [build]
-    command = "npm install && tsc"
-    publish = "/"
+    command = "npm install"
+    publish = "public"
     functions = "functions"
 
 [dev]
