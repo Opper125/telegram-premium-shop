@@ -1,25 +1,23 @@
 [build]
-    command = "npm install"
-    publish = "public"
-    functions = "functions"
+    # No build command needed since it's a static site
+    command = "echo 'No build required'"
+    # Publish the root directory
+    publish = "/"
+    # No functions directory since we're not using serverless functions currently
+    functions = ""
 
 [dev]
     framework = "#custom"
     command = "echo 'Custom static site development'"
 
 [[redirects]]
+    # Redirect all requests to index.html by default
     from = "/*"
     to = "/index.html"
     status = 200
 
 [[redirects]]
+    # Redirect to post.html for post creation
     from = "/post"
     to = "/post.html"
     status = 200
-
-[[headers]]
-    for = "/functions/*"
-    [headers.values]
-        Access-Control-Allow-Origin = "*"
-        Access-Control-Allow-Methods = "GET, POST, PUT, OPTIONS"
-        Access-Control-Allow-Headers = "Content-Type"
