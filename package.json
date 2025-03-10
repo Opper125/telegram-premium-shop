@@ -1,12 +1,17 @@
 {
     "name": "telegram-premium-shop",
     "version": "1.0.0",
-    "description": "A modern Telegram Premium Shop with static hosting",
+    "description": "A modern Telegram Premium Shop with static hosting and functions",
     "main": "index.html",
     "scripts": {
         "start": "echo 'No server required for static site'",
-        "test": "echo 'No tests specified'"
+        "test": "echo 'No tests specified'",
+        "build": "echo 'No build step required'"
     },
+    "dependencies": {
+        "@netlify/functions": "^1.0.0"
+    },
+    "devDependencies": {},
     "author": "",
     "license": "ISC"
 }
