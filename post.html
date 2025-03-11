@@ -6,14 +6,63 @@
     <title>Create Post - Telegram Premium Shop</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { background: linear-gradient(135deg, #1e3c72, #2a5298); color: #fff; min-height: 100vh; }
-        .container { max-width: 600px; margin: 50px auto; padding: 20px; background: rgba(255, 255, 255, 0.1); border-radius: 20px; }
-        h2 { font-size: 1.8em; margin-bottom: 20px; color: #00aaff; text-align: center; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 5px; }
-        .form-group textarea, .form-group input[type="text"] { width: 100%; padding: 10px; border-radius: 10px; border: none; background: rgba(255, 255, 255, 0.2); color: #fff; }
-        button { display: block; width: 100%; padding: 12px; background: #00aaff; border: none; border-radius: 50px; color: #fff; cursor: pointer; }
-        button:hover { background: #0077cc; }
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 600px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #00aaff;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group textarea,
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            resize: vertical;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: #00aaff;
+            border: none;
+            border-radius: 50px;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #0077cc;
+        }
+        #status {
+            text-align: center;
+            margin-top: 10px;
+            color: #2ecc71;
+        }
     </style>
 </head>
 <body>
@@ -25,9 +74,10 @@
         </div>
         <div class="form-group">
             <label for="media">Upload Media URL (Optional - Image, Video, or Audio):</label>
-            <input type="text" id="media" placeholder="Enter media URL">
+            <input type="text" id="media" placeholder="Enter media URL (e.g., https://example.com/image.jpg)">
         </div>
         <button onclick="submitPost()">Submit Post</button>
+        <div id="status"></div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js"></script>
@@ -50,6 +100,7 @@ const firebaseConfig = {
         const auth = firebase.auth();
 
         let userId = null;
+
         auth.onAuthStateChanged(user => {
             if (user) {
                 userId = user.uid;
@@ -60,29 +111,48 @@ const firebaseConfig = {
         });
 
         function submitPost() {
-            if (!userId) return;
-            const content = document.getElementById('content').value;
-            const media = document.getElementById('media').value;
-            let mediaType = null;
+            if (!userId) {
+                alert('အကောင့်ဝင်ပါ။');
+                return;
+            }
 
+            const content = document.getElementById('content').value.trim();
+            const media = document.getElementById('media').value.trim();
+
+            if (!content && !media) {
+                alert('အနည်းဆုံး အကြောင်းအရာ သို့မဟုတ် မီဒီယာ URL တစ်ခု ထည့်ပါ။');
+                return;
+            }
+
+            let mediaType = null;
             if (media) {
-                if (media.includes('image')) mediaType = 'image';
-                else if (media.includes('video')) mediaType = 'video';
-                else if (media.includes('audio')) mediaType = 'audio';
+                if (media.match(/\.(jpeg|jpg|png|gif)$/i)) mediaType = 'image';
+                else if (media.match(/\.(mp4|webm|ogg)$/i)) mediaType = 'video';
+                else if (media.match(/\.(mp3|wav|ogg)$/i)) mediaType = 'audio';
+                else {
+                    alert('မမှန်ကန်သော မီဒီယာ URL ဖြစ်ပါသည်။ (Image, Video, Audio သာ လက်ခံပါသည်)');
+                    return;
+                }
             }
 
             const post = {
                 userId,
-                content: content || '',
+                content: content || null,
                 media: media || null,
                 mediaType,
                 timestamp: Date.now()
             };
 
-            db.ref('posts').push(post).then(() => {
-                alert('ပို့စ်တင်ပြီးပါပြီ။');
-                window.location.href = 'index.html';
-            });
+            db.ref('posts').push(post)
+                .then(() => {
+                    document.getElementById('status').innerText = 'ပို့စ်တင်ပြီးပါပြီ။';
+                    document.getElementById('content').value = '';
+                    document.getElementById('media').value = '';
+                    setTimeout(() => window.location.href = 'index.html', 2000);
+                })
+                .catch(error => {
+                    alert('Error: ' + error.message);
+                });
         }
     </script>
 </body>
