@@ -6,275 +6,54 @@
     <title>Telegram Premium Shop ✨</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-        body {
-            background: linear-gradient(135deg, #1e3c72, #2a5298);
-            color: #fff;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .navbar {
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            padding: 15px 20px;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
-        .navbar .logo {
-            display: flex;
-            align-items: center;
-        }
-        .navbar .logo img {
-            width: 50px;
-            height: 50px;
-            margin-right: 10px;
-        }
-        .navbar .logo h1 {
-            font-size: 1.5em;
-            font-weight: 600;
-            color: #fff;
-        }
-        .navbar .menu {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-        .navbar .menu a {
-            color: #fff;
-            text-decoration: none;
-            font-weight: 500;
-            transition: color 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .navbar .menu a:hover {
-            color: #00aaff;
-        }
-        .navbar .notification {
-            position: relative;
-        }
-        .navbar .notification img {
-            width: 30px;
-            height: 30px;
-        }
-        .navbar .notification .badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #ff4d4d;
-            color: #fff;
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 0.8em;
-        }
-        .hero {
-            text-align: center;
-            padding: 50px 20px;
-            background: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c') no-repeat center center/cover;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            margin-bottom: 30px;
-        }
-        .hero h2 {
-            font-size: 2.5em;
-            font-weight: 700;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
-        }
-        .hero p {
-            font-size: 1.2em;
-            font-weight: 300;
-            margin-bottom: 20px;
-        }
-        .section {
-            padding: 30px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(5px);
-        }
-        .section h2 {
-            font-size: 1.8em;
-            margin-bottom: 20px;
-            color: #00aaff;
-        }
-        .posts, .orders {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        .post-card, .order-card {
-            background: rgba(255, 255, 255, 0.15);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s;
-        }
-        .post-card:hover, .order-card:hover {
-            transform: translateY(-5px);
-        }
-        .post-card img, .post-card video, .post-card audio {
-            max-width: 100%;
-            border-radius: 10px;
-            margin-top: 10px;
-        }
-        .premium-options {
-            margin-bottom: 30px;
-        }
-        .premium-option {
-            background: #ff4d4d;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            cursor: pointer;
-            transition: transform 0.3s, background 0.3s;
-            text-align: center;
-        }
-        .premium-option:hover {
-            transform: scale(1.05);
-            background: #e60000;
-        }
-        .quantity {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin: 10px 0;
-        }
-        .quantity button {
-            background: #00aaff;
-            border: none;
-            padding: 5px 15px;
-            border-radius: 5px;
-            color: #fff;
-            cursor: pointer;
-            margin: 0 10px;
-        }
-        #totalPrice {
-            text-align: center;
-            font-size: 1.5em;
-            margin: 15px 0;
-            color: #ff4d4d;
-        }
-        .payment-method {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-        .payment-method img {
-            width: 60px;
-            height: 40px;
-            object-fit: contain;
-            cursor: pointer;
-            border: 2px solid transparent;
-            border-radius: 5px;
-            transition: border 0.3s;
-        }
-        .payment-method img.selected {
-            border: 2px solid #00aaff;
-        }
-        .payment-method input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 10px;
-            border: none;
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
-        }
-        #status {
-            text-align: center;
-            margin-top: 10px;
-            color: #2ecc71;
-            font-weight: 600;
-        }
-        .contact-section {
-            text-align: center;
-        }
-        .contact-section a {
-            color: #00aaff;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        .contact-section a:hover {
-            text-decoration: underline;
-        }
-        .create-post-btn {
-            display: block;
-            margin: 20px auto;
-            padding: 12px 30px;
-            background: #00aaff;
-            border: none;
-            border-radius: 50px;
-            color: #fff;
-            font-size: 1em;
-            cursor: pointer;
-            transition: transform 0.3s, background 0.3s;
-        }
-        .create-post-btn:hover {
-            transform: scale(1.05);
-            background: #0077cc;
-        }
-        .phone-number-popup {
-            position: fixed;
-            top: 50%;
-            right: -300px;
-            background: #2ecc71;
-            color: #fff;
-            padding: 15px 20px;
-            border-radius: 10px;
-            font-size: 1.2em;
-            animation: slideIn 0.5s forwards, slideOut 0.5s 9.5s forwards;
-            z-index: 1000;
-        }
-        @keyframes slideIn {
-            from { right: -300px; }
-            to { right: 20px; }
-        }
-        @keyframes slideOut {
-            from { right: 20px; }
-            to { right: -300px; }
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background: linear-gradient(135deg, #1e3c72, #2a5298); color: #fff; min-height: 100vh; overflow-x: hidden; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .navbar { background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); padding: 15px 20px; position: sticky; top: 0; z-index: 1000; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); }
+        .navbar .logo { display: flex; align-items: center; }
+        .navbar .logo img { width: 50px; height: 50px; margin-right: 10px; }
+        .navbar .logo h1 { font-size: 1.5em; font-weight: 600; color: #fff; }
+        .navbar .menu { display: flex; gap: 20px; align-items: center; }
+        .navbar .menu a, .navbar .menu button { color: #fff; text-decoration: none; font-weight: 500; transition: color 0.3s; display: flex; align-items: center; gap: 5px; background: none; border: none; cursor: pointer; }
+        .navbar .menu button:hover { color: #00aaff; }
+        .hero { text-align: center; padding: 50px 20px; background: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c') no-repeat center center/cover; border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); margin-bottom: 30px; }
+        .hero h2 { font-size: 2.5em; font-weight: 700; margin-bottom: 10px; text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5); }
+        .hero p { font-size: 1.2em; font-weight: 300; margin-bottom: 20px; }
+        .section { padding: 30px; background: rgba(255, 255, 255, 0.1); border-radius: 20px; margin-bottom: 30px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); backdrop-filter: blur(5px); }
+        .section h2 { font-size: 1.8em; margin-bottom: 20px; color: #00aaff; }
+        .posts, .orders { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .post-card, .order-card { background: rgba(255, 255, 255, 0.15); padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); transition: transform 0.3s; }
+        .post-card:hover, .order-card:hover { transform: translateY(-5px); }
+        .post-card img, .post-card video, .post-card audio { max-width: 100%; border-radius: 10px; margin-top: 10px; }
+        .premium-options { margin-bottom: 30px; }
+        .premium-option { background: #ff4d4d; padding: 15px; border-radius: 10px; margin-bottom: 15px; cursor: pointer; transition: transform 0.3s, background 0.3s; text-align: center; }
+        .premium-option:hover { transform: scale(1.05); background: #e60000; }
+        .quantity { display: flex; justify-content: center; align-items: center; margin: 10px 0; }
+        .quantity button { background: #00aaff; border: none; padding: 5px 15px; border-radius: 5px; color: #fff; cursor: pointer; margin: 0 10px; }
+        #totalPrice { text-align: center; font-size: 1.5em; margin: 15px 0; color: #ff4d4d; }
+        .payment-method { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 20px; }
+        .payment-method img { width: 60px; height: 40px; object-fit: contain; cursor: pointer; border: 2px solid transparent; border-radius: 5px; transition: border 0.3s; }
+        .payment-method img.selected { border: 2px solid #00aaff; }
+        .payment-method input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 10px; border: none; background: rgba(255, 255, 255, 0.2); color: #fff; }
+        #status { text-align: center; margin-top: 10px; color: #2ecc71; font-weight: 600; }
+        .create-post-btn, button { display: block; margin: 20px auto; padding: 12px 30px; background: #00aaff; border: none; border-radius: 50px; color: #fff; font-size: 1em; cursor: pointer; transition: transform 0.3s, background 0.3s; }
+        .create-post-btn:hover, button:hover { transform: scale(1.05); background: #0077cc; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.7); z-index: 2000; }
+        .modal-content { background: rgba(255, 255, 255, 0.1); width: 90%; max-width: 400px; margin: 50px auto; padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
+        .modal-content h2 { font-size: 1.8em; color: #00aaff; text-align: center; margin-bottom: 20px; }
+        .modal-content input { width: 100%; padding: 10px; margin: 10px 0; border-radius: 10px; border: none; background: rgba(255, 255, 255, 0.2); color: #fff; }
+        .modal-content button { width: 100%; }
+        .modal-content .close { float: right; font-size: 1.5em; cursor: pointer; color: #fff; }
+        .phone-number-popup { position: fixed; top: 50%; right: -300px; background: #2ecc71; color: #fff; padding: 15px 20px; border-radius: 10px; font-size: 1.2em; animation: slideIn 0.5s forwards, slideOut 0.5s 9.5s forwards; z-index: 1000; }
+        @keyframes slideIn { from { right: -300px; } to { right: 20px; } }
+        @keyframes slideOut { from { right: 20px; } to { right: -300px; } }
         @media (max-width: 768px) {
-            .navbar {
-                flex-direction: column;
-                gap: 10px;
-            }
-            .navbar .menu {
-                flex-direction: column;
-                gap: 10px;
-                text-align: center;
-            }
-            .hero h2 {
-                font-size: 1.8em;
-            }
-            .hero p {
-                font-size: 1em;
-            }
-            .section {
-                padding: 20px;
-            }
-            .posts, .orders {
-                grid-template-columns: 1fr;
-            }
+            .navbar { flex-direction: column; gap: 10px; }
+            .navbar .menu { flex-direction: column; gap: 10px; text-align: center; }
+            .hero h2 { font-size: 1.8em; }
+            .hero p { font-size: 1em; }
+            .section { padding: 20px; }
+            .posts, .orders { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -285,29 +64,25 @@
             <h1>Telegram Premium Shop</h1>
         </div>
         <div class="menu">
-            <a href="#homeSection" onclick="showSection('homeSection')"><img src="https://img.icons8.com/ios-filled/50/ffffff/home.png" alt="Home" style="width:20px;"> Home</a>
-            <a href="#shopSection" onclick="showSection('shopSection')"><img src="https://img.icons8.com/ios-filled/50/ffffff/shop.png" alt="Shop" style="width:20px;"> Shop</a>
-            <a href="#hostSection" onclick="showSection('hostSection')"><img src="https://img.icons8.com/ios-filled/50/ffffff/group.png" alt="Host" style="width:20px;"> Host</a>
-            <a href="#meSection" onclick="showSection('meSection')"><img src="https://img.icons8.com/ios-filled/50/ffffff/user.png" alt="Me" style="width:20px;"> Me</a>
-            <a href="admin.html" id="adminLink" style="display:none;">Admin</a>
-            <div class="notification">
-                <img src="https://img.icons8.com/ios-filled/50/ffffff/bell.png" alt="Notification">
-                <span id="notificationBadge" class="badge">0</span>
-            </div>
+            <a href="#homeSection" onclick="showSection('homeSection')" id="homeLink" style="display:none;"><img src="https://img.icons8.com/ios-filled/50/ffffff/home.png" alt="Home" style="width:20px;"> Home</a>
+            <a href="#shopSection" onclick="showSection('shopSection')" id="shopLink" style="display:none;"><img src="https://img.icons8.com/ios-filled/50/ffffff/shop.png" alt="Shop" style="width:20px;"> Shop</a>
+            <a href="#hostSection" onclick="showSection('hostSection')" id="hostLink" style="display:none;"><img src="https://img.icons8.com/ios-filled/50/ffffff/group.png" alt="Host" style="width:20px;"> Host</a>
+            <a href="#meSection" onclick="showSection('meSection')" id="meLink" style="display:none;"><img src="https://img.icons8.com/ios-filled/50/ffffff/user.png" alt="Me" style="width:20px;"> Me</a>
             <button id="loginBtn">Login</button>
+            <button id="signupBtn">Signup</button>
             <button id="logoutBtn" style="display:none;">Logout</button>
         </div>
     </div>
 
-    <div class="hero">
+    <div class="hero" id="mainHero" style="display:none;">
         <h2>Welcome to Telegram Premium Shop ✨</h2>
         <p>Unlock the best Telegram features with our premium plans!</p>
     </div>
 
-    <div class="container">
-        <div id="homeSection" class="section">
+    <div class="container" id="mainContent" style="display:none;">
+        <div id="homeSection" class="section" style="display:none;">
             <h2>Home</h2>
-            <button class="create-post-btn" onclick="window.location.href='post.html'">Create a Post</button>
+            <button class="create-post-btn" onclick="openPostModal()">Create a Post</button>
             <div class="posts" id="posts"></div>
         </div>
 
@@ -334,19 +109,52 @@
             <div id="status"></div>
         </div>
 
-        <div id="hostSection" class="section">
+        <div id="hostSection" class="section" style="display:none;">
             <h2>Host</h2>
             <div class="orders" id="userOrders"></div>
         </div>
 
-        <div id="meSection" class="section">
+        <div id="meSection" class="section" style="display:none;">
             <h2>Me</h2>
-            <div class="contact-section">
-                <p>Contact us for more information!</p>
-                <p>Telegram: <a href="https://t.me/OPPERN" target="_blank">@OPPERN</a></p>
-                <p>Address: 424 တာမွေ Street, 3 Yangon, Myanmar</p>
-                <p>Email: <a href="mailto:support@telegrampremiumshop.com">support@telegrampremiumshop.com</a></p>
-            </div>
+            <p>Contact us for more information!</p>
+            <p>Telegram: <a href="https://t.me/OPPERN">@OPPERN</a></p>
+            <p>Address: 424 တာမွေ Street, 3 Yangon, Myanmar</p>
+            <p>Email: <a href="mailto:support@telegrampremiumshop.com">support@telegrampremiumshop.com</a></p>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('loginModal')">×</span>
+            <h2>Login</h2>
+            <input type="email" id="loginEmail" placeholder="Enter your email" required>
+            <input type="password" id="loginPassword" placeholder="Enter your password" required>
+            <button onclick="login()">Login</button>
+            <p style="text-align:center; margin-top:10px;">အကောင့်မရှိသေးဘူးလား? <a href="#" onclick="switchToSignup()">အကောင့်ဖွင့်ရန်</a></p>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('signupModal')">×</span>
+            <h2>Signup</h2>
+            <input type="email" id="signupEmail" placeholder="Enter your email" required>
+            <input type="password" id="signupPassword" placeholder="Enter your password" required>
+            <button onclick="signup()">Signup</button>
+            <p style="text-align:center; margin-top:10px;">အကောင့်ရှိပြီးသားလား? <a href="#" onclick="switchToLogin()">အကောင့်ဝင်ရန်</a></p>
+        </div>
+    </div>
+
+    <!-- Post Modal -->
+    <div id="postModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('postModal')">×</span>
+            <h2>Create a Post</h2>
+            <input type="text" id="postContent" placeholder="Write your post here...">
+            <input type="text" id="postMedia" placeholder="Enter media URL (optional)">
+            <button onclick="submitPost()">Submit Post</button>
         </div>
     </div>
 
@@ -376,43 +184,94 @@ const firebaseConfig = {
         let selectedPrice = 60000;
         let quantity = 1;
         let selectedPaymentMethod = '';
-        let notificationCount = 0;
 
         auth.onAuthStateChanged(user => {
             if (user) {
                 userId = user.uid;
                 document.getElementById('loginBtn').style.display = 'none';
+                document.getElementById('signupBtn').style.display = 'none';
                 document.getElementById('logoutBtn').style.display = 'block';
-                if (user.email === 'admin@telegrampremiumshop.com') {
-                    document.getElementById('adminLink').style.display = 'block';
-                }
+                document.getElementById('homeLink').style.display = 'inline-flex';
+                document.getElementById('shopLink').style.display = 'inline-flex';
+                document.getElementById('hostLink').style.display = 'inline-flex';
+                document.getElementById('meLink').style.display = 'inline-flex';
+                document.getElementById('mainContent').style.display = 'block';
+                document.getElementById('mainHero').style.display = 'block';
+                showSection('shopSection');
                 loadPosts();
                 loadUserOrders();
             } else {
                 userId = null;
                 document.getElementById('loginBtn').style.display = 'block';
+                document.getElementById('signupBtn').style.display = 'block';
                 document.getElementById('logoutBtn').style.display = 'none';
-                document.getElementById('adminLink').style.display = 'none';
-                alert('အကောင့်ဝင်ပါ။');
-                window.location.href = 'login.html';
+                document.getElementById('homeLink').style.display = 'none';
+                document.getElementById('shopLink').style.display = 'none';
+                document.getElementById('hostLink').style.display = 'none';
+                document.getElementById('meLink').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'none';
+                document.getElementById('mainHero').style.display = 'none';
+                openModal('loginModal');
             }
         });
 
-        document.getElementById('loginBtn').addEventListener('click', () => {
-            window.location.href = 'login.html';
+        document.getElementById('loginBtn').addEventListener('click', () => openModal('loginModal'));
+        document.getElementById('signupBtn').addEventListener('click', () => openModal('signupModal'));
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            auth.signOut().then(() => alert('အကောင့်ထွက်ပြီးပါပြီ။'));
         });
 
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            auth.signOut().then(() => {
-                alert('အကောင့်ထွက်ပြီးပါပြီ။');
-            });
-        });
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function switchToSignup() {
+            closeModal('loginModal');
+            openModal('signupModal');
+        }
+
+        function switchToLogin() {
+            closeModal('signupModal');
+            openModal('loginModal');
+        }
+
+        function login() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            if (!email || !password) {
+                alert('Email နှင့် Password ဖြည့်ပါ။');
+                return;
+            }
+            auth.signInWithEmailAndPassword(email, password)
+                .then(() => {
+                    closeModal('loginModal');
+                    alert('အကောင့်ဝင်ပြီးပါပြီ။');
+                })
+                .catch(error => alert('Error: ' + error.message));
+        }
+
+        function signup() {
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value.trim();
+            if (!email || !password) {
+                alert('Email နှင့် Password ဖြည့်ပါ။');
+                return;
+            }
+            auth.createUserWithEmailAndPassword(email, password)
+                .then(() => {
+                    closeModal('signupModal');
+                    alert('အကောင့်ဖွင့်ပြီးပါပြီ။');
+                })
+                .catch(error => alert('Error: ' + error.message));
+        }
 
         function showSection(sectionId) {
             document.querySelectorAll('.section').forEach(section => section.style.display = 'none');
             document.getElementById(sectionId).style.display = 'block';
-            if (sectionId === 'homeSection') loadPosts();
-            if (sectionId === 'hostSection') loadUserOrders();
         }
 
         function loadPosts() {
@@ -425,11 +284,7 @@ const firebaseConfig = {
                         <div class="post-card">
                             <p><strong>${post.userId}</strong> - ${new Date(post.timestamp).toLocaleString()}</p>
                             ${post.content ? `<p>${post.content}</p>` : ''}
-                            ${post.media ? `
-                                ${post.mediaType === 'image' ? `<img src="${post.media}" alt="Post Media">` :
-                                  post.mediaType === 'video' ? `<video src="${post.media}" controls></video>` :
-                                  post.mediaType === 'audio' ? `<audio src="${post.media}" controls></audio>` : ''}
-                            ` : ''}
+                            ${post.media ? `<img src="${post.media}" alt="Post Media">` : ''}
                         </div>
                     `;
                 });
@@ -480,13 +335,11 @@ const firebaseConfig = {
                 timestamp: Date.now()
             };
             db.ref('orders').push(order).then(() => {
-                notificationCount++;
-                updateNotificationBadge();
-                document.getElementById('status').innerText = 'အော်ဒါတင်ပြီးပါပြီ။ အက်မင်အတည်ပြုတာကို စောင့်ပါ။';
+                document.getElementById('status').innerText = 'အော်ဒါတင်ပြီးပါပြီ။';
                 document.getElementById('transactionLast6').value = '';
                 document.getElementById('telegramUsername').value = '';
                 loadUserOrders();
-            });
+            }).catch(error => alert('Error: ' + error.message));
         }
 
         function loadUserOrders() {
@@ -505,7 +358,6 @@ const firebaseConfig = {
                             <p><strong>Telegram:</strong> ${order.telegramUsername}</p>
                             <p><strong>ငွေပေးချေမှု:</strong> ${order.paymentMethod}</p>
                             <p><strong>အခြေအနေ:</strong> ${order.status}</p>
-                            <p><strong>အချိန်:</strong> ${order.timestamp ? new Date(order.timestamp).toLocaleString() : 'စောင့်ဆိုင်းနေ'}</p>
                         </div>
                     `;
                 });
@@ -513,8 +365,34 @@ const firebaseConfig = {
             });
         }
 
-        function updateNotificationBadge() {
-            document.getElementById('notificationBadge').innerText = notificationCount;
+        function openPostModal() {
+            openModal('postModal');
+        }
+
+        function submitPost() {
+            if (!userId) {
+                alert('အကောင့်ဝင်ပါ။');
+                return;
+            }
+            const content = document.getElementById('postContent').value.trim();
+            const media = document.getElementById('postMedia').value.trim();
+            if (!content && !media) {
+                alert('အနည်းဆုံး အကြောင်းအရာ သို့မဟုတ် မီဒီယာ URL ထည့်ပါ။');
+                return;
+            }
+            const post = {
+                userId,
+                content: content || null,
+                media: media || null,
+                timestamp: Date.now()
+            };
+            db.ref('posts').push(post).then(() => {
+                closeModal('postModal');
+                document.getElementById('postContent').value = '';
+                document.getElementById('postMedia').value = '';
+                alert('ပို့စ်တင်ပြီးပါပြီ။');
+                loadPosts();
+            }).catch(error => alert('Error: ' + error.message));
         }
     </script>
 </body>
