@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Post - Telegram Premium Shop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { background: linear-gradient(135deg, #1e3c72, #2a5298); color: #fff; min-height: 100vh; }
+        .container { max-width: 600px; margin: 50px auto; padding: 20px; background: rgba(255, 255, 255, 0.1); border-radius: 20px; }
+        h2 { font-size: 1.8em; margin-bottom: 20px; color: #00aaff; text-align: center; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 5px; }
+        .form-group textarea, .form-group input[type="text"] { width: 100%; padding: 10px; border-radius: 10px; border: none; background: rgba(255, 255, 255, 0.2); color: #fff; }
+        button { display: block; width: 100%; padding: 12px; background: #00aaff; border: none; border-radius: 50px; color: #fff; cursor: pointer; }
+        button:hover { background: #0077cc; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Create a Post</h2>
+        <div class="form-group">
+            <label for="content">Post Content (Optional):</label>
+            <textarea id="content" rows="4" placeholder="Write your post here..."></textarea>
+        </div>
+        <div class="form-group">
+            <label for="media">Upload Media URL (Optional - Image, Video, or Audio):</label>
+            <input type="text" id="media" placeholder="Enter media URL">
+        </div>
+        <button onclick="submitPost()">Submit Post</button>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.4.0/firebase-database.js"></script>
+    <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBJacTY2m9yQSDPpq7SLzUYZY6fY8qpSBQ",
+  authDomain: "telegram-premium-shop.firebaseapp.com",
+  projectId: "telegram-premium-shop",
+  storageBucket: "telegram-premium-shop.firebasestorage.app",
+  messagingSenderId: "180831107855",
+  appId: "1:180831107855:web:e8f20d197611ba7026dc7a",
+  measurementId: "G-8ETNRSFGP0",
+  databaseURL: "https://telegram-premium-shop-default-rtdb.asia-southeast1.firebasedatabase.app/"
+};
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+        const auth = firebase.auth();
+
+        let userId = null;
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                userId = user.uid;
+            } else {
+                alert('အကောင့်ဝင်ပါ။');
+                window.location.href = 'login.html';
+            }
+        });
+
+        function submitPost() {
+            if (!userId) return;
+            const content = document.getElementById('content').value;
+            const media = document.getElementById('media').value;
+            let mediaType = null;
+
+            if (media) {
+                if (media.includes('image')) mediaType = 'image';
+                else if (media.includes('video')) mediaType = 'video';
+                else if (media.includes('audio')) mediaType = 'audio';
+            }
+
+            const post = {
+                userId,
+                content: content || '',
+                media: media || null,
+                mediaType,
+                timestamp: Date.now()
+            };
+
+            db.ref('posts').push(post).then(() => {
+                alert('ပို့စ်တင်ပြီးပါပြီ။');
+                window.location.href = 'index.html';
+            });
+        }
+    </script>
+</body>
+</html>
