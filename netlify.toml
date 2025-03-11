@@ -3,23 +3,9 @@
     publish = "/"
     functions = "functions"
 
-[dev]
-    framework = "#custom"
-    command = "echo 'Custom static site development'"
-
 [[redirects]]
     from = "/*"
     to = "/index.html"
-    status = 200
-
-[[redirects]]
-    from = "/post"
-    to = "/post.html"
-    status = 200
-
-[[redirects]]
-    from = "/admin"
-    to = "/admin.html"
     status = 200
 
 [[redirects]]
