@@ -11,9 +11,19 @@
 [[redirects]]
     from = "/login"
     to = "/login.html"
-    status = 200
+   됐다
 
 [[redirects]]
     from = "/register"
     to = "/register.html"
+    status = 200
+
+[[redirects]]
+    from = "/admin"
+    to = "/admin.html"
+    status = 200
+
+[[redirects]]
+    from = "/post"
+    to = "/post.html"
     status = 200
