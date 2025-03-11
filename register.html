@@ -6,25 +6,81 @@
     <title>Register - Telegram Premium Shop</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { background: linear-gradient(135deg, #1e3c72, #2a5298); color: #fff; min-height: 100vh; display: flex; justify-content: center; align-items: center; }
-        .container { max-width: 400px; background: rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 20px; }
-        h2 { font-size: 1.8em; margin-bottom: 20px; color: #00aaff; text-align: center; }
-        .form-group { margin-bottom: 15px; }
-        .form-group input { width: 100%; padding: 10px; border-radius: 10px; border: none; background: rgba(255, 255, 255, 0.2); color: #fff; }
-        button { width: 100%; padding: 12px; background: #00aaff; border: none; border-radius: 50px; color: #fff; cursor: pointer; }
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #00aaff;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 10px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #00aaff;
+            border: none;
+            border-radius: 50px;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background: #0077cc;
+        }
+        p {
+            text-align: center;
+            margin-top: 10px;
+        }
+        p a {
+            color: #00aaff;
+            text-decoration: none;
+        }
+        p a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h2>Register</h2>
         <div class="form-group">
+            <label for="email">Email:</label>
             <input type="email" id="email" placeholder="Enter your email">
         </div>
         <div class="form-group">
+            <label for="password">Password:</label>
             <input type="password" id="password" placeholder="Enter your password">
         </div>
         <button onclick="register()">Register</button>
-        <p style="text-align:center; margin-top:10px;">အကောင့်ရှိပြီးသားလား? <a href="login.html" style="color:#00aaff;">အကောင့်ဝင်ရန်</a></p>
+        <p>အကောင့်ရှိပြီးသားလား? <a href="login.html">အကောင့်ဝင်ရန်</a></p>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js"></script>
@@ -47,6 +103,12 @@ const firebaseConfig = {
         function register() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+
+            if (!email || !password) {
+                alert('အားလုံးဖြည့်ပါ။');
+                return;
+            }
+
             auth.createUserWithEmailAndPassword(email, password)
                 .then(() => {
                     alert('အကောင့်ဖွင့်ပြီးပါပြီ။ အကောင့်ဝင်ပါ။');
