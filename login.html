@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Telegram Premium Shop</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { background: linear-gradient(135deg, #1e3c72, #2a5298); color: #fff; min-height: 100vh; display: flex; justify-content: center; align-items: center; }
+        .container { max-width: 400px; background: rgba(255, 255, 255, 0.1); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
+        h2 { font-size: 1.8em; margin-bottom: 20px; color: #00aaff; text-align: center; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; }
+        .form-group input { width: 100%; padding: 10px; border-radius: 10px; border: none; background: rgba(255, 255, 255, 0.2); color: #fff; }
+        button { width: 100%; padding: 12px; background: #00aaff; border: none; border-radius: 50px; color: #fff; cursor: pointer; }
+        button:hover { background: #0077cc; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Login</h2>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" placeholder="Enter your email">
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" placeholder="Enter your password">
+        </div>
+        <button onclick="login()">Login</button>
+        <p style="text-align:center; margin-top:10px;">အကောင့်မရှိသေးဘူးလား? <a href="register.html" style="color:#00aaff;">အကောင့်ဖွင့်ရန်</a></p>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js"></script>
+    <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBJacTY2m9yQSDPpq7SLzUYZY6fY8qpSBQ",
+  authDomain: "telegram-premium-shop.firebaseapp.com",
+  projectId: "telegram-premium-shop",
+  storageBucket: "telegram-premium-shop.firebasestorage.app",
+  messagingSenderId: "180831107855",
+  appId: "1:180831107855:web:e8f20d197611ba7026dc7a",
+  measurementId: "G-8ETNRSFGP0",
+  databaseURL: "https://telegram-premium-shop-default-rtdb.asia-southeast1.firebasedatabase.app/"
+};
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            auth.signInWithEmailAndPassword(email, password)
+                .then(() => {
+                    window.location.href = 'index.html';
+                })
+                .catch(error => {
+                    alert(error.message);
+                });
+        }
+    </script>
+</body>
+</html>
