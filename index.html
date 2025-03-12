@@ -419,267 +419,247 @@
     let selectedPrice = 60000;
     let quantity = 1;
     let selectedPaymentMethod = '';
-    const deviceId = navigator.userAgent + Date.now(); // Unique device identifier
+    const deviceId = navigator.userAgent + Date.now();
 
-    // Check if user is logged in from LocalStorage
     document.addEventListener('DOMContentLoaded', () => {
         const storedUser = localStorage.getItem('user');
         if (storedUser) {
             user = JSON.parse(storedUser);
             updateUIForLoggedInUser();
             fetchOrders();
-            setInterval(fetchOrders, 1000); // Fetch orders every 1 second for real-time updates
+            setInterval(fetchOrders, 2000); // Poll every 2 seconds for real-time effect
         }
     });
-       
-        document.getElementById('loginBtn').addEventListener('click', () => openModal('loginModal'));
-        document.getElementById('signupBtn').addEventListener('click', () => openModal('signupModal'));
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            localStorage.removeItem('user');
-            user = null;
-            updateUIForLoggedOutUser();
-            alert('အကောင့်ထွက်ပြီးပါပြီၡ。');
-        });
 
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'block';
+    document.getElementById('loginBtn').addEventListener('click', () => openModal('loginModal'));
+    document.getElementById('signupBtn').addEventListener('click', () => openModal('signupModal'));
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        localStorage.removeItem('user');
+        user = null;
+        updateUIForLoggedOutUser();
+        alert('အကောင့်ထွက်ပြီးပါပြီၡ。');
+    });
+
+    function openModal(modalId) { document.getElementById(modalId).style.display = 'block'; }
+    function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
+
+    function signup() {
+        const email = document.getElementById('signupEmail').value.trim();
+        const password = document.getElementById('signupPassword').value.trim();
+        if (!email || !password) {
+            alert('အီးမေးလ် နှင့် စကားဝှက် ဖြည့်ပါၡ。');
+            return;
         }
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        function signup() {
-            const email = document.getElementById('signupEmail').value.trim();
-            const password = document.getElementById('signupPassword').value.trim();
-            if (!email || !password) {
-                alert('အီးမေးလ် နှင့် စကားဝှက် ဖြည့်ပါၡ。');
-                return;
+        const anonymousId = `anon_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+        fetch('/.netlify/functions/data', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'signup', email, password, deviceId, anonymousId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                user = { email, deviceId, anonymousId };
+                localStorage.setItem('user', JSON.stringify(user));
+                closeModal('signupModal');
+                alert('အကောင့်ဖွင့်ပြီးပါပြီၡ。Anonymous စနစ်ဖြင့် အတည်ပြုပြီးပါတယ်ၡ。');
+                updateUIForLoggedInUser();
+                fetchOrders();
+                setInterval(fetchOrders, 2000);
             }
+        })
+        .catch(error => {
+            console.error('Signup Error:', error);
+            alert('အမှား: ' + error.message);
+        });
+    }
 
-            const anonymousId = `anon_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-            fetch('/.netlify/functions/data', {
+    function login() {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value.trim();
+        if (!email || !password) {
+            alert('အီးမေးလ် နှင့် စကားဝှက် ဖြည့်ပါၡ。');
+            return;
+        }
+        fetch('/.netlify/functions/data', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'login', email, password, deviceId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                user = { email, deviceId, anonymousId: data.anonymousId };
+                localStorage.setItem('user', JSON.stringify(user));
+                closeModal('loginModal');
+                alert('အကောင့်ဝင်ပြီးပါပြီၡ。');
+                updateUIForLoggedInUser();
+                fetchOrders();
+                setInterval(fetchOrders, 2000);
+            }
+        })
+        .catch(error => {
+            console.error('Login Error:', error);
+            alert('အမှား: ' + error.message);
+        });
+    }
+
+    function updateUIForLoggedInUser() {
+        document.getElementById('loginBtn').style.display = 'none';
+        document.getElementById('signupBtn').style.display = 'none';
+        document.getElementById('logoutBtn').style.display = 'block';
+        document.querySelector('.hero').style.display = 'block';
+        document.querySelector('.container').style.display = 'block';
+        document.getElementById('orderHistory').style.display = 'block';
+    }
+
+    function updateUIForLoggedOutUser() {
+        document.getElementById('loginBtn').style.display = 'block';
+        document.getElementById('signupBtn').style.display = 'block';
+        document.getElementById('logoutBtn').style.display = 'none';
+        document.querySelector('.hero').style.display = 'none';
+        document.querySelector('.container').style.display = 'none';
+        document.getElementById('orderHistory').style.display = 'none';
+    }
+
+    document.querySelectorAll('.premium-option').forEach(option => {
+        option.addEventListener('click', () => {
+            selectedMonths = parseInt(option.dataset.months);
+            selectedPrice = parseInt(option.dataset.price);
+            updateTotal();
+        });
+    });
+
+    function increaseQuantity() { quantity++; updateTotal(); }
+    function decreaseQuantity() { if (quantity > 1) quantity--; updateTotal(); }
+    function updateTotal() {
+        document.getElementById('quantity').textContent = quantity;
+        document.getElementById('totalPrice').textContent = `စုစုပေါင်း: ${selectedPrice * quantity} ကျပ်`;
+    }
+
+    function selectPayment(method) {
+        selectedPaymentMethod = method;
+        document.querySelectorAll('.payment-option').forEach(option => option.classList.remove('selected'));
+        document.querySelector(`img[alt="${method.charAt(0).toUpperCase() + method.slice(1)}"]`).classList.add('selected');
+        const popup = document.getElementById('phoneNumberPopup');
+        popup.style.display = 'block';
+        setTimeout(() => popup.style.display = 'none', 10000);
+    }
+
+    async function submitOrder() {
+        if (!user) {
+            alert('အကောင့်ဝင်ပါၡ。');
+            return;
+        }
+        if (!selectedPaymentMethod || !document.getElementById('transactionLast6').value || !document.getElementById('telegramUsername').value) {
+            alert('အားလုံးဖြည့်ပါၡ。');
+            return;
+        }
+        const order = {
+            email: user.email,
+            deviceId: user.deviceId,
+            anonymousId: user.anonymousId,
+            months: selectedMonths,
+            quantity,
+            total: selectedPrice * quantity,
+            transactionLast6: document.getElementById('transactionLast6').value,
+            telegramUsername: document.getElementById('telegramUsername').value,
+            paymentMethod: selectedPaymentMethod
+        };
+        try {
+            const response = await fetch('/.netlify/functions/data', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'signup', email, password, deviceId, anonymousId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    alert(data.error);
-                } else {
-                    user = { email, deviceId, anonymousId };
-                    localStorage.setItem('user', JSON.stringify(user));
-                    closeModal('signupModal');
-                    alert('အကောင့်ဖွင့်ပြီးပါပြီၡ。Anonymous စနစ်ဖြင့် အတည်ပြုပြီးပါတယ်ၡ。');
-                    updateUIForLoggedInUser();
-                    fetchOrders();
-                }
-            })
-            .catch(error => {
-                console.error('Signup Error:', error);
-                alert('အမှား: ' + error.message);
+                body: JSON.stringify({ action: 'submitOrder', order })
             });
-        }
-
-        function login() {
-            const email = document.getElementById('loginEmail').value.trim();
-            const password = document.getElementById('loginPassword').value.trim();
-            if (!email || !password) {
-                alert('အီးမေးလ် နှင့် စကားဝှက် ဖြည့်ပါၡ。');
-                return;
+            const data = await response.json();
+            if (data.error) {
+                alert(data.error);
+            } else {
+                document.getElementById('status').textContent = 'အော်ဒါတင်ပြီးပါပြီၡ。';
+                document.getElementById('transactionLast6').value = '';
+                document.getElementById('telegramUsername').value = '';
+                const lightning = document.getElementById('lightning');
+                lightning.style.display = 'block';
+                setTimeout(() => lightning.style.display = 'none', 1000);
+                fetchOrders();
             }
-            fetch('/.netlify/functions/data', {
+        } catch (error) {
+            console.error('Submit Order Error:', error);
+            alert('အမှား: ' + error.message);
+        }
+    }
+
+    async function fetchOrders() {
+        if (!user) return;
+        try {
+            const response = await fetch('/.netlify/functions/data', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'login', email, password, deviceId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    alert(data.error);
-                } else {
-                    user = { email, deviceId, anonymousId: data.anonymousId };
-                    localStorage.setItem('user', JSON.stringify(user));
-                    closeModal('loginModal');
-                    alert('အကောင့်ဝင်ပြီးပါပြီၡ。');
-                    updateUIForLoggedInUser();
-                    fetchOrders();
-                }
-            })
-            .catch(error => {
-                console.error('Login Error:', error);
-                alert('အမှား: ' + error.message);
+                body: JSON.stringify({ action: 'getOrders', email: user.email })
             });
-        }
-
-        function updateUIForLoggedInUser() {
-            document.getElementById('loginBtn').style.display = 'none';
-            document.getElementById('signupBtn').style.display = 'none';
-            document.getElementById('logoutBtn').style.display = 'block';
-            document.querySelector('.hero').style.display = 'block';
-            document.querySelector('.container').style.display = 'block';
-            document.getElementById('orderHistory').style.display = 'block';
-        }
-
-        function updateUIForLoggedOutUser() {
-            document.getElementById('loginBtn').style.display = 'block';
-            document.getElementById('signupBtn').style.display = 'block';
-            document.getElementById('logoutBtn').style.display = 'none';
-            document.querySelector('.hero').style.display = 'none';
-            document.querySelector('.container').style.display = 'none';
-            document.getElementById('orderHistory').style.display = 'none';
-        }
-
-        document.querySelectorAll('.premium-option').forEach(option => {
-            option.addEventListener('click', () => {
-                selectedMonths = parseInt(option.dataset.months);
-                selectedPrice = parseInt(option.dataset.price);
-                updateTotal();
-            });
-        });
-
-        function increaseQuantity() { quantity++; updateTotal(); }
-        function decreaseQuantity() { if (quantity > 1) quantity--; updateTotal(); }
-        function updateTotal() {
-            document.getElementById('quantity').textContent = quantity;
-            document.getElementById('totalPrice').textContent = `စုစုပေါင်း: ${selectedPrice * quantity} ကျပ်`;
-        }
-
-        function selectPayment(method) {
-            selectedPaymentMethod = method;
-            document.querySelectorAll('.payment-option').forEach(option => option.classList.remove('selected'));
-            document.querySelector(`img[alt="${method.charAt(0).toUpperCase() + method.slice(1)}"]`).classList.add('selected');
-            const popup = document.getElementById('phoneNumberPopup');
-            popup.style.display = 'block';
-            setTimeout(() => popup.style.display = 'none', 10000);
-        }
-
-        async function submitOrder() {
-            if (!user) {
-                alert('အကောင့်ဝင်ပါၡ。');
-                return;
+            if (!response.ok) throw new Error('Network response was not ok');
+            const data = await response.json();
+            if (data.error) {
+                document.getElementById('orderList').innerHTML = `<p>${data.error}</p>`;
+            } else {
+                const orders = data.orders || [];
+                document.getElementById('orderList').innerHTML = orders.map(order => `
+                    <div class="order-item">
+                        <p>အမှာစာအမှတ်: ${order.id}</p>
+                        <p>လများ: ${order.months}</p>
+                        <p>အရေအတွက်: ${order.quantity}</p>
+                        <p>စုစုပေါင်း: ${order.total} ကျပ်</p>
+                        <p>အခြေအနေ: ${order.status}</p>
+                        <p>အချိန်: ${new Date(order.timestamp).toLocaleString()}</p>
+                        <button class="download-btn" onclick='downloadReceipt(${JSON.stringify(order)})'>Download Receipt</button>
+                    </div>
+                `).join('');
             }
-            if (!selectedPaymentMethod || !document.getElementById('transactionLast6').value || !document.getElementById('telegramUsername').value) {
-                alert('အားလုံးဖြည့်ပါၡ。');
-                return;
-            }
-            const order = {
-                email: user.email,
-                deviceId: user.deviceId,
-                anonymousId: user.anonymousId,
-                months: selectedMonths,
-                quantity,
-                total: selectedPrice * quantity,
-                transactionLast6: document.getElementById('transactionLast6').value,
-                telegramUsername: document.getElementById('telegramUsername').value,
-                paymentMethod: selectedPaymentMethod,
-                status: 'Approved',
-                timestamp: Date.now()
-            };
-            try {
-                const response = await fetch('/.netlify/functions/data', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'submitOrder', order })
-                });
-                const data = await response.json();
-                if (data.error) {
-                    alert(data.error);
-                } else {
-                    document.getElementById('status').textContent = 'အော်ဒါတင်ပြီးပါပြီၡ。';
-                    document.getElementById('transactionLast6').value = '';
-                    document.getElementById('telegramUsername').value = '';
-                    // Show lightning animation
-                    const lightning = document.getElementById('lightning');
-                    lightning.style.display = 'block';
-                    // Fetch orders immediately without refresh
-                    fetchOrders();
-                }
-            } catch (error) {
-                console.error('Submit Order Error:', error);
-                alert('အမှား: ' + error.message);
-            }
+        } catch (error) {
+            console.error('Error fetching orders:', error);
+            document.getElementById('orderList').innerHTML = `<p>အမှား: ${error.message}</p>`;
         }
+    }
 
-        async function fetchOrders() {
-            if (!user) return;
-            try {
-                const response = await fetch('/.netlify/functions/data', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'getOrders', email: user.email })
-                });
-                if (!response.ok) throw new Error('Network response was not ok');
-                const data = await response.json();
-                if (data.error) {
-                    document.getElementById('orderList').innerHTML = `<p>${data.error}</p>`;
-                } else {
-                    const orders = data.orders || [];
-                    document.getElementById('orderList').innerHTML = orders.map(order => `
-                        <div class="order-item">
-                            <p>အမှာစာအမှတ်: ${order.id}</p>
-                            <p>လများ: ${order.months}</p>
-                            <p>အရေအတွက်: ${order.quantity}</p>
-                            <p>စုစုပေါင်း: ${order.total} ကျပ်</p>
-                            <p>အခြေအနေ: ${order.status}</p>
-                            <p>အချိန်: ${new Date(order.timestamp).toLocaleString()}</p>
-                            <button class="download-btn" onclick='downloadReceipt(${JSON.stringify(order)})'>Download Receipt</button>
-                        </div>
-                    `).join('');
-                }
-            } catch (error) {
-                console.error('Error fetching orders:', error);
-                document.getElementById('orderList').innerHTML = `<p>အမှား: ${error.message}</p>`;
-            }
-        }
-
-        function downloadReceipt(order) {
-            const doc = new jsPDF();
-            const logoUrl = 'https://raw.githubusercontent.com/Opper125/telegram-premium-shop/756e2da02cfc2a5f510630e894b736fb6351468f/telegram-logo.png';
-
-            // Load Telegram Logo
-            const img = new Image();
-            img.crossOrigin = 'Anonymous';
-            img.src = logoUrl;
-            img.onload = () => {
-                // Add Logo
-                doc.addImage(img, 'PNG', 10, 10, 30, 30);
-
-                // Add Title
-                doc.setFontSize(20);
-                doc.setTextColor(0, 136, 204);
-                doc.text('Telegram Premium Shop', 50, 25);
-                doc.setFontSize(12);
-                doc.setTextColor(0);
-                doc.text('Order Receipt', 50, 35);
-
-                // Add Order Details
-                doc.setFontSize(12);
-                doc.setTextColor(0);
-                doc.text(`Order ID: ${order.id}`, 10, 50);
-                doc.text(`Email: ${order.email}`, 10, 60);
-                doc.text(`Months: ${order.months}`, 10, 70);
-                doc.text(`Quantity: ${order.quantity}`, 10, 80);
-                doc.text(`Total: ${order.total} ကျပ်`, 10, 90);
-                doc.text(`Transaction Last 6: ${order.transactionLast6}`, 10, 100);
-                doc.text(`Telegram Username: ${order.telegramUsername}`, 10, 110);
-                doc.text(`Payment Method: ${order.paymentMethod}`, 10, 120);
-                doc.text(`Status: ${order.status}`, 10, 130);
-                doc.text(`Date: ${new Date(order.timestamp).toLocaleString()}`, 10, 140);
-
-                // Add Border and Styling
-                doc.setDrawColor(0, 136, 204);
-                doc.setLineWidth(1);
-                doc.roundedRect(5, 5, 200, 280, 5, 5, 'S');
-
-                // Save the PDF
-                doc.save(`Telegram_Premium_Order_${order.id}.pdf`);
-            };
-            img.onerror = () => {
-                alert('Failed to load Telegram Logo for the receipt. Please try again.');
-            };
-        }
+    function downloadReceipt(order) {
+        const doc = new jsPDF();
+        const logoUrl = 'https://raw.githubusercontent.com/Opper125/telegram-premium-shop/756e2da02cfc2a5f510630e894b736fb6351468f/telegram-logo.png';
+        const img = new Image();
+        img.crossOrigin = 'Anonymous';
+        img.src = logoUrl;
+        img.onload = () => {
+            doc.addImage(img, 'PNG', 10, 10, 30, 30);
+            doc.setFontSize(20);
+            doc.setTextColor(0, 136, 204);
+            doc.text('Telegram Premium Shop', 50, 25);
+            doc.setFontSize(12);
+            doc.setTextColor(0);
+            doc.text('Order Receipt', 50, 35);
+            doc.text(`Order ID: ${order.id}`, 10, 50);
+            doc.text(`Email: ${order.email}`, 10, 60);
+            doc.text(`Months: ${order.months}`, 10, 70);
+            doc.text(`Quantity: ${order.quantity}`, 10, 80);
+            doc.text(`Total: ${order.total} ကျပ်`, 10, 90);
+            doc.text(`Transaction Last 6: ${order.transactionLast6}`, 10, 100);
+            doc.text(`Telegram Username: ${order.telegramUsername}`, 10, 110);
+            doc.text(`Payment Method: ${order.paymentMethod}`, 10, 120);
+            doc.text(`Status: ${order.status}`, 10, 130);
+            doc.text(`Date: ${new Date(order.timestamp).toLocaleString()}`, 10, 140);
+            doc.setDrawColor(0, 136, 204);
+            doc.setLineWidth(1);
+            doc.roundedRect(5, 5, 200, 280, 5, 5, 'S');
+            doc.save(`Telegram_Premium_Order_${order.id}.pdf`);
+        };
+        img.onerror = () => {
+            alert('Failed to load Telegram Logo for the receipt. Please try again.');
+        };
+    }
     </script>
 </body>
 </html>
