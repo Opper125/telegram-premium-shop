@@ -4,4 +4,3 @@
   command = "echo 'No build command needed'"
 
 [functions]
-  included_files = ["functions/data.json"]
