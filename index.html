@@ -413,24 +413,25 @@
     <!-- Include jsPDF for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
-        const { jsPDF } = window.jspdf;
-        let user = null;
-        let selectedMonths = 3;
-        let selectedPrice = 60000;
-        let quantity = 1;
-        let selectedPaymentMethod = '';
-        const deviceId = navigator.userAgent + Date.now(); // Unique device identifier
+    const { jsPDF } = window.jspdf;
+    let user = null;
+    let selectedMonths = 3;
+    let selectedPrice = 60000;
+    let quantity = 1;
+    let selectedPaymentMethod = '';
+    const deviceId = navigator.userAgent + Date.now(); // Unique device identifier
 
-        // Check if user is logged in from LocalStorage
-        document.addEventListener('DOMContentLoaded', () => {
-            const storedUser = localStorage.getItem('user');
-            if (storedUser) {
-                user = JSON.parse(storedUser);
-                updateUIForLoggedInUser();
-                fetchOrders();
-            }
-        });
-
+    // Check if user is logged in from LocalStorage
+    document.addEventListener('DOMContentLoaded', () => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            user = JSON.parse(storedUser);
+            updateUIForLoggedInUser();
+            fetchOrders();
+            setInterval(fetchOrders, 1000); // Fetch orders every 1 second for real-time updates
+        }
+    });
+       
         document.getElementById('loginBtn').addEventListener('click', () => openModal('loginModal'));
         document.getElementById('signupBtn').addEventListener('click', () => openModal('signupModal'));
         document.getElementById('logoutBtn').addEventListener('click', () => {
