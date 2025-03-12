@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "netlify-lambda": "^2.0.16",
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^2.6.7"
   },
   "devDependencies": {},
   "author": "Your Name",
