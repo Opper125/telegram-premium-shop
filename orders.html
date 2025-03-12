@@ -32,7 +32,7 @@
             position: fixed;
             top: 20px;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translate W(-50%);
             padding: 15px 30px;
             border-radius: 25px;
             z-index: 5000;
@@ -206,13 +206,13 @@
     <script>
         const { jsPDF } = window.jspdf;
         let user = null;
+        const GITHUB_TOKEN = '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'; // Replace with your GitHub Token
+        const REPO = 'Opper125/telegram-premium-shop'; // Replace with your GitHub repo
+        const DATA_PATH = 'data.json';
 
         function showNotification(message, type) {
             const notification = document.getElementById('notification');
-            notification.innerHTML = `
-                <span>${type === 'success' ? '✓' : '✗'}</span>
-                ${message}
-            `;
+            notification.innerHTML = `<span>${type === 'success' ? '✓' : '✗'}</span> ${message}`;
             notification.className = `notification ${type}`;
             notification.style.display = 'flex';
             setTimeout(() => notification.style.display = 'none', 3000);
