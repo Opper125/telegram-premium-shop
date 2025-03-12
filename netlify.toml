@@ -1,0 +1,18 @@
+[build]
+  # Publish လုပ်မယ့် Directory ကို သတ်မှတ်ပါ။ ဒီမှာ အဓိက ဖိုင်တွေရှိတဲ့ နေရာကို သုံးပါတယ်။
+  publish = "."
+
+  # Functions တွေကို ထည့်သွင်းဖို့ သတ်မှတ်ပါ။ သင်က `functions` ဖိုဒါထဲမှာ `data.js` ကို သုံးထားတာမို့ ဒီလိုပြုလုပ်ပါတယ်။
+  functions = "functions"
+
+[functions]
+  # Functions ထဲမှာ အသုံးပြုမယ့် အပိုဖိုင်တွေ (ဥပမာ: data.json) ကို ထည့်ပါ။
+  included_files = ["functions/data.json"]
+
+# အကယ်၍ Build Command လိုအပ်ရင် (ဒီစနစ်မှာ မလိုအပ်သေးပေမယ့် အကာအကွယ်အတြက် ထည့်ထားပါတယ်)
+[build]
+  command = "echo 'No build command needed'"
+
+# Optional: Environment Variables (အကယ်၍ အနာဂတ်မှာ လိုအပ်ရင် ထည့်နိုင်ပါတယ်)
+#[build.environment]
+#  NODE_VERSION = "14"
