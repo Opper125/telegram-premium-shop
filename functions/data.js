@@ -26,11 +26,11 @@ exports.handler = async (event) => {
     let data = readData();
 
     if (action === 'signup') {
-        const { email, password, deviceId } = body;
+        const { email, password, deviceId, anonymousId } = body;
         if (data.users.find(u => u.email === email)) {
-            return { statusCode: 400, body: JSON.stringify({ error: 'အီးမေးလ် ရှိပြီးသားဖြစ်ပါတယ်။' }) };
+            return { statusCode: 400, body: JSON.stringify({ error: 'အီးမေးလ် ရှိပြီးသားဖြစ်ပါတယ်ၡ。' }) };
         }
-        data.users.push({ email, password, deviceId });
+        data.users.push({ email, password, deviceId, anonymousId });
         writeData(data);
         return { statusCode: 200, body: JSON.stringify({ success: true }) };
     }
@@ -39,13 +39,13 @@ exports.handler = async (event) => {
         const { email, password, deviceId } = body;
         const user = data.users.find(u => u.email === email && u.password === password);
         if (!user) {
-            return { statusCode: 400, body: JSON.stringify({ error: 'အီးမေးလ် သို့မဟုတ် စကားဝှက် မမှန်ပါ။' }) };
+            return { statusCode: 400, body: JSON.stringify({ error: 'အီးမေးလ် သို့မဟုတ် စကားဝှက် မမှန်ပါၡ。' }) };
         }
         if (user.deviceId !== deviceId) {
             user.deviceId = deviceId; // Update deviceId if changed
             writeData(data);
         }
-        return { statusCode: 200, body: JSON.stringify({ success: true }) };
+        return { statusCode: 200, body: JSON.stringify({ success: true, anonymousId: user.anonymousId }) };
     }
 
     if (action === 'submitOrder') {
