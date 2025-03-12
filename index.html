@@ -6,18 +6,58 @@
     <title>Telegram Premium Shop - အဆင့်မြင့် အတွေ့အကြုံ ✨</title>
     <link rel="icon" href="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/756e2da02cfc2a5f510630e894b736fb6351468f/telegram-logo.png" type="image/png">
     <style>
+        :root {
+            --primary: #0088cc;
+            --secondary: #00aaff;
+            --success: #28a745;
+            --error: #dc3545;
+            --bg-gradient: linear-gradient(135deg, #0f0c29, #24243e, #4a4063);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Poppins', 'Noto Sans Myanmar', sans-serif;
         }
+
         body {
-            background: linear-gradient(135deg, #0f0c29, #24243e, #4a4063);
+            background: var(--bg-gradient);
             color: #fff;
             min-height: 100vh;
             overflow-x: hidden;
         }
+
+        /* Notification Styling */
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 30px;
+            border-radius: 25px;
+            z-index: 5000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        .notification.success {
+            background: var(--success);
+            box-shadow: 0 0 15px rgba(40, 167, 69, 0.5);
+        }
+
+        .notification.error {
+            background: var(--error);
+            box-shadow: 0 0 15px rgba(220, 53, 69, 0.5);
+        }
+
+        @keyframes slideDown {
+            from { top: -100px; }
+            to { top: 20px; }
+        }
+
         .navbar {
             background: rgba(0, 0, 0, 0.9);
             padding: 20px;
@@ -27,94 +67,115 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 3px solid #0088cc;
+            border-bottom: 3px solid var(--primary);
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
         }
+
         .logo {
             display: flex;
             align-items: center;
         }
+
         .logo-img {
             width: 60px;
             height: 60px;
             margin-right: 15px;
             border-radius: 50%;
-            border: 2px solid #0088cc;
+            border: 2px solid var(--primary);
             animation: pulse 2s infinite;
         }
+
         @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 5px #0088cc; }
-            50% { transform: scale(1.1); box-shadow: 0 0 20px #0088cc; }
-            100% { transform: scale(1); box-shadow: 0 0 5px #0088cc; }
+            0% { transform: scale(1); box-shadow: 0 0 5px var(--primary); }
+            50% { transform: scale(1.1); box-shadow: 0 0 20px var(--primary); }
+            100% { transform: scale(1); box-shadow: 0 0 5px var(--primary); }
         }
+
         .logo h1 {
             font-size: 2em;
             font-weight: 700;
-            color: #0088cc;
+            color: var(--primary);
             text-shadow: 0 0 10px rgba(0, 136, 204, 0.8);
         }
-        .menu button {
-            padding: 10px 25px;
-            background: linear-gradient(135deg, #0088cc, #00aaff);
+
+        .btn {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             border: none;
             border-radius: 25px;
             color: #fff;
             font-weight: 600;
             cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 136, 204, 0.3);
         }
-        .menu button:hover {
-            transform: scale(1.1);
-            box-shadow: 0 0 15px #0088cc;
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 136, 204, 0.5);
         }
+
         .hero {
             text-align: center;
             padding: 80px 20px;
             background: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c') no-repeat center/cover;
-            border: 3px solid #0088cc;
+            border: 3px solid var(--primary);
             border-radius: 20px;
             margin: 30px 0;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            animation: fadeIn 1s ease-in;
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .hero h2 {
             font-size: 3em;
             font-weight: 700;
-            color: #0088cc;
-            text-shadow: 0 0 15px #0088cc;
+            color: var(--primary);
+            text-shadow: 0 0 15px var(--primary);
         }
+
         .hero p {
             font-size: 1.5em;
             font-weight: 300;
             color: #e6e6e6;
             margin-top: 10px;
         }
+
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
+
         .section {
             padding: 40px;
             background: rgba(255, 255, 255, 0.05);
-            border: 2px solid #0088cc;
+            border: 2px solid var(--primary);
             border-radius: 20px;
             margin-bottom: 30px;
             box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
         }
+
         .section h2 {
             font-size: 2.2em;
-            color: #0088cc;
+            color: var(--primary);
             text-align: center;
             margin-bottom: 20px;
-            text-shadow: 0 0 10px #0088cc;
+            text-shadow: 0 0 10px var(--primary);
         }
+
         .premium-options {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
         }
+
         .premium-option {
-            background: linear-gradient(135deg, #0088cc, #00aaff);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             padding: 20px;
             border-radius: 15px;
             text-align: center;
@@ -123,18 +184,21 @@
             cursor: pointer;
             transition: transform 0.3s, box-shadow 0.3s;
         }
+
         .premium-option:hover {
             transform: scale(1.05);
-            box-shadow: 0 0 20px #0088cc;
+            box-shadow: 0 0 20px var(--primary);
         }
+
         .quantity {
             display: flex;
             justify-content: center;
             align-items: center;
             margin: 20px 0;
         }
+
         .quantity-btn {
-            background: #0088cc;
+            background: var(--primary);
             border: none;
             padding: 10px 20px;
             border-radius: 10px;
@@ -144,16 +208,19 @@
             margin: 0 15px;
             transition: background 0.3s;
         }
+
         .quantity-btn:hover {
-            background: #00aaff;
+            background: var(--secondary);
         }
+
         #totalPrice {
             text-align: center;
             font-size: 2em;
-            color: #0088cc;
+            color: var(--primary);
             margin: 20px 0;
-            text-shadow: 0 0 10px #0088cc;
+            text-shadow: 0 0 10px var(--primary);
         }
+
         .payment-method {
             display: flex;
             flex-wrap: wrap;
@@ -161,47 +228,52 @@
             justify-content: center;
             margin-bottom: 30px;
         }
+
         .payment-method img {
             width: 80px;
             height: 50px;
             object-fit: contain;
-            border: 2px solid #0088cc;
+            border: 2px solid var(--primary);
             border-radius: 10px;
             cursor: pointer;
             transition: transform 0.3s, border-color 0.3s;
         }
+
         .payment-method img.selected {
-            border-color: #00aaff;
+            border-color: var(--secondary);
             transform: scale(1.1);
         }
-        .payment-method input {
+
+        .payment-method input, .modal-content input {
             width: 100%;
             padding: 15px;
             margin: 15px 0;
-            border: 2px solid transparent;
+            border: 2px solid var(--primary);
             border-radius: 15px;
             background: rgba(255, 255, 255, 0.1);
             color: #fff;
-            font-size: 1.1em;
-            animation: glowingBorder 2s infinite;
+            transition: border-color 0.3s ease;
         }
-        @keyframes glowingBorder {
-            0% { border-color: #ff4500; box-shadow: 0 0 10px #ff4500; }
-            50% { border-color: #ffa500; box-shadow: 0 0 20px #ffa500; }
-            100% { border-color: #ff4500; box-shadow: 0 0 10px #ff4500; }
+
+        .payment-method input:focus, .modal-content input:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 170, 255, 0.3);
         }
+
         #status {
             text-align: center;
             font-size: 1.5em;
-            color: #0088cc;
+            color: var(--primary);
             font-weight: 600;
             margin-top: 20px;
         }
+
         .submit-btn {
             display: block;
             margin: 0 auto;
             padding: 15px 40px;
-            background: linear-gradient(135deg, #0088cc, #00aaff);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             border: none;
             border-radius: 25px;
             color: #fff;
@@ -210,10 +282,12 @@
             cursor: pointer;
             transition: transform 0.3s, box-shadow 0.3s;
         }
+
         .submit-btn:hover {
             transform: scale(1.1);
-            box-shadow: 0 0 20px #0088cc;
+            box-shadow: 0 0 20px var(--primary);
         }
+
         .modal {
             display: none;
             position: fixed;
@@ -224,44 +298,39 @@
             background: rgba(0, 0, 0, 0.8);
             z-index: 2000;
         }
+
         .modal-content {
             background: rgba(255, 255, 255, 0.1);
             width: 90%;
             max-width: 450px;
             margin: 100px auto;
             padding: 30px;
-            border: 2px solid #0088cc;
+            border: 2px solid var(--primary);
             border-radius: 20px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
         }
+
         .modal-content h2 {
             font-size: 2em;
-            color: #0088cc;
+            color: var(--primary);
             text-align: center;
             margin-bottom: 20px;
-            text-shadow: 0 0 10px #0088cc;
+            text-shadow: 0 0 10px var(--primary);
         }
-        .modal-content input {
-            width: 100%;
-            padding: 15px;
-            margin: 15px 0;
-            border: 2px solid #0088cc;
-            border-radius: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-        }
+
         .modal-content .close {
             float: right;
             font-size: 2em;
             cursor: pointer;
-            color: #0088cc;
-            text-shadow: 0 0 10px #0088cc;
+            color: var(--primary);
+            text-shadow: 0 0 10px var(--primary);
         }
+
         .phone-number-popup {
             position: fixed;
             top: 50%;
             right: -300px;
-            background: linear-gradient(135deg, #0088cc, #00aaff);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: #fff;
             padding: 20px;
             border-radius: 15px;
@@ -270,36 +339,42 @@
             animation: slideIn 0.5s forwards, slideOut 0.5s 9.5s forwards;
             z-index: 1000;
         }
+
         @keyframes slideIn {
             from { right: -300px; }
             to { right: 20px; }
         }
+
         @keyframes slideOut {
             from { right: 20px; }
             to { right: -300px; }
         }
+
         .order-item {
             background: linear-gradient(135deg, rgba(0, 136, 204, 0.2), rgba(0, 170, 255, 0.2));
             padding: 20px;
             margin: 15px 0;
             border-radius: 15px;
-            border: 2px solid #0088cc;
+            border: 2px solid var(--primary);
             box-shadow: 0 0 20px rgba(0, 136, 204, 0.5);
             transition: transform 0.3s;
         }
+
         .order-item:hover {
             transform: scale(1.02);
         }
+
         .order-item p {
             margin: 5px 0;
             font-size: 1.1em;
             color: #e6e6e6;
         }
+
         .download-btn {
             display: inline-block;
             margin-top: 10px;
             padding: 8px 20px;
-            background: linear-gradient(135deg, #0088cc, #00aaff);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             border: none;
             border-radius: 25px;
             color: #fff;
@@ -307,10 +382,12 @@
             cursor: pointer;
             transition: transform 0.3s, box-shadow 0.3s;
         }
+
         .download-btn:hover {
             transform: scale(1.1);
-            box-shadow: 0 0 15px #0088cc;
+            box-shadow: 0 0 15px var(--primary);
         }
+
         #lightning {
             display: none;
             position: fixed;
@@ -322,6 +399,7 @@
             z-index: 3000;
             animation: lightningFlash 1s;
         }
+
         @keyframes lightningFlash {
             0% { opacity: 0; background: rgba(255, 255, 255, 0); }
             10% { opacity: 1; background: rgba(255, 255, 255, 0.8); }
@@ -330,6 +408,7 @@
             40% { opacity: 0; background: rgba(255, 255, 255, 0); }
             100% { opacity: 0; background: rgba(255, 255, 255, 0); }
         }
+
         @media (max-width: 768px) {
             .navbar { flex-direction: column; gap: 15px; }
             .menu { flex-direction: column; gap: 15px; }
@@ -341,6 +420,7 @@
     </style>
 </head>
 <body>
+    <div id="notification" class="notification" style="display: none;"></div>
     <div id="lightning"></div>
     <div class="navbar">
         <div class="logo">
@@ -348,9 +428,9 @@
             <h1>Telegram Premium Shop</h1>
         </div>
         <div class="menu">
-            <button id="loginBtn">အကောင့်ဝင်ရန်</button>
-            <button id="signupBtn">အကောင့်ဖွင့်ရန်</button>
-            <button id="logoutBtn" style="display:none;">အကောင့်ထွက်ရန်</button>
+            <button id="loginBtn" class="btn">အကောင့်ဝင်ရန်</button>
+            <button id="signupBtn" class="btn">အကောင့်ဖွင့်ရန်</button>
+            <button id="logoutBtn" class="btn" style="display:none;">အကောင့်ထွက်ရန်</button>
         </div>
     </div>
 
@@ -419,7 +499,19 @@
         let selectedPrice = 60000;
         let quantity = 1;
         let selectedPaymentMethod = '';
-        const deviceId = navigator.userAgent + Date.now(); // Unique device identifier
+        const deviceId = `${navigator.userAgent}-${Date.now()}`; // Unique device identifier
+
+        // Notification Function
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.innerHTML = `
+                <span>${type === 'success' ? '✓' : '✗'}</span>
+                ${message}
+            `;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'flex';
+            setTimeout(() => notification.style.display = 'none', 3000);
+        }
 
         // Check if user is logged in from LocalStorage
         document.addEventListener('DOMContentLoaded', () => {
@@ -428,6 +520,7 @@
                 user = JSON.parse(storedUser);
                 updateUIForLoggedInUser();
                 fetchOrders();
+                setInterval(fetchOrders, 5000); // Real-time updates every 5 seconds
             }
         });
 
@@ -437,7 +530,7 @@
             localStorage.removeItem('user');
             user = null;
             updateUIForLoggedOutUser();
-            alert('အကောင့်ထွက်ပြီးပါပြီၡ。');
+            showNotification('အကောင့်ထွက်ပြီးပါပြီၡ', 'success');
         });
 
         function openModal(modalId) {
@@ -448,68 +541,67 @@
             document.getElementById(modalId).style.display = 'none';
         }
 
-        function signup() {
+        async function signup() {
             const email = document.getElementById('signupEmail').value.trim();
             const password = document.getElementById('signupPassword').value.trim();
             if (!email || !password) {
-                alert('အီးမေးလ် နှင့် စကားဝှက် ဖြည့်ပါၡ。');
+                showNotification('အီးမေးလ် နှင့် စကားဝှက် ဖြည့်ပါၡ', 'error');
                 return;
             }
 
             const anonymousId = `anon_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-            fetch('/.netlify/functions/data', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'signup', email, password, deviceId, anonymousId })
-            })
-            .then(response => response.json())
-            .then(data => {
+            try {
+                const response = await fetch('/.netlify/functions/data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'signup', email, password, deviceId, anonymousId })
+                });
+                const data = await response.json();
                 if (data.error) {
-                    alert(data.error);
+                    showNotification(data.error, 'error');
                 } else {
                     user = { email, deviceId, anonymousId };
                     localStorage.setItem('user', JSON.stringify(user));
                     closeModal('signupModal');
-                    alert('အကောင့်ဖွင့်ပြီးပါပြီၡ。Anonymous စနစ်ဖြင့် အတည်ပြုပြီးပါတယ်ၡ。');
+                    showNotification('အကောင့်ဖွင့်ပြီးပါပြီၡ Anonymous စနစ်ဖြင့် အတည်ပြုပြီးပါတယ်ၡ', 'success');
                     updateUIForLoggedInUser();
                     fetchOrders();
                 }
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error('Signup Error:', error);
-                alert('အမှား: ' + error.message);
-            });
+                showNotification('ဆာဗာအမှားၡ နောက်မှထပ်ကြိုးစားပါၡ', 'error');
+            }
         }
 
-        function login() {
+        async function login() {
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value.trim();
             if (!email || !password) {
-                alert('အီးမေးလ် နှင့် စကားဝှက် ဖြည့်ပါၡ。');
+                showNotification('အီးမေးလ် နှင့် စကားဝှက် ဖြည့်ပါၡ', 'error');
                 return;
             }
-            fetch('/.netlify/functions/data', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'login', email, password, deviceId })
-            })
-            .then(response => response.json())
-            .then(data => {
+            try {
+                const response = await fetch('/.netlify/functions/data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'login', email, password, deviceId })
+                });
+                const data = await response.json();
                 if (data.error) {
-                    alert(data.error);
+                    showNotification(data.error, 'error');
                 } else {
                     user = { email, deviceId, anonymousId: data.anonymousId };
                     localStorage.setItem('user', JSON.stringify(user));
                     closeModal('loginModal');
-                    alert('အကောင့်ဝင်ပြီးပါပြီၡ。');
+                    showNotification('အကောင့်ဝင်ပြီးပါပြီၡ', 'success');
                     updateUIForLoggedInUser();
                     fetchOrders();
+                    setInterval(fetchOrders, 5000); // Start real-time updates
                 }
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error('Login Error:', error);
-                alert('အမှား: ' + error.message);
-            });
+                showNotification('ဆာဗာအမှားၡ နောက်မှထပ်ကြိုးစားပါၡ', 'error');
+            }
         }
 
         function updateUIForLoggedInUser() {
@@ -556,11 +648,11 @@
 
         async function submitOrder() {
             if (!user) {
-                alert('အကောင့်ဝင်ပါၡ。');
+                showNotification('အကောင့်ဝင်ပါၡ', 'error');
                 return;
             }
             if (!selectedPaymentMethod || !document.getElementById('transactionLast6').value || !document.getElementById('telegramUsername').value) {
-                alert('အားလုံးဖြည့်ပါၡ。');
+                showNotification('အားလုံးဖြည့်ပါၡ', 'error');
                 return;
             }
             const order = {
@@ -584,20 +676,21 @@
                 });
                 const data = await response.json();
                 if (data.error) {
-                    alert(data.error);
+                    showNotification(data.error, 'error');
                 } else {
-                    document.getElementById('status').textContent = 'အော်ဒါတင်ပြီးပါပြီၡ。';
+                    document.getElementById('status').textContent = 'အော်ဒါတင်ပြီးပါပြီၡ';
+                    showNotification('အော်ဒါတင်ပြီးပါပြီၡ', 'success');
                     document.getElementById('transactionLast6').value = '';
                     document.getElementById('telegramUsername').value = '';
                     // Show lightning animation
                     const lightning = document.getElementById('lightning');
                     lightning.style.display = 'block';
-                    // Fetch orders immediately without refresh
+                    setTimeout(() => lightning.style.display = 'none', 1000);
                     fetchOrders();
                 }
             } catch (error) {
                 console.error('Submit Order Error:', error);
-                alert('အမှား: ' + error.message);
+                showNotification('ဆာဗာအမှားၡ နောက်မှထပ်ကြိုးစားပါၡ', 'error');
             }
         }
 
@@ -629,7 +722,7 @@
                 }
             } catch (error) {
                 console.error('Error fetching orders:', error);
-                document.getElementById('orderList').innerHTML = `<p>အမှား: ${error.message}</p>`;
+                showNotification('အော်ဒါများကြည့်ရာတွင် အမှားၡ', 'error');
             }
         }
 
@@ -676,9 +769,10 @@
                 doc.save(`Telegram_Premium_Order_${order.id}.pdf`);
             };
             img.onerror = () => {
-                alert('Failed to load Telegram Logo for the receipt. Please try again.');
+                showNotification('လိုဂို မတင်နိုင်ပါ။ ထပ်ကြိုးစားပါၡ', 'error');
             };
         }
     </script>
+    <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'91f56399da98b036',t:'MTc0MTgwNDUwMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>
