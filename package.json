@@ -1,14 +1,14 @@
 {
   "name": "telegram-premium-shop",
   "version": "1.0.0",
-  "description": "Telegram Premium Shop with Netlify Functions and Blobs",
+  "description": "Telegram Premium Shop with Netlify Functions and In-Memory Data",
   "main": "index.html",
   "scripts": {
     "start": "echo 'No start script needed for static site'",
     "build": "echo 'No build script needed for static site'"
   },
   "dependencies": {
-    "@netlify/blobs": "^6.0.0"
+    "netlify-lambda": "^2.0.16"
   },
   "devDependencies": {},
   "author": "Your Name",
