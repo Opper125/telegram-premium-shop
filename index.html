@@ -395,25 +395,31 @@
                 alert('အီးမေးလ် နှင့် စကားဝှက် ဖြည့်ပါ။');
                 return;
             }
-            fetch('/api/data', {
+
+            // Anonymous Authentication: Automatically verify and register user
+            const anonymousId = `anon_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+            fetch('/.netlify/functions/data', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'signup', email, password, deviceId })
+                body: JSON.stringify({ action: 'signup', email, password, deviceId, anonymousId })
             })
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
                     alert(data.error);
                 } else {
-                    user = { email, deviceId };
+                    user = { email, deviceId, anonymousId };
                     localStorage.setItem('user', JSON.stringify(user));
                     closeModal('signupModal');
-                    alert('အကောင့်ဖွင့်ပြီးပါပြီ။');
+                    alert('အကောင့်ဖွင့်ပြီးပါပြီ။ Anonymous စနစ်ဖြင့် အတည်ပြုပြီးပါပြီ။');
                     updateUIForLoggedInUser();
                     fetchOrders();
                 }
             })
-            .catch(error => alert('အမှား: ' + error.message));
+            .catch(error => {
+                console.error('Signup Error:', error);
+                alert('အမှား: ' + error.message);
+            });
         }
 
         function login() {
@@ -423,7 +429,7 @@
                 alert('အီးမေးလ် နှင့် စကားဝှက် ဖြည့်ပါ။');
                 return;
             }
-            fetch('/api/data', {
+            fetch('/.netlify/functions/data', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'login', email, password, deviceId })
@@ -433,7 +439,7 @@
                 if (data.error) {
                     alert(data.error);
                 } else {
-                    user = { email, deviceId };
+                    user = { email, deviceId, anonymousId: data.anonymousId };
                     localStorage.setItem('user', JSON.stringify(user));
                     closeModal('loginModal');
                     alert('အကောင့်ဝင်ပြီးပါပြီ။');
@@ -441,7 +447,10 @@
                     fetchOrders();
                 }
             })
-            .catch(error => alert('အမှား: ' + error.message));
+            .catch(error => {
+                console.error('Login Error:', error);
+                alert('အမှား: ' + error.message);
+            });
         }
 
         function updateUIForLoggedInUser() {
@@ -488,16 +497,17 @@
 
         function submitOrder() {
             if (!user) {
-                alert('အကောင့်ဝင်ပါ။');
+                alert('အကောင့်ဝင်ပါၡ。');
                 return;
             }
             if (!selectedPaymentMethod || !document.getElementById('transactionLast6').value || !document.getElementById('telegramUsername').value) {
-                alert('အားလုံးဖြည့်ပါ။');
+                alert('အားလုံးဖြည့်ပါၡ。');
                 return;
             }
             const order = {
                 email: user.email,
                 deviceId: user.deviceId,
+                anonymousId: user.anonymousId,
                 months: selectedMonths,
                 quantity,
                 total: selectedPrice * quantity,
@@ -507,7 +517,7 @@
                 status: 'Approved',
                 timestamp: Date.now()
             };
-            fetch('/api/data', {
+            fetch('/.netlify/functions/data', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'submitOrder', order })
@@ -517,18 +527,21 @@
                 if (data.error) {
                     alert(data.error);
                 } else {
-                    document.getElementById('status').textContent = 'အော်ဒါတင်ပြီးပါပြီ။';
+                    document.getElementById('status').textContent = 'အော်ဒါတင်ပြီးပါပြီၡ。';
                     document.getElementById('transactionLast6').value = '';
                     document.getElementById('telegramUsername').value = '';
                     fetchOrders();
                 }
             })
-            .catch(error => alert('အမှား: ' + error.message));
+            .catch(error => {
+                console.error('Submit Order Error:', error);
+                alert('အမှား: ' + error.message);
+            });
         }
 
         function fetchOrders() {
             if (!user) return;
-            fetch('/api/data', {
+            fetch('/.netlify/functions/data', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'getOrders', email: user.email })
