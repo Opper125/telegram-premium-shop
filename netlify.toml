@@ -1,7 +1,8 @@
 [build]
-  publish = "."
   functions = "functions"
+  node_bundler = "esbuild"
   command = "echo 'No build command needed'"
 
 [functions]
   node_bundler = "esbuild"
+  node_version = "18"
