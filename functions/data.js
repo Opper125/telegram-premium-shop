@@ -1,6 +1,6 @@
 const fetch = require('node-fetch');
 
-const GITHUB_TOKEN = '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'; // Replace with your GitHub Personal Access Token
+const GITHUB_TOKEN = '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'; // Replace with your GitHub Personal Access Token
 const REPO = 'Opper125/telegram-premium-shop'; // Replace with your GitHub repo
 const DATA_PATH = 'data.json';
 
