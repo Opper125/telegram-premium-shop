@@ -1,8 +1,4 @@
-// In-Memory Data Store (Resets on server restart)
-let inMemoryData = {
-    users: [],
-    orders: []
-};
+const { getStore } = require('@netlify/blobs');
 
 // Helper function to validate email format
 function isValidEmail(email) {
@@ -10,7 +6,38 @@ function isValidEmail(email) {
     return emailRegex.test(email);
 }
 
-// Export the handler function for Netlify Functions
+// Initialize Netlify Blobs store
+async function getDataStore() {
+    return getStore('telegram-premium-shop-data');
+}
+
+// Initialize or load data from Netlify Blobs
+async function loadData() {
+    const store = await getDataStore();
+    try {
+        const data = await store.get('data', { type: 'json' });
+        if (!data) {
+            // If no data exists, initialize with empty arrays
+            return { users: [], orders: [] };
+        }
+        return data;
+    } catch (error) {
+        console.error('Error loading data from Netlify Blobs:', error);
+        return { users: [], orders: [] }; // Fallback to empty data
+    }
+}
+
+// Save data to Netlify Blobs
+async function saveData(data) {
+    const store = await getDataStore();
+    try {
+        await store.set('data', JSON.stringify(data), { type: 'json' });
+    } catch (error) {
+        console.error('Error saving data to Netlify Blobs:', error);
+        throw new Error('Failed to save data');
+    }
+}
+
 exports.handler = async (event) => {
     // Only allow POST requests
     if (event.httpMethod !== 'POST') {
@@ -22,6 +49,9 @@ exports.handler = async (event) => {
     }
 
     try {
+        // Load existing data from Netlify Blobs
+        const data = await loadData();
+
         // Parse the request body
         const body = JSON.parse(event.body);
         const { action } = body;
@@ -46,14 +76,14 @@ exports.handler = async (event) => {
                         headers: { 'Content-Type': 'application/json' }
                     };
                 }
-                if (inMemoryData.users.find(u => u.email === email)) {
+                if (data.users.find(u => u.email === email)) {
                     return {
                         statusCode: 400,
                         body: JSON.stringify({ error: 'Email already exists.' }),
                         headers: { 'Content-Type': 'application/json' }
                     };
                 }
-                if (inMemoryData.users.find(u => u.deviceId === deviceId)) {
+                if (data.users.find(u => u.deviceId === deviceId)) {
                     return {
                         statusCode: 400,
                         body: JSON.stringify({ error: 'Device already registered.' }),
@@ -62,7 +92,9 @@ exports.handler = async (event) => {
                 }
 
                 // Add new user
-                inMemoryData.users.push({ email, password, deviceId, anonymousId });
+                data.users.push({ email, password, deviceId, anonymousId });
+                await saveData(data);
+
                 return {
                     statusCode: 200,
                     body: JSON.stringify({ success: true, message: 'User registered successfully.' }),
@@ -90,7 +122,7 @@ exports.handler = async (event) => {
                 }
 
                 // Find user
-                const user = inMemoryData.users.find(u => u.email === email && u.password === password);
+                const user = data.users.find(u => u.email === email && u.password === password);
                 if (!user) {
                     return {
                         statusCode: 401,
@@ -102,6 +134,7 @@ exports.handler = async (event) => {
                 // Update deviceId if changed
                 if (user.deviceId !== deviceId) {
                     user.deviceId = deviceId;
+                    await saveData(data);
                 }
 
                 return {
@@ -129,7 +162,7 @@ exports.handler = async (event) => {
                         headers: { 'Content-Type': 'application/json' }
                     };
                 }
-                if (!inMemoryData.users.find(u => u.email === order.email && u.deviceId === order.deviceId)) {
+                if (!data.users.find(u => u.email === order.email && u.deviceId === order.deviceId)) {
                     return {
                         statusCode: 403,
                         body: JSON.stringify({ error: 'Unauthorized user.' }),
@@ -144,7 +177,8 @@ exports.handler = async (event) => {
                     status: 'Approved',
                     timestamp: Date.now()
                 };
-                inMemoryData.orders.push(newOrder);
+                data.orders.push(newOrder);
+                await saveData(data);
 
                 return {
                     statusCode: 200,
@@ -173,7 +207,7 @@ exports.handler = async (event) => {
                 }
 
                 // Fetch orders for the user
-                const userOrders = inMemoryData.orders.filter(order => order.email === email);
+                const userOrders = data.orders.filter(order => order.email === email);
                 return {
                     statusCode: 200,
                     body: JSON.stringify({ success: true, orders: userOrders }),
