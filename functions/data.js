@@ -11,19 +11,19 @@ async function getDataStore() {
     return getStore('telegram-premium-shop-data');
 }
 
-// Initialize or load data from Netlify Blobs
+// Load data from Netlify Blobs
 async function loadData() {
     const store = await getDataStore();
     try {
         const data = await store.get('data', { type: 'json' });
-        if (!data) {
-            // If no data exists, initialize with empty arrays
+        if (!data || !data.users || !data.orders) {
+            console.warn('No valid data found, initializing new store.');
             return { users: [], orders: [] };
         }
         return data;
     } catch (error) {
         console.error('Error loading data from Netlify Blobs:', error);
-        return { users: [], orders: [] }; // Fallback to empty data
+        throw new Error('Failed to load data. Please try again later.');
     }
 }
 
@@ -39,7 +39,6 @@ async function saveData(data) {
 }
 
 exports.handler = async (event) => {
-    // Only allow POST requests
     if (event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
@@ -49,19 +48,13 @@ exports.handler = async (event) => {
     }
 
     try {
-        // Load existing data from Netlify Blobs
         const data = await loadData();
-
-        // Parse the request body
         const body = JSON.parse(event.body);
         const { action } = body;
 
-        // Handle different actions
         switch (action) {
             case 'signup': {
                 const { email, password, deviceId, anonymousId } = body;
-
-                // Input validation
                 if (!email || !password || !deviceId || !anonymousId) {
                     return {
                         statusCode: 400,
@@ -91,7 +84,6 @@ exports.handler = async (event) => {
                     };
                 }
 
-                // Add new user
                 data.users.push({ email, password, deviceId, anonymousId });
                 await saveData(data);
 
@@ -104,8 +96,6 @@ exports.handler = async (event) => {
 
             case 'login': {
                 const { email, password, deviceId } = body;
-
-                // Input validation
                 if (!email || !password || !deviceId) {
                     return {
                         statusCode: 400,
@@ -121,7 +111,6 @@ exports.handler = async (event) => {
                     };
                 }
 
-                // Find user
                 const user = data.users.find(u => u.email === email && u.password === password);
                 if (!user) {
                     return {
@@ -131,7 +120,6 @@ exports.handler = async (event) => {
                     };
                 }
 
-                // Update deviceId if changed
                 if (user.deviceId !== deviceId) {
                     user.deviceId = deviceId;
                     await saveData(data);
@@ -146,8 +134,6 @@ exports.handler = async (event) => {
 
             case 'submitOrder': {
                 const { order } = body;
-
-                // Input validation
                 if (!order || !order.email || !order.deviceId || !order.anonymousId || !order.months || !order.quantity || !order.total || !order.transactionLast6 || !order.telegramUsername || !order.paymentMethod) {
                     return {
                         statusCode: 400,
@@ -170,7 +156,6 @@ exports.handler = async (event) => {
                     };
                 }
 
-                // Add order with timestamp
                 const newOrder = {
                     ...order,
                     id: Date.now().toString(),
@@ -189,8 +174,6 @@ exports.handler = async (event) => {
 
             case 'getOrders': {
                 const { email } = body;
-
-                // Input validation
                 if (!email) {
                     return {
                         statusCode: 400,
@@ -206,7 +189,6 @@ exports.handler = async (event) => {
                     };
                 }
 
-                // Fetch orders for the user
                 const userOrders = data.orders.filter(order => order.email === email);
                 return {
                     statusCode: 200,
