@@ -298,7 +298,7 @@
 
     <div class="hero">
         <h2>Telegram Premium Shop မှ ကြိုဆိုပါတယ် ✨</h2>
-        <p>သင့်အတွက် အဆင့်မြင့် Telegram ဝန်ဆောင်မှုများကို ပေးအပ်ပါမယ်။</p>
+        <p>သင့်အတွက် အဆင့်မြင့် Telegram ဝန်ဆောင်မှုများကို ပေးအပ်ပါမယ်ၡ。</p>
     </div>
 
     <div class="container">
@@ -316,8 +316,8 @@
             </div>
             <div id="totalPrice">စုစုပေါင်း: ၆၀,၀၀၀ ကျပ်</div>
             <div class="payment-method">
-                <img src="https://github.com/Opper125/telegram-premium-shop/blob/37d47c886a0b6eb2f5eea6db306ace23123119e8/kpay-logo.png" alt="Kpay" class="payment-option" onclick="selectPayment('kpay')">
-                <img src="https://github.com/Opper125/telegram-premium-shop/blob/37d47c886a0b6eb2f5eea6db306ace23123119e8/wave-logo.png" alt="Wave" class="payment-option" onclick="selectPayment('wave')">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/8/84/kpay-logo.png" alt="Kpay" class="payment-option" onclick="selectPayment('kpay')">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/wave-logo.png" alt="Wave" class="payment-option" onclick="selectPayment('wave')">
             </div>
             <input type="text" id="transactionLast6" placeholder="ငွေလွှဲပြီး အမှတ် (နောက်ဆုံး ၆ လုံး)" required>
             <input type="text" id="telegramUsername" placeholder="Telegram အမည်" required>
@@ -368,7 +368,7 @@
                 updateUIForLoggedInUser();
                 fetchOrders();
             }
-            setInterval(fetchOrders, 1000); // Fetch orders every second
+            setInterval(fetchOrders, 1000); // Fetch orders every 1 second for real-time updates
         });
 
         document.getElementById('loginBtn').addEventListener('click', () => openModal('loginModal'));
@@ -377,7 +377,7 @@
             localStorage.removeItem('user');
             user = null;
             updateUIForLoggedOutUser();
-            alert('အကောင့်ထွက်ပြီးပါပြီ။');
+            alert('အကောင့်ထွက်ပြီးပါပြီၡ。');
         });
 
         function openModal(modalId) {
@@ -392,11 +392,10 @@
             const email = document.getElementById('signupEmail').value.trim();
             const password = document.getElementById('signupPassword').value.trim();
             if (!email || !password) {
-                alert('အီးမေးလ် နှင့် စကားဝှက် ဖြည့်ပါ။');
+                alert('အီးမေးလ် နှင့် စကားဝှက် ဖြည့်ပါၡ。');
                 return;
             }
 
-            // Anonymous Authentication: Automatically verify and register user
             const anonymousId = `anon_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
             fetch('/.netlify/functions/data', {
                 method: 'POST',
@@ -411,7 +410,7 @@
                     user = { email, deviceId, anonymousId };
                     localStorage.setItem('user', JSON.stringify(user));
                     closeModal('signupModal');
-                    alert('အကောင့်ဖွင့်ပြီးပါပြီ။ Anonymous စနစ်ဖြင့် အတည်ပြုပြီးပါပြီ။');
+                    alert('အကောင့်ဖွင့်ပြီးပါပြီၡ。Anonymous စနစ်ဖြင့် အတည်ပြုပြီးပါတယ်ၡ。');
                     updateUIForLoggedInUser();
                     fetchOrders();
                 }
@@ -426,7 +425,7 @@
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value.trim();
             if (!email || !password) {
-                alert('အီးမေးလ် နှင့် စကားဝှက် ဖြည့်ပါ။');
+                alert('အီးမေးလ် နှင့် စကားဝှက် ဖြည့်ပါၡ。');
                 return;
             }
             fetch('/.netlify/functions/data', {
@@ -442,7 +441,7 @@
                     user = { email, deviceId, anonymousId: data.anonymousId };
                     localStorage.setItem('user', JSON.stringify(user));
                     closeModal('loginModal');
-                    alert('အကောင့်ဝင်ပြီးပါပြီ။');
+                    alert('အကောင့်ဝင်ပြီးပါပြီၡ。');
                     updateUIForLoggedInUser();
                     fetchOrders();
                 }
@@ -546,7 +545,10 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'getOrders', email: user.email })
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
             .then(data => {
                 if (data.error) {
                     document.getElementById('orderList').innerHTML = `<p>${data.error}</p>`;
@@ -564,7 +566,10 @@
                     `).join('');
                 }
             })
-            .catch(error => console.error('Error fetching orders:', error));
+            .catch(error => {
+                console.error('Error fetching orders:', error);
+                document.getElementById('orderList').innerHTML = `<p>အမှား: ${error.message}</p>`;
+            });
         }
     </script>
 </body>
