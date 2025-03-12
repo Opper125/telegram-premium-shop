@@ -1,58 +1,79 @@
 const fetch = require('node-fetch');
 
-const GITHUB_TOKEN = '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'; // Replace with your GitHub Personal Access Token
-const REPO = 'Opper125/telegram-premium-shop'; // Replace with your GitHub repo
+const GITHUB_TOKEN = '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'; // Replace with your new Token after deleting this one
+const REPO = 'Opper125/telegram-premium-shop'; // Replace with your actual repo if different
 const DATA_PATH = 'data.json';
 
+// Suppress punycode deprecation warning for now
+process.removeAllListeners('warning');
+
 async function getDataFromGitHub() {
-    const response = await fetch(`https://api.github.com/repos/${REPO}/contents/${DATA_PATH}`, {
-        headers: {
-            'Authorization': `token ${GITHUB_TOKEN}`,
-            'Accept': 'application/vnd.github.v3+json'
+    try {
+        const response = await fetch(`https://api.github.com/repos/${REPO}/contents/${DATA_PATH}`, {
+            headers: {
+                'Authorization': `token ${GITHUB_TOKEN}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'User-Agent': 'Telegram-Premium-Shop'
+            }
+        });
+
+        if (!response.ok) {
+            if (response.status === 404) {
+                console.log('data.json not found, returning empty data');
+                return { users: [], orders: [] };
+            }
+            const errorText = await response.text();
+            throw new Error(`GitHub API error: ${response.status} - ${errorText}`);
         }
-    });
-    if (!response.ok) {
-        if (response.status === 404) {
-            return { users: [], orders: [] }; // Return empty data if file doesn't exist
-        }
-        throw new Error('Failed to fetch data from GitHub');
+
+        const data = await response.json();
+        const content = Buffer.from(data.content, 'base64').toString('utf8');
+        return JSON.parse(content);
+    } catch (error) {
+        console.error('Error in getDataFromGitHub:', error);
+        throw error;
     }
-    const data = await response.json();
-    const content = Buffer.from(data.content, 'base64').toString('utf8');
-    return JSON.parse(content);
 }
 
 async function updateDataToGitHub(newData) {
-    const currentDataResponse = await fetch(`https://api.github.com/repos/${REPO}/contents/${DATA_PATH}`, {
-        headers: {
-            'Authorization': `token ${GITHUB_TOKEN}`,
-            'Accept': 'application/vnd.github.v3+json'
+    try {
+        const currentDataResponse = await fetch(`https://api.github.com/repos/${REPO}/contents/${DATA_PATH}`, {
+            headers: {
+                'Authorization': `token ${GITHUB_TOKEN}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'User-Agent': 'Telegram-Premium-Shop'
+            }
+        });
+
+        let sha;
+        if (currentDataResponse.ok) {
+            const currentData = await currentDataResponse.json();
+            sha = currentData.sha;
         }
-    });
 
-    let sha;
-    if (currentDataResponse.ok) {
-        const currentData = await currentDataResponse.json();
-        sha = currentData.sha;
-    }
+        const content = Buffer.from(JSON.stringify(newData, null, 2)).toString('base64');
+        const updateResponse = await fetch(`https://api.github.com/repos/${REPO}/contents/${DATA_PATH}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${GITHUB_TOKEN}`,
+                'Accept': 'application/vnd.github.v3+json',
+                'User-Agent': 'Telegram-Premium-Shop'
+            },
+            body: JSON.stringify({
+                message: 'Update data.json with new user/order data',
+                content,
+                sha: sha || undefined,
+                branch: 'main'
+            })
+        });
 
-    const content = Buffer.from(JSON.stringify(newData, null, 2)).toString('base64');
-    const updateResponse = await fetch(`https://api.github.com/repos/${REPO}/contents/${DATA_PATH}`, {
-        method: 'PUT',
-        headers: {
-            'Authorization': `token ${GITHUB_TOKEN}`,
-            'Accept': 'application/vnd.github.v3+json'
-        },
-        body: JSON.stringify({
-            message: 'Update data.json with new user/order data',
-            content,
-            sha: sha || undefined,
-            branch: 'main'
-        })
-    });
-
-    if (!updateResponse.ok) {
-        throw new Error('Failed to update data to GitHub');
+        if (!updateResponse.ok) {
+            const errorText = await updateResponse.text();
+            throw new Error(`Failed to update GitHub: ${updateResponse.status} - ${errorText}`);
+        }
+    } catch (error) {
+        console.error('Error in updateDataToGitHub:', error);
+        throw error;
     }
 }
 
@@ -166,10 +187,10 @@ exports.handler = async (event) => {
                 return { statusCode: 400, body: JSON.stringify({ error: 'မမှန်ကန်သော လုပ်ဆောင်ချက်ၡ' }) };
         }
     } catch (error) {
-        console.error('ဆာဗာ အမှား:', error);
+        console.error('ဆာဗာ အမှား:', error.message);
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: 'ဆာဗာအတွင်းပိုင်း အမှားၡ နောက်မှ ထပ်ကြိုးစားပါၡ' })
+            body: JSON.stringify({ error: `ဆာဗာအတွင်းပိုင်း အမှားၡ ${error.message}` })
         };
     }
 };
