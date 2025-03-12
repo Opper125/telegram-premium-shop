@@ -1,143 +1,88 @@
-// In-Memory Data Store (Resets on server restart)
+// functions/data.js
 let inMemoryData = {
     users: [],
     orders: []
 };
 
-// Helper function to validate email format
 function isValidEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
 }
 
-// Export the handler function for Netlify Functions
 exports.handler = async (event) => {
-    // Only allow POST requests
     if (event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
-            body: JSON.stringify({ error: 'Method Not Allowed. Use POST request only.' }),
+            body: JSON.stringify({ error: 'ခွင့်မပြုသော တောင်းဆိုမှု။ POST သာသုံးပါၡ' }),
             headers: { 'Content-Type': 'application/json' }
         };
     }
 
     try {
-        // Parse the request body
         const body = JSON.parse(event.body);
         const { action } = body;
 
-        // Handle different actions
         switch (action) {
             case 'signup': {
                 const { email, password, deviceId, anonymousId } = body;
-
-                // Input validation
                 if (!email || !password || !deviceId || !anonymousId) {
-                    return {
-                        statusCode: 400,
-                        body: JSON.stringify({ error: 'All fields (email, password, deviceId, anonymousId) are required.' }),
-                        headers: { 'Content-Type': 'application/json' }
-                    };
+                    return { statusCode: 400, body: JSON.stringify({ error: 'အားလုံးဖြည့်ရန် လိုအပ်ပါသည်ၡ' }) };
                 }
                 if (!isValidEmail(email)) {
-                    return {
-                        statusCode: 400,
-                        body: JSON.stringify({ error: 'Invalid email format.' }),
-                        headers: { 'Content-Type': 'application/json' }
-                    };
+                    return { statusCode: 400, body: JSON.stringify({ error: 'အီးမေးလ် ပုံစံမမှန်ပါၡ' }) };
                 }
                 if (inMemoryData.users.find(u => u.email === email)) {
-                    return {
-                        statusCode: 400,
-                        body: JSON.stringify({ error: 'Email already exists.' }),
-                        headers: { 'Content-Type': 'application/json' }
-                    };
+                    return { statusCode: 400, body: JSON.stringify({ error: 'ဤအီးမေးလ် ရှိပြီးပါပြီၡ' }) };
                 }
                 if (inMemoryData.users.find(u => u.deviceId === deviceId)) {
-                    return {
-                        statusCode: 400,
-                        body: JSON.stringify({ error: 'Device already registered.' }),
-                        headers: { 'Content-Type': 'application/json' }
-                    };
+                    return { statusCode: 400, body: JSON.stringify({ error: 'ဤစက်ကို မှတ်ပုံတင်ပြီးပါပြီၡ' }) };
                 }
 
-                // Add new user
-                inMemoryData.users.push({ email, password, deviceId, anonymousId });
+                const user = { email, password, deviceId, anonymousId, createdAt: Date.now() };
+                inMemoryData.users.push(user);
                 return {
                     statusCode: 200,
-                    body: JSON.stringify({ success: true, message: 'User registered successfully.' }),
-                    headers: { 'Content-Type': 'application/json' }
+                    body: JSON.stringify({ success: true, message: 'အကောင့်ဖွင့်ပြီးပါပြီၡ', user: { email, anonymousId } })
                 };
             }
 
             case 'login': {
                 const { email, password, deviceId } = body;
-
-                // Input validation
                 if (!email || !password || !deviceId) {
-                    return {
-                        statusCode: 400,
-                        body: JSON.stringify({ error: 'All fields (email, password, deviceId) are required.' }),
-                        headers: { 'Content-Type': 'application/json' }
-                    };
+                    return { statusCode: 400, body: JSON.stringify({ error: 'အားလုံးဖြည့်ရန် လိုအပ်ပါသည်ၡ' }) };
                 }
                 if (!isValidEmail(email)) {
-                    return {
-                        statusCode: 400,
-                        body: JSON.stringify({ error: 'Invalid email format.' }),
-                        headers: { 'Content-Type': 'application/json' }
-                    };
+                    return { statusCode: 400, body: JSON.stringify({ error: 'အီးမေးလ် ပုံစံမမှန်ပါၡ' }) };
                 }
 
-                // Find user
                 const user = inMemoryData.users.find(u => u.email === email && u.password === password);
                 if (!user) {
-                    return {
-                        statusCode: 401,
-                        body: JSON.stringify({ error: 'Invalid email or password.' }),
-                        headers: { 'Content-Type': 'application/json' }
-                    };
+                    return { statusCode: 401, body: JSON.stringify({ error: 'အီးမေးလ် သို့မဟုတ် စကားဝှက် မမှန်ပါၡ' }) };
                 }
 
-                // Update deviceId if changed
-                if (user.deviceId !== deviceId) {
-                    user.deviceId = deviceId;
-                }
-
+                user.deviceId = deviceId;
+                user.lastLogin = Date.now();
                 return {
                     statusCode: 200,
-                    body: JSON.stringify({ success: true, anonymousId: user.anonymousId, message: 'Login successful.' }),
-                    headers: { 'Content-Type': 'application/json' }
+                    body: JSON.stringify({ success: true, anonymousId: user.anonymousId, message: 'အကောင့်ဝင်ပြီးပါပြီၡ' })
                 };
             }
 
             case 'submitOrder': {
                 const { order } = body;
-
-                // Input validation
-                if (!order || !order.email || !order.deviceId || !order.anonymousId || !order.months || !order.quantity || !order.total || !order.transactionLast6 || !order.telegramUsername || !order.paymentMethod) {
-                    return {
-                        statusCode: 400,
-                        body: JSON.stringify({ error: 'All order fields are required.' }),
-                        headers: { 'Content-Type': 'application/json' }
-                    };
+                const requiredFields = ['email', 'deviceId', 'anonymousId', 'months', 'quantity', 'total', 
+                    'transactionLast6', 'telegramUsername', 'paymentMethod'];
+                
+                if (!order || requiredFields.some(field => !order[field])) {
+                    return { statusCode: 400, body: JSON.stringify({ error: 'အော်ဒါအတွက် အားလုံးဖြည့်ပါၡ' }) };
                 }
                 if (!isValidEmail(order.email)) {
-                    return {
-                        statusCode: 400,
-                        body: JSON.stringify({ error: 'Invalid email format in order.' }),
-                        headers: { 'Content-Type': 'application/json' }
-                    };
+                    return { statusCode: 400, body: JSON.stringify({ error: 'အီးမေးလ် ပုံစံမမှန်ပါၡ' }) };
                 }
                 if (!inMemoryData.users.find(u => u.email === order.email && u.deviceId === order.deviceId)) {
-                    return {
-                        statusCode: 403,
-                        body: JSON.stringify({ error: 'Unauthorized user.' }),
-                        headers: { 'Content-Type': 'application/json' }
-                    };
+                    return { statusCode: 403, body: JSON.stringify({ error: 'ခွင့်မပြုထားသော အသုံးပြုသူပါၡ' }) };
                 }
 
-                // Add order with timestamp
                 const newOrder = {
                     ...order,
                     id: Date.now().toString(),
@@ -145,56 +90,33 @@ exports.handler = async (event) => {
                     timestamp: Date.now()
                 };
                 inMemoryData.orders.push(newOrder);
-
                 return {
                     statusCode: 200,
-                    body: JSON.stringify({ success: true, orderId: newOrder.id, message: 'Order submitted successfully.' }),
-                    headers: { 'Content-Type': 'application/json' }
+                    body: JSON.stringify({ success: true, orderId: newOrder.id, message: 'အော်ဒါတင်ပြီးပါပြီၡ' })
                 };
             }
 
             case 'getOrders': {
                 const { email } = body;
-
-                // Input validation
-                if (!email) {
-                    return {
-                        statusCode: 400,
-                        body: JSON.stringify({ error: 'Email is required.' }),
-                        headers: { 'Content-Type': 'application/json' }
-                    };
-                }
-                if (!isValidEmail(email)) {
-                    return {
-                        statusCode: 400,
-                        body: JSON.stringify({ error: 'Invalid email format.' }),
-                        headers: { 'Content-Type': 'application/json' }
-                    };
+                if (!email || !isValidEmail(email)) {
+                    return { statusCode: 400, body: JSON.stringify({ error: 'မှန်ကန်သော အီးမေးလ် လိုအပ်ပါသည်ၡ' }) };
                 }
 
-                // Fetch orders for the user
                 const userOrders = inMemoryData.orders.filter(order => order.email === email);
                 return {
                     statusCode: 200,
-                    body: JSON.stringify({ success: true, orders: userOrders }),
-                    headers: { 'Content-Type': 'application/json' }
+                    body: JSON.stringify({ success: true, orders: userOrders })
                 };
             }
 
-            default: {
-                return {
-                    statusCode: 400,
-                    body: JSON.stringify({ error: 'Invalid action.' }),
-                    headers: { 'Content-Type': 'application/json' }
-                };
-            }
+            default:
+                return { statusCode: 400, body: JSON.stringify({ error: 'မမှန်ကန်သော လုပ်ဆောင်ချက်ၡ' }) };
         }
     } catch (error) {
-        console.error('Server Error:', error);
+        console.error('ဆာဗာ အမှား:', error);
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: 'Internal Server Error. Please try again later.' }),
-            headers: { 'Content-Type': 'application/json' }
+            body: JSON.stringify({ error: 'ဆာဗာအတွင်းပိုင်း အမှားၡ နောက်မှ ထပ်ကြိုးစားပါၡ' })
         };
     }
 };
