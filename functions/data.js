@@ -1,4 +1,3 @@
-// functions/data.js
 let inMemoryData = {
     users: [],
     orders: []
@@ -32,7 +31,7 @@ exports.handler = async (event) => {
                     return { statusCode: 400, body: JSON.stringify({ error: 'အီးမေးလ် ပုံစံမမှန်ပါၡ' }) };
                 }
                 if (inMemoryData.users.find(u => u.email === email)) {
-                    return { statusCode: 400, body: JSON.stringify({ error: 'ဤအီးမေးလ် ရှိပြီးပါပြီၡ' }) };
+                    return { statusCode: 400, body: JSON.stringify({ error: 'ဤအီးမေးလ် ရှိပြီးပါပြီၡ အကောင့်သစ်ဖွင့်၍ မရပါၡ' }) };
                 }
                 if (inMemoryData.users.find(u => u.deviceId === deviceId)) {
                     return { statusCode: 400, body: JSON.stringify({ error: 'ဤစက်ကို မှတ်ပုံတင်ပြီးပါပြီၡ' }) };
