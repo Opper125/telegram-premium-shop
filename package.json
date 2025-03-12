@@ -1,17 +1,8 @@
 {
   "name": "telegram-premium-shop",
   "version": "1.0.0",
-  "description": "Telegram Premium Shop with Netlify Functions and GitHub Data",
-  "main": "index.html",
-  "scripts": {
-    "start": "echo 'No start script needed for static site'",
-    "build": "echo 'No build script needed for static site'"
-  },
+  "description": "Telegram Premium Shop Backend",
   "dependencies": {
-    "netlify-lambda": "^2.0.16",
     "node-fetch": "^2.6.7"
-  },
-  "devDependencies": {},
-  "author": "Your Name",
-  "license": "MIT"
+  }
 }
