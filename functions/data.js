@@ -1,15 +1,20 @@
 const fetch = require('node-fetch');
 
-const GITHUB_TOKEN = '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'; // Replace with your new Token after deleting this one
+const GITHUB_TOKEN = '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'; // Replace with your new Token
 const REPO = 'Opper125/telegram-premium-shop'; // Replace with your actual repo if different
 const DATA_PATH = 'data.json';
 
-// Suppress punycode deprecation warning for now
+// Suppress punycode deprecation warning if it appears
 process.removeAllListeners('warning');
 
 async function getDataFromGitHub() {
     try {
+        if (!fetch) {
+            throw new Error('node-fetch module is not properly imported');
+        }
+
         const response = await fetch(`https://api.github.com/repos/${REPO}/contents/${DATA_PATH}`, {
+            method: 'GET',
             headers: {
                 'Authorization': `token ${GITHUB_TOKEN}`,
                 'Accept': 'application/vnd.github.v3+json',
@@ -30,14 +35,19 @@ async function getDataFromGitHub() {
         const content = Buffer.from(data.content, 'base64').toString('utf8');
         return JSON.parse(content);
     } catch (error) {
-        console.error('Error in getDataFromGitHub:', error);
+        console.error('Error in getDataFromGitHub:', error.message);
         throw error;
     }
 }
 
 async function updateDataToGitHub(newData) {
     try {
+        if (!fetch) {
+            throw new Error('node-fetch module is not properly imported');
+        }
+
         const currentDataResponse = await fetch(`https://api.github.com/repos/${REPO}/contents/${DATA_PATH}`, {
+            method: 'GET',
             headers: {
                 'Authorization': `token ${GITHUB_TOKEN}`,
                 'Accept': 'application/vnd.github.v3+json',
@@ -72,7 +82,7 @@ async function updateDataToGitHub(newData) {
             throw new Error(`Failed to update GitHub: ${updateResponse.status} - ${errorText}`);
         }
     } catch (error) {
-        console.error('Error in updateDataToGitHub:', error);
+        console.error('Error in updateDataToGitHub:', error.message);
         throw error;
     }
 }
