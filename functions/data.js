@@ -1,4 +1,8 @@
-const { getStore } = require('@netlify/blobs');
+// In-Memory Data Store (Resets on server restart)
+let inMemoryData = {
+    users: [],
+    orders: []
+};
 
 // Helper function to validate email format
 function isValidEmail(email) {
@@ -6,39 +10,9 @@ function isValidEmail(email) {
     return emailRegex.test(email);
 }
 
-// Initialize Netlify Blobs store
-async function getDataStore() {
-    return getStore('telegram-premium-shop-data');
-}
-
-// Load data from Netlify Blobs
-async function loadData() {
-    const store = await getDataStore();
-    try {
-        const data = await store.get('data', { type: 'json' });
-        if (!data || !data.users || !data.orders) {
-            console.warn('No valid data found, initializing new store.');
-            return { users: [], orders: [] };
-        }
-        return data;
-    } catch (error) {
-        console.error('Error loading data from Netlify Blobs:', error);
-        throw new Error('Failed to load data. Please try again later.');
-    }
-}
-
-// Save data to Netlify Blobs
-async function saveData(data) {
-    const store = await getDataStore();
-    try {
-        await store.set('data', JSON.stringify(data), { type: 'json' });
-    } catch (error) {
-        console.error('Error saving data to Netlify Blobs:', error);
-        throw new Error('Failed to save data');
-    }
-}
-
+// Export the handler function for Netlify Functions
 exports.handler = async (event) => {
+    // Only allow POST requests
     if (event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
@@ -48,13 +22,16 @@ exports.handler = async (event) => {
     }
 
     try {
-        const data = await loadData();
+        // Parse the request body
         const body = JSON.parse(event.body);
         const { action } = body;
 
+        // Handle different actions
         switch (action) {
             case 'signup': {
                 const { email, password, deviceId, anonymousId } = body;
+
+                // Input validation
                 if (!email || !password || !deviceId || !anonymousId) {
                     return {
                         statusCode: 400,
@@ -69,14 +46,14 @@ exports.handler = async (event) => {
                         headers: { 'Content-Type': 'application/json' }
                     };
                 }
-                if (data.users.find(u => u.email === email)) {
+                if (inMemoryData.users.find(u => u.email === email)) {
                     return {
                         statusCode: 400,
                         body: JSON.stringify({ error: 'Email already exists.' }),
                         headers: { 'Content-Type': 'application/json' }
                     };
                 }
-                if (data.users.find(u => u.deviceId === deviceId)) {
+                if (inMemoryData.users.find(u => u.deviceId === deviceId)) {
                     return {
                         statusCode: 400,
                         body: JSON.stringify({ error: 'Device already registered.' }),
@@ -84,9 +61,8 @@ exports.handler = async (event) => {
                     };
                 }
 
-                data.users.push({ email, password, deviceId, anonymousId });
-                await saveData(data);
-
+                // Add new user
+                inMemoryData.users.push({ email, password, deviceId, anonymousId });
                 return {
                     statusCode: 200,
                     body: JSON.stringify({ success: true, message: 'User registered successfully.' }),
@@ -96,6 +72,8 @@ exports.handler = async (event) => {
 
             case 'login': {
                 const { email, password, deviceId } = body;
+
+                // Input validation
                 if (!email || !password || !deviceId) {
                     return {
                         statusCode: 400,
@@ -111,7 +89,8 @@ exports.handler = async (event) => {
                     };
                 }
 
-                const user = data.users.find(u => u.email === email && u.password === password);
+                // Find user
+                const user = inMemoryData.users.find(u => u.email === email && u.password === password);
                 if (!user) {
                     return {
                         statusCode: 401,
@@ -120,9 +99,9 @@ exports.handler = async (event) => {
                     };
                 }
 
+                // Update deviceId if changed
                 if (user.deviceId !== deviceId) {
                     user.deviceId = deviceId;
-                    await saveData(data);
                 }
 
                 return {
@@ -134,6 +113,8 @@ exports.handler = async (event) => {
 
             case 'submitOrder': {
                 const { order } = body;
+
+                // Input validation
                 if (!order || !order.email || !order.deviceId || !order.anonymousId || !order.months || !order.quantity || !order.total || !order.transactionLast6 || !order.telegramUsername || !order.paymentMethod) {
                     return {
                         statusCode: 400,
@@ -148,7 +129,7 @@ exports.handler = async (event) => {
                         headers: { 'Content-Type': 'application/json' }
                     };
                 }
-                if (!data.users.find(u => u.email === order.email && u.deviceId === order.deviceId)) {
+                if (!inMemoryData.users.find(u => u.email === order.email && u.deviceId === order.deviceId)) {
                     return {
                         statusCode: 403,
                         body: JSON.stringify({ error: 'Unauthorized user.' }),
@@ -156,14 +137,14 @@ exports.handler = async (event) => {
                     };
                 }
 
+                // Add order with timestamp
                 const newOrder = {
                     ...order,
                     id: Date.now().toString(),
                     status: 'Approved',
                     timestamp: Date.now()
                 };
-                data.orders.push(newOrder);
-                await saveData(data);
+                inMemoryData.orders.push(newOrder);
 
                 return {
                     statusCode: 200,
@@ -174,6 +155,8 @@ exports.handler = async (event) => {
 
             case 'getOrders': {
                 const { email } = body;
+
+                // Input validation
                 if (!email) {
                     return {
                         statusCode: 400,
@@ -189,7 +172,8 @@ exports.handler = async (event) => {
                     };
                 }
 
-                const userOrders = data.orders.filter(order => order.email === email);
+                // Fetch orders for the user
+                const userOrders = inMemoryData.orders.filter(order => order.email === email);
                 return {
                     statusCode: 200,
                     body: JSON.stringify({ success: true, orders: userOrders }),
