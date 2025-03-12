@@ -1,8 +1,19 @@
 [build]
+  publish = "public"
   functions = "functions"
-  node_bundler = "esbuild"
   command = "echo 'No build command needed'"
-
+  node_bundler = "esbuild"
+}
 [functions]
   node_bundler = "esbuild"
   node_version = "18"
+  directory = "functions"
+}
+[build.environment]
+  NODE_VERSION = "18"
+}
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+}
