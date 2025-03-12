@@ -92,7 +92,7 @@ exports.handler = async (event) => {
                 inMemoryData.orders.push(newOrder);
                 return {
                     statusCode: 200,
-                    body: JSON.stringify({ success: true, orderId: newOrder.id, message: 'အော်ဒါတင်ပြီးပါပြီၡ' })
+                    body: JSON.stringify({ success: true, orderId: newOrder.id, message: 'အော်ဒါတင်ပြီးပါပြီၡ', order: newOrder })
                 };
             }
 
