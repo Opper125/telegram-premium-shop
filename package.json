@@ -1,7 +1,7 @@
 {
   "name": "telegram-premium-shop",
   "version": "1.0.0",
-  "description": "Telegram Premium Shop with Netlify Functions and LocalStorage",
+  "description": "Telegram Premium Shop with Netlify Functions and In-Memory Data",
   "main": "index.html",
   "scripts": {
     "start": "echo 'No start script needed for static site'",
