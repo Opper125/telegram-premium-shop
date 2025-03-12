@@ -40,6 +40,12 @@
             margin-right: 15px;
             border-radius: 50%;
             border: 2px solid #0088cc;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 5px #0088cc; }
+            50% { transform: scale(1.1); box-shadow: 0 0 20px #0088cc; }
+            100% { transform: scale(1); box-shadow: 0 0 5px #0088cc; }
         }
         .logo h1 {
             font-size: 2em;
@@ -172,11 +178,17 @@
             width: 100%;
             padding: 15px;
             margin: 15px 0;
-            border: 2px solid #0088cc;
+            border: 2px solid transparent;
             border-radius: 15px;
             background: rgba(255, 255, 255, 0.1);
             color: #fff;
             font-size: 1.1em;
+            animation: glowingBorder 2s infinite;
+        }
+        @keyframes glowingBorder {
+            0% { border-color: #ff4500; box-shadow: 0 0 10px #ff4500; }
+            50% { border-color: #ffa500; box-shadow: 0 0 20px #ffa500; }
+            100% { border-color: #ff4500; box-shadow: 0 0 10px #ff4500; }
         }
         #status {
             text-align: center;
@@ -267,11 +279,56 @@
             to { right: -300px; }
         }
         .order-item {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 10px;
-            border: 1px solid #0088cc;
+            background: linear-gradient(135deg, rgba(0, 136, 204, 0.2), rgba(0, 170, 255, 0.2));
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 15px;
+            border: 2px solid #0088cc;
+            box-shadow: 0 0 20px rgba(0, 136, 204, 0.5);
+            transition: transform 0.3s;
+        }
+        .order-item:hover {
+            transform: scale(1.02);
+        }
+        .order-item p {
+            margin: 5px 0;
+            font-size: 1.1em;
+            color: #e6e6e6;
+        }
+        .download-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 20px;
+            background: linear-gradient(135deg, #0088cc, #00aaff);
+            border: none;
+            border-radius: 25px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .download-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px #0088cc;
+        }
+        #lightning {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 3000;
+            animation: lightningFlash 1s;
+        }
+        @keyframes lightningFlash {
+            0% { opacity: 0; background: rgba(255, 255, 255, 0); }
+            10% { opacity: 1; background: rgba(255, 255, 255, 0.8); }
+            20% { opacity: 0; background: rgba(255, 255, 255, 0); }
+            30% { opacity: 1; background: rgba(255, 255, 255, 0.6); }
+            40% { opacity: 0; background: rgba(255, 255, 255, 0); }
+            100% { opacity: 0; background: rgba(255, 255, 255, 0); }
         }
         @media (max-width: 768px) {
             .navbar { flex-direction: column; gap: 15px; }
@@ -284,6 +341,7 @@
     </style>
 </head>
 <body>
+    <div id="lightning"></div>
     <div class="navbar">
         <div class="logo">
             <img src="https://telegram.org/file/7654/1234/5678/photo.png" alt="Telegram Logo" class="logo-img">
@@ -352,7 +410,10 @@
 
     <div id="phoneNumberPopup" class="phone-number-popup" style="display:none;">09786284670 (DHMK)</div>
 
+    <!-- Include jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
+        const { jsPDF } = window.jspdf;
         let user = null;
         let selectedMonths = 3;
         let selectedPrice = 60000;
@@ -368,7 +429,6 @@
                 updateUIForLoggedInUser();
                 fetchOrders();
             }
-            setInterval(fetchOrders, 1000); // Fetch orders every 1 second for real-time updates
         });
 
         document.getElementById('loginBtn').addEventListener('click', () => openModal('loginModal'));
@@ -494,7 +554,7 @@
             setTimeout(() => popup.style.display = 'none', 10000);
         }
 
-        function submitOrder() {
+        async function submitOrder() {
             if (!user) {
                 alert('အကောင့်ဝင်ပါၡ。');
                 return;
@@ -516,40 +576,41 @@
                 status: 'Approved',
                 timestamp: Date.now()
             };
-            fetch('/.netlify/functions/data', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'submitOrder', order })
-            })
-            .then(response => response.json())
-            .then(data => {
+            try {
+                const response = await fetch('/.netlify/functions/data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'submitOrder', order })
+                });
+                const data = await response.json();
                 if (data.error) {
                     alert(data.error);
                 } else {
                     document.getElementById('status').textContent = 'အော်ဒါတင်ပြီးပါပြီၡ。';
                     document.getElementById('transactionLast6').value = '';
                     document.getElementById('telegramUsername').value = '';
+                    // Show lightning animation
+                    const lightning = document.getElementById('lightning');
+                    lightning.style.display = 'block';
+                    // Fetch orders immediately without refresh
                     fetchOrders();
                 }
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error('Submit Order Error:', error);
                 alert('အမှား: ' + error.message);
-            });
+            }
         }
 
-        function fetchOrders() {
+        async function fetchOrders() {
             if (!user) return;
-            fetch('/.netlify/functions/data', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'getOrders', email: user.email })
-            })
-            .then(response => {
+            try {
+                const response = await fetch('/.netlify/functions/data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'getOrders', email: user.email })
+                });
                 if (!response.ok) throw new Error('Network response was not ok');
-                return response.json();
-            })
-            .then(data => {
+                const data = await response.json();
                 if (data.error) {
                     document.getElementById('orderList').innerHTML = `<p>${data.error}</p>`;
                 } else {
@@ -562,14 +623,61 @@
                             <p>စုစုပေါင်း: ${order.total} ကျပ်</p>
                             <p>အခြေအနေ: ${order.status}</p>
                             <p>အချိန်: ${new Date(order.timestamp).toLocaleString()}</p>
+                            <button class="download-btn" onclick='downloadReceipt(${JSON.stringify(order)})'>Download Receipt</button>
                         </div>
                     `).join('');
                 }
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error('Error fetching orders:', error);
                 document.getElementById('orderList').innerHTML = `<p>အမှား: ${error.message}</p>`;
-            });
+            }
+        }
+
+        function downloadReceipt(order) {
+            const doc = new jsPDF();
+            const logoUrl = 'https://telegram.org/file/7654/1234/5678/photo.png';
+
+            // Load Telegram Logo
+            const img = new Image();
+            img.crossOrigin = 'Anonymous';
+            img.src = logoUrl;
+            img.onload = () => {
+                // Add Logo
+                doc.addImage(img, 'PNG', 10, 10, 30, 30);
+
+                // Add Title
+                doc.setFontSize(20);
+                doc.setTextColor(0, 136, 204);
+                doc.text('Telegram Premium Shop', 50, 25);
+                doc.setFontSize(12);
+                doc.setTextColor(0);
+                doc.text('Order Receipt', 50, 35);
+
+                // Add Order Details
+                doc.setFontSize(12);
+                doc.setTextColor(0);
+                doc.text(`Order ID: ${order.id}`, 10, 50);
+                doc.text(`Email: ${order.email}`, 10, 60);
+                doc.text(`Months: ${order.months}`, 10, 70);
+                doc.text(`Quantity: ${order.quantity}`, 10, 80);
+                doc.text(`Total: ${order.total} ကျပ်`, 10, 90);
+                doc.text(`Transaction Last 6: ${order.transactionLast6}`, 10, 100);
+                doc.text(`Telegram Username: ${order.telegramUsername}`, 10, 110);
+                doc.text(`Payment Method: ${order.paymentMethod}`, 10, 120);
+                doc.text(`Status: ${order.status}`, 10, 130);
+                doc.text(`Date: ${new Date(order.timestamp).toLocaleString()}`, 10, 140);
+
+                // Add Border and Styling
+                doc.setDrawColor(0, 136, 204);
+                doc.setLineWidth(1);
+                doc.roundedRect(5, 5, 200, 280, 5, 5, 'S');
+
+                // Save the PDF
+                doc.save(`Telegram_Premium_Order_${order.id}.pdf`);
+            };
+            img.onerror = () => {
+                alert('Failed to load Telegram Logo for the receipt. Please try again.');
+            };
         }
     </script>
 </body>
