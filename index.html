@@ -175,7 +175,7 @@
         }
 
         .premium-option {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient 135deg, var(--primary), var(--secondary);
             padding: 20px;
             border-radius: 15px;
             text-align: center;
@@ -301,8 +301,7 @@
 
         .modal-content {
             background: rgba(255, 255, 255, 0.1);
-            width: 90%;
-            max-width: 450px;
+            width: 90       max-width: 450px;
             margin: 100px auto;
             padding: 30px;
             border: 2px solid var(--primary);
@@ -431,6 +430,7 @@
             <button id="loginBtn" class="btn">အကောင့်ဝင်ရန်</button>
             <button id="signupBtn" class="btn">အကောင့်ဖွင့်ရန်</button>
             <button id="logoutBtn" class="btn" style="display:none;">အကောင့်ထွက်ရန်</button>
+            <a href="/orders.html" class="btn" id="ordersBtn" style="display:none;">အော်ဒါမှတ်တမ်း</a>
         </div>
     </div>
 
@@ -608,6 +608,7 @@
             document.getElementById('loginBtn').style.display = 'none';
             document.getElementById('signupBtn').style.display = 'none';
             document.getElementById('logoutBtn').style.display = 'block';
+            document.getElementById('ordersBtn').style.display = 'block';
             document.querySelector('.hero').style.display = 'block';
             document.querySelector('.container').style.display = 'block';
             document.getElementById('orderHistory').style.display = 'block';
@@ -617,6 +618,7 @@
             document.getElementById('loginBtn').style.display = 'block';
             document.getElementById('signupBtn').style.display = 'block';
             document.getElementById('logoutBtn').style.display = 'none';
+            document.getElementById('ordersBtn').style.display = 'none';
             document.querySelector('.hero').style.display = 'none';
             document.querySelector('.container').style.display = 'none';
             document.getElementById('orderHistory').style.display = 'none';
