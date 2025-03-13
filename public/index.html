@@ -17,6 +17,39 @@
             color: #fff;
             min-height: 100vh;
             overflow-x: hidden;
+            position: relative;
+        }
+        /* Galaxy Background with Stars Animation */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c') no-repeat center/cover;
+            opacity: 0.3;
+            z-index: -1;
+        }
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
         }
         .navbar {
             background: rgba(0, 0, 0, 0.9);
@@ -50,7 +83,7 @@
         .logo h1 {
             font-size: 2em;
             font-weight: 700;
-            color: #0088cc;
+            color: #ffeb3b; /* Yellow Color */
             text-shadow: 0 0 10px rgba(0, 136, 204, 0.8);
         }
         .menu button {
@@ -62,15 +95,32 @@
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .menu button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 10%, transparent 10%);
+            background-size: 20px 20px;
+            animation: galaxy 5s linear infinite;
+            z-index: 0;
         }
         .menu button:hover {
             transform: scale(1.1);
             box-shadow: 0 0 15px #0088cc;
         }
+        @keyframes galaxy {
+            0% { background-position: 0 0; }
+            100% { background-position: 100px 100px; }
+        }
         .hero {
             text-align: center;
             padding: 80px 20px;
-            background: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c') no-repeat center/cover;
             border: 3px solid #0088cc;
             border-radius: 20px;
             margin: 30px 0;
@@ -79,13 +129,13 @@
         .hero h2 {
             font-size: 3em;
             font-weight: 700;
-            color: #0088cc;
+            color: #00ff00; /* Green Color */
             text-shadow: 0 0 15px #0088cc;
         }
         .hero p {
             font-size: 1.5em;
             font-weight: 300;
-            color: #e6e6e6;
+            color: #ffeb3b; /* Yellow Color */
             margin-top: 10px;
         }
         .container {
@@ -103,7 +153,7 @@
         }
         .section h2 {
             font-size: 2.2em;
-            color: #0088cc;
+            color: #ffeb3b; /* Yellow Color */
             text-align: center;
             margin-bottom: 20px;
             text-shadow: 0 0 10px #0088cc;
@@ -118,10 +168,25 @@
             padding: 20px;
             border-radius: 15px;
             text-align: center;
-            color: #fff;
+            color: #ffeb3b; /* Yellow Color */
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.3s, box-shadow 0.3s;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            position: relative;
+            overflow: hidden;
+        }
+        .premium-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 10%, transparent 10%);
+            background-size: 20px 20px;
+            animation: galaxy 5s linear infinite;
+            z-index: 0;
         }
         .premium-option:hover {
             transform: scale(1.05);
@@ -143,6 +208,20 @@
             cursor: pointer;
             margin: 0 15px;
             transition: background 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .quantity-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 10%, transparent 10%);
+            background-size: 20px 20px;
+            animation: galaxy 5s linear infinite;
+            z-index: 0;
         }
         .quantity-btn:hover {
             background: #00aaff;
@@ -150,7 +229,7 @@
         #totalPrice {
             text-align: center;
             font-size: 2em;
-            color: #0088cc;
+            color: #ff0000; /* Red Color */
             margin: 20px 0;
             text-shadow: 0 0 10px #0088cc;
         }
@@ -181,7 +260,7 @@
             border: 2px solid transparent;
             border-radius: 15px;
             background: rgba(255, 255, 255, 0.1);
-            color: #fff;
+            color: #ffeb3b; /* Yellow Color */
             font-size: 1.1em;
             animation: glowingBorder 2s infinite;
         }
@@ -193,7 +272,7 @@
         #status {
             text-align: center;
             font-size: 1.5em;
-            color: #0088cc;
+            color: #00ff00; /* Green Color */
             font-weight: 600;
             margin-top: 20px;
         }
@@ -209,6 +288,20 @@
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 10%, transparent 10%);
+            background-size: 20px 20px;
+            animation: galaxy 5s linear infinite;
+            z-index: 0;
         }
         .submit-btn:hover {
             transform: scale(1.1);
@@ -236,7 +329,7 @@
         }
         .modal-content h2 {
             font-size: 2em;
-            color: #0088cc;
+            color: #ffeb3b; /* Yellow Color */
             text-align: center;
             margin-bottom: 20px;
             text-shadow: 0 0 10px #0088cc;
@@ -257,12 +350,33 @@
             color: #0088cc;
             text-shadow: 0 0 10px #0088cc;
         }
+        .message {
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 10px;
+            animation: fadeIn 0.5s;
+        }
+        .message.success {
+            background: #00ff00; /* Green Color */
+            color: #fff;
+        }
+        .message.error {
+            background: #ff0000; /* Red Color */
+            color: #fff;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         .phone-number-popup {
             position: fixed;
             top: 50%;
             right: -300px;
             background: linear-gradient(135deg, #0088cc, #00aaff);
-            color: #fff;
+            color: #ffeb3b; /* Yellow Color */
             padding: 20px;
             border-radius: 15px;
             font-size: 1.5em;
@@ -293,7 +407,7 @@
         .order-item p {
             margin: 5px 0;
             font-size: 1.1em;
-            color: #e6e6e6;
+            color: #ffeb3b; /* Yellow Color */
         }
         .download-btn {
             display: inline-block;
@@ -306,6 +420,20 @@
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .download-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 10%, transparent 10%);
+            background-size: 20px 20px;
+            animation: galaxy 5s linear infinite;
+            z-index: 0;
         }
         .download-btn:hover {
             transform: scale(1.1);
@@ -342,6 +470,7 @@
 </head>
 <body>
     <div id="lightning"></div>
+    <div class="stars" id="stars"></div>
     <div class="navbar">
         <div class="logo">
             <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/756e2da02cfc2a5f510630e894b736fb6351468f/telegram-logo.png" alt="Telegram Logo" class="logo-img">
@@ -395,6 +524,7 @@
             <input type="email" id="loginEmail" placeholder="အီးမေးလ်" required>
             <input type="password" id="loginPassword" placeholder="စကားဝှက်" required>
             <button class="submit-btn" onclick="login()">အကောင့်ဝင်မည်</button>
+            <div id="loginMessage" class="message"></div>
         </div>
     </div>
 
@@ -405,6 +535,7 @@
             <input type="email" id="signupEmail" placeholder="အီးမေးလ်" required>
             <input type="password" id="signupPassword" placeholder="စကားဝှက်" required>
             <button class="submit-btn" onclick="signup()">အကောင့်ဖွင့်မည်</button>
+            <div id="signupMessage" class="message"></div>
         </div>
     </div>
 
@@ -420,6 +551,22 @@
         let quantity = 1;
         let selectedPaymentMethod = '';
         const deviceId = navigator.userAgent + Date.now(); // Unique device identifier
+
+        // Create Stars for Background Animation
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = `${Math.random() * 3}px`;
+                star.style.height = star.style.width;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.animationDelay = `${Math.random() * 3}s`;
+                starsContainer.appendChild(star);
+            }
+        }
+        createStars();
 
         // Check if user is logged in from LocalStorage
         document.addEventListener('DOMContentLoaded', () => {
@@ -437,7 +584,7 @@
             localStorage.removeItem('user');
             user = null;
             updateUIForLoggedOutUser();
-            alert('အကောင့်ထွက်ပြီးပါပြီၡ。');
+            showMessage('logoutMessage', 'အကောင့်ထွက်ပြီးပါပြီၡ。', 'success');
         });
 
         function openModal(modalId) {
@@ -446,13 +593,26 @@
 
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
+            clearMessages();
+        }
+
+        function showMessage(elementId, message, type) {
+            const messageDiv = document.getElementById(elementId);
+            messageDiv.textContent = message;
+            messageDiv.className = `message ${type}`;
+            setTimeout(() => messageDiv.textContent = '', 3000);
+        }
+
+        function clearMessages() {
+            document.getElementById('signupMessage').textContent = '';
+            document.getElementById('loginMessage').textContent = '';
         }
 
         async function signup() {
             const email = document.getElementById('signupEmail').value.trim();
             const password = document.getElementById('signupPassword').value.trim();
             if (!email || !password) {
-                alert('အီးမေးလ် နှင့် စကားဝှက် ဖြည့်ပါၡ。');
+                showMessage('signupMessage', 'အီးမေးလ် နှင့် စကားဝှက် ဖြည့်ပါၡ。', 'error');
                 return;
             }
 
@@ -465,18 +625,18 @@
                 });
                 const data = await response.json();
                 if (data.error) {
-                    alert(data.error);
+                    showMessage('signupMessage', data.error, 'error');
                 } else {
                     user = { email, deviceId, anonymousId };
                     localStorage.setItem('user', JSON.stringify(user));
                     closeModal('signupModal');
-                    alert('အကောင့်ဖွင့်ပြီးပါပြီၡ。Anonymous စနစ်ဖြင့် အတည်ပြုပြီးပါတယ်ၡ。');
+                    showMessage('signupMessage', 'အကောင့်ဖွင့်ပြီးပါပြီၡ。Anonymous စနစ်ဖြင့် အတည်ပြုပြီးပါတယ်ၡ。', 'success');
                     updateUIForLoggedInUser();
                     fetchOrders();
                 }
             } catch (error) {
                 console.error('Signup Error:', error);
-                alert('အမှား: ' + error.message);
+                showMessage('signupMessage', 'အမှား: ' + error.message, 'error');
             }
         }
 
@@ -484,7 +644,7 @@
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value.trim();
             if (!email || !password) {
-                alert('အီးမေးလ် နှင့် စကားဝှက် ဖြည့်ပါၡ。');
+                showMessage('loginMessage', 'အီးမေးလ် နှင့် စကားဝှက် ဖြည့်ပါၡ。', 'error');
                 return;
             }
             try {
@@ -495,18 +655,18 @@
                 });
                 const data = await response.json();
                 if (data.error) {
-                    alert(data.error);
+                    showMessage('loginMessage', data.error, 'error');
                 } else {
                     user = { email, deviceId, anonymousId: data.anonymousId };
                     localStorage.setItem('user', JSON.stringify(user));
                     closeModal('loginModal');
-                    alert('အကောင့်ဝင်ပြီးပါပြီၡ。');
+                    showMessage('loginMessage', 'အကောင့်ဝင်ပြီးပါပြီၡ。', 'success');
                     updateUIForLoggedInUser();
                     fetchOrders();
                 }
             } catch (error) {
                 console.error('Login Error:', error);
-                alert('အမှား: ' + error.message);
+                showMessage('loginMessage', 'အမှား: ' + error.message, 'error');
             }
         }
 
