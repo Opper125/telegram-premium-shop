@@ -4,8 +4,8 @@
   "description": "Backend for Telegram Premium Shop using Netlify Functions",
   "main": "functions/data.js",
   "scripts": {
-    "start": "netlify dev",
-    "build": "echo 'No build required'"
+    "build": "npm install",
+    "start": "netlify dev"
   },
   "dependencies": {
     "node-fetch": "^2.6.7"
