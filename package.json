@@ -1,20 +1,10 @@
 {
   "name": "telegram-premium-shop",
   "version": "1.0.0",
-  "description": "Backend for Telegram Premium Shop using Netlify Functions",
+  "description": "Telegram Premium Shop with Netlify Functions",
   "main": "functions/data.js",
   "scripts": {
-    "build": "npm install",
     "start": "netlify dev"
-  },
-  "dependencies": {
-    "node-fetch": "^2.6.7"
-  },
-  "devDependencies": {
-    "netlify-cli": "^17.0.0"
-  },
-  "engines": {
-    "node": "18.x"
   },
   "author": "Your Name",
   "license": "MIT"
