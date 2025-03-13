@@ -1,7 +1,7 @@
 [build]
   publish = "public"
   functions = "functions"
-  command = "echo 'No build command needed'"
+  command = "npm install"
   node_bundler = "esbuild"
 
 [functions]
@@ -11,7 +11,6 @@
 
 [build.environment]
   NODE_VERSION = "18"
-  GITHUB_TOKEN = "ghp_sF8ERXjIVvimlVHdxPBcpwyiEtu2cm3dP16"
 
 [[redirects]]
   from = "/*"
