@@ -11,7 +11,7 @@ exports.handler = async (event) => {
         return {
             statusCode: 405,
             body: JSON.stringify({ error: 'ခွင့်မပြုသော တောင်းဆိုမှု။ POST သာသုံးပါၡ' }),
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
         };
     }
 
@@ -36,7 +36,8 @@ exports.handler = async (event) => {
                 data.users.push(user);
                 return {
                     statusCode: 200,
-                    body: JSON.stringify({ success: true, message: 'အကောင့်ဖွင့်ပြီးပါပြီၡ', user: { email, anonymousId } })
+                    body: JSON.stringify({ success: true, message: 'အကောင့်ဖွင့်ပြီးပါပြီၡ', user: { email, anonymousId } }),
+                    headers: { 'Access-Control-Allow-Origin': '*' }
                 };
             }
 
@@ -58,7 +59,8 @@ exports.handler = async (event) => {
                 user.lastLogin = Date.now();
                 return {
                     statusCode: 200,
-                    body: JSON.stringify({ success: true, anonymousId: user.anonymousId, message: 'အကောင့်ဝင်ပြီးပါပြီၡ' })
+                    body: JSON.stringify({ success: true, anonymousId: user.anonymousId, message: 'အကောင့်ဝင်ပြီးပါပြီၡ' }),
+                    headers: { 'Access-Control-Allow-Origin': '*' }
                 };
             }
 
@@ -86,7 +88,8 @@ exports.handler = async (event) => {
                 data.orders.push(newOrder);
                 return {
                     statusCode: 200,
-                    body: JSON.stringify({ success: true, orderId: newOrder.id, message: 'အော်ဒါတင်ပြီးပါပြီၡ', order: newOrder })
+                    body: JSON.stringify({ success: true, orderId: newOrder.id, message: 'အော်ဒါတင်ပြီးပါပြီၡ', order: newOrder }),
+                    headers: { 'Access-Control-Allow-Origin': '*' }
                 };
             }
 
@@ -99,7 +102,16 @@ exports.handler = async (event) => {
                 const userOrders = data.orders.filter(order => order.email === email);
                 return {
                     statusCode: 200,
-                    body: JSON.stringify({ success: true, orders: userOrders })
+                    body: JSON.stringify({ success: true, orders: userOrders }),
+                    headers: { 'Access-Control-Allow-Origin': '*' }
+                };
+            }
+
+            case 'getAllOrders': {
+                return {
+                    statusCode: 200,
+                    body: JSON.stringify({ success: true, orders: data.orders }),
+                    headers: { 'Access-Control-Allow-Origin': '*' }
                 };
             }
 
@@ -111,7 +123,7 @@ exports.handler = async (event) => {
         return {
             statusCode: 500,
             body: JSON.stringify({ error: `ဆာဗာအတွင်းပိုင်း အမှားၡ ${error.message}` }),
-            headers: { 'Content-Type': 'application/json' }
+            headers: { 'Access-Control-Allow-Origin': '*' }
         };
     }
 };
