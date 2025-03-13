@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Premium Shop - အဆင့်မြင့် အတွေ့အကြုံ ✨</title>
+    <link rel="icon" href="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/756e2da02cfc2a5f510630e894b736fb6351468f/telegram-logo.png" type="image/png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Noto Sans Myanmar', sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #0f0c29, #24243e, #4a4063);
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            touch-action: manipulation;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c') no-repeat center/cover;
+            opacity: 0.3;
+            z-index: -1;
+        }
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+        @keyframes twinkle {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+        .navbar {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #0088cc;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        .logo-img {
+            width: 60px;
+            height: 60px;
+            margin-right: 15px;
+            border-radius: 50%;
+            border: 2px solid #0088cc;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 5px #0088cc; }
+            50% { transform: scale(1.1); box-shadow: 0 0 20px #0088cc; }
+            100% { transform: scale(1); box-shadow: 0 0 5px #0088cc; }
+        }
+        .logo h1 {
+            font-size: 2em;
+            font-weight: 700;
+            color: #ffeb3b;
+            text-shadow: 0 0 10px rgba(0, 136, 204, 0.8);
+        }
+        .menu button {
+            padding: 10px 25px;
+            background: linear-gradient(135deg, #0088cc, #00aaff);
+            border: none;
+            border-radius: 25px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            margin-left: 10px;
+        }
+        .menu button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px #0088cc;
+        }
+        .hero {
+            text-align: center;
+            padding: 80px 20px;
+            border: 3px solid #0088cc;
+            border-radius: 20px;
+            margin: 30px 0;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+        }
+        .hero h2 {
+            font-size: 3em;
+            font-weight: 700;
+            color: #00ff00;
+            text-shadow: 0 0 15px #0088cc;
+        }
+        .hero p {
+            font-size: 1.5em;
+            font-weight: 300;
+            color: #ffeb3b;
+            margin-top: 10px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .section {
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid #0088cc;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
+        }
+        .section h2 {
+            font-size: 2.2em;
+            color: #ffeb3b;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #0088cc;
+        }
+        .premium-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .premium-option {
+            background: linear-gradient(135deg, #0088cc, #00aaff);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            color: #ffeb3b;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+            position: relative;
+            overflow: hidden;
+        }
+        .premium-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 10%, transparent 10%);
+            background-size: 20px 20px;
+            animation: galaxy 5s linear infinite;
+            z-index: 0;
+        }
+        @keyframes galaxy {
+            0% { background-position: 0 0; }
+            100% { background-position: 100px 100px; }
+        }
+        .premium-option:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px #0088cc;
+        }
+        .quantity {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+        }
+        .quantity-btn {
+            background: #0088cc;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 0 15px;
+            transition: background 0.3s;
+        }
+        .quantity-btn:hover {
+            background: #00aaff;
+        }
+        #totalPrice {
+            text-align: center;
+            font-size: 2em;
+            color: #ff0000;
+            margin: 20px 0;
+            text-shadow: 0 0 10px #0088cc;
+        }
+        .payment-method {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        .payment-method img {
+            width: 80px;
+            height: 50px;
+            object-fit: contain;
+            border: 2px solid #0088cc;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+        .payment-method img.selected {
+            border-color: #00aaff;
+            transform: scale(1.1);
+        }
+        .payment-method input {
+            width: 100%;
+            padding: 15px;
+            margin: 15px 0;
+            border: 2px solid transparent;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffeb3b;
+            font-size: 1.1em;
+            animation: glowingBorder 2s infinite;
+        }
+        @keyframes glowingBorder {
+            0% { border-color: #ff4500; box-shadow: 0 0 10px #ff4500; }
+            50% { border-color: #ffa500; box-shadow: 0 0 20px #ffa500; }
+            100% { border-color: #ff4500; box-shadow: 0 0 10px #ff4500; }
+        }
+        #status {
+            text-align: center;
+            font-size: 1.5em;
+            color: #00ff00;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+        .submit-btn {
+            display: block;
+            margin: 0 auto;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #0088cc, #00aaff);
+            border: none;
+            border-radius: 25px;
+            color: #fff;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .submit-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px #0088cc;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+        }
+        .modal-content {
+            background: rgba(255, 215, 0, 0.3);
+            width: 90%;
+            max-width: 450px;
+            margin: 100px auto;
+            padding: 30px;
+            border: 2px solid #ffd700;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            position: relative;
+            overflow: hidden;
+        }
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #ffd700, #ffeb3b, #ff4500, #ffd700);
+            animation: ripple 5s infinite;
+            opacity: 0.3;
+            z-index: 0;
+        }
+        @keyframes ripple {
+            0% { transform: scale(0); opacity: 0.3; }
+            50% { transform: scale(2); opacity: 0; }
+            100% { transform: scale(0); opacity: 0.3; }
+        }
+        .modal-content h2 {
+            font-size: 2em;
+            color: #ffeb3b;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #ffd700;
+            position: relative;
+            z-index: 1;
+        }
+        .modal-content input {
+            width: 100%;
+            padding: 15px;
+            margin: 15px 0;
+            border: 2px solid #ffd700;
+            border-radius: 15px;
+            background: rgba(255, 215, 0, 0.1);
+            color: #fff;
+            position: relative;
+            z-index: 1;
+        }
+        .modal-content .close {
+            float: right;
+            font-size: 2em;
+            cursor: pointer;
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700;
+            position: relative;
+            z-index: 1;
+        }
+        .message {
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 10px;
+            animation: fadeIn 0.5s;
+            position: relative;
+            z-index: 1;
+        }
+        .message.success {
+            background: #00ff00;
+            color: #fff;
+        }
+        .message.error {
+            background: #ff0000;
+            color: #fff;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .phone-number-popup {
+            position: fixed;
+            top: 50%;
+            right: -300px;
+            background: linear-gradient(135deg, #0088cc, #00aaff);
+            color: #ffeb3b;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 1.5em;
+            font-weight: 600;
+            animation: slideIn 0.5s forwards, slideOut 0.5s 9.5s forwards;
+            z-index: 1000;
+        }
+        @keyframes slideIn {
+            from { right: -300px; }
+            to { right: 20px; }
+        }
+        @keyframes slideOut {
+            from { right: 20px; }
+            to { right: -300px; }
+        }
+        .order-item {
+            background: linear-gradient(135deg, rgba(0, 136, 204, 0.2), rgba(0, 170, 255, 0.2));
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 15px;
+            border: 2px solid #0088cc;
+            box-shadow: 0 0 20px rgba(0, 136, 204, 0.5);
+            transition: transform 0.3s;
+        }
+        .order-item:hover {
+            transform: scale(1.02);
+        }
+        .order-item p {
+            margin: 5px 0;
+            font-size: 1.1em;
+            color: #ffeb3b;
+        }
+        .download-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 20px;
+            background: linear-gradient(135deg, #0088cc, #00aaff);
+            border: none;
+            border-radius: 25px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .download-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px #0088cc;
+        }
+        #lightning {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 3000;
+            animation: lightningFlash 1s;
+        }
+        @keyframes lightningFlash {
+            0% { opacity: 0; background: rgba(255, 255, 255, 0); }
+            10% { opacity: 1; background: rgba(255, 255, 255, 0.8); }
+            20% { opacity: 0; background: rgba(255, 255, 255, 0); }
+            30% { opacity: 1; background: rgba(255, 255, 255, 0.6); }
+            40% { opacity: 0; background: rgba(255, 255, 255, 0); }
+            100% { opacity: 0; background: rgba(255, 255, 255, 0); }
+        }
+        @media (max-width: 768px) {
+            .navbar { flex-direction: column; gap: 15px; }
+            .menu { flex-direction: column; gap: 15px; }
+            .hero h2 { font-size: 2em; }
+            .hero p { font-size: 1.2em; }
+            .section { padding: 20px; }
+            .premium-options { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="lightning"></div>
+    <div class="stars" id="stars"></div>
+    <div class="navbar">
+        <div class="logo">
+            <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/756e2da02cfc2a5f510630e894b736fb6351468f/telegram-logo.png" alt="Telegram Logo" class="logo-img">
+            <h1>Telegram Premium Shop</h1>
+        </div>
+        <div class="menu">
+            <button id="loginBtn">အကောင့်ဝင်ရန်</button>
+            <button id="signupBtn">အကောင့်ဖွင့်ရန်</button>
+            <button id="logoutBtn" style="display:none;">အကောင့်ထွက်ရန်</button>
+            <button id="aboutBtn">About</button>
+        </div>
+    </div>
+
+    <div class="hero">
+        <h2>Telegram Premium Shop မှ ကြိုဆိုပါတယ် ✨</h2>
+        <p>သင့်အတွက် အဆင့်မြင့် Telegram ဝန်ဆောင်မှုများကို ပေးအပ်ပါမယ်ၡ。</p>
+    </div>
+
+    <div class="container">
+        <div class="section">
+            <h2>ပရီမီယံ ပစ္စည်းများ ရွေးချယ်မှု</h2>
+            <div class="premium-options">
+                <div class="premium-option" data-months="3" data-price="60000">၃ လ - ၆၀,၀၀၀ ကျပ်</div>
+                <div class="premium-option" data-months="6" data-price="135000">၆ လ - ၁၃၅,၀၀၀ ကျပ်</div>
+                <div class="premium-option" data-months="12" data-price="210000">၁ နှစ် - ၂၁၀,၀၀၀ ကျပ်</div>
+            </div>
+            <div class="quantity">
+                <button class="quantity-btn" onclick="decreaseQuantity()">-</button>
+                <span id="quantity">1</span>
+                <button class="quantity-btn" onclick="increaseQuantity()">+</button>
+            </div>
+            <div id="totalPrice">စုစုပေါင်း: ၆၀,၀၀၀ ကျပ်</div>
+            <div class="payment-method">
+                <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/37d47c886a0b6eb2f5eea6db306ace23123119e8/kpay-logo.png" alt="Kpay" class="payment-option" onclick="selectPayment('kpay')">
+                <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/37d47c886a0b6eb2f5eea6db306ace23123119e8/wave-logo.png" alt="Wave" class="payment-option" onclick="selectPayment('wave')">
+            </div>
+            <input type="text" id="transactionLast6" placeholder="ငွေလွှဲပြီး အမှတ် (နောက်ဆုံး ၆ လုံး)" required>
+            <input type="text" id="telegramUsername" placeholder="Telegram အမည်" required>
+            <button class="submit-btn" onclick="submitOrder()">အော်ဒါတင်မည်</button>
+            <div id="status"></div>
+        </div>
+        <div class="section" id="orderHistory" style="display:none;">
+            <h2>အော်ဒါ မှတ်တမ်း</h2>
+            <div id="orderList"></div>
+        </div>
+    </div>
+
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('loginModal')">×</span>
+            <h2>အကောင့်ဝင်ရန်</h2>
+            <input type="email" id="loginEmail" placeholder="အီးမေးလ်" required>
+            <input type="password" id="loginPassword" placeholder="စကားဝှက်" required>
+            <button class="submit-btn" onclick="login()">အကောင့်ဝင်မည်</button>
+            <div id="loginMessage" class="message"></div>
+        </div>
+    </div>
+
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('signupModal')">×</span>
+            <h2>အကောင့်ဖွင့်ရန်</h2>
+            <input type="email" id="signupEmail" placeholder="အီးမေးလ်" required>
+            <input type="password" id="signupPassword" placeholder="စကားဝှက်" required>
+            <button class="submit-btn" onclick="signup()">အကောင့်ဖွင့်မည်</button>
+            <div id="signupMessage" class="message"></div>
+        </div>
+    </div>
+
+    <div id="aboutModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('aboutModal')">×</span>
+            <h2>About Us</h2>
+            <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/756e2da02cfc2a5f510630e894b736fb6351468f/telegram-logo.png" alt="Telegram Logo" style="width: 100px; height: auto; display: block; margin: 20px auto;">
+            <p style="text-align: center; color: #ffeb3b;">Contact us on Telegram: <a href="https://t.me/OPPERN" target="_blank" style="color: #ffd700; text-decoration: underline;">https://t.me/OPPERN</a></p>
+        </div>
+    </div>
+
+    <div id="phoneNumberPopup" class="phone-number-popup" style="display:none;">09786284670 (DHMK)</div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script>
+        const { jsPDF } = window.jspdf;
+        let user = null;
+        let selectedMonths = 3;
+        let selectedPrice = 60000;
+        let quantity = 1;
+        let selectedPaymentMethod = '';
+        const deviceId = navigator.userAgent + Date.now();
+
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = `${Math.random() * 3}px`;
+                star.style.height = star.style.width;
+                star.style.left = `${Math.random() * 100}%`;
+                star.style.top = `${Math.random() * 100}%`;
+                star.style.animationDelay = `${Math.random() * 3}s`;
+                starsContainer.appendChild(star);
+            }
+        }
+        createStars();
+
+        let lastTouch = null;
+        document.body.addEventListener('touchstart', (e) => {
+            lastTouch = e.touches[0];
+        });
+        document.body.addEventListener('touchmove', (e) => {
+            if (lastTouch) {
+                const currentTouch = e.touches[0];
+                const dx = currentTouch.clientX - lastTouch.clientX;
+                const dy = currentTouch.clientY - lastTouch.clientY;
+                if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+                    createRipple(currentTouch.clientX, currentTouch.clientY);
+                    lastTouch = currentTouch;
+                }
+            }
+        });
+        function createRipple(x, y) {
+            const ripple = document.createElement('div');
+            ripple.style.position = 'absolute';
+            ripple.style.borderRadius = '50%';
+            ripple.style.background = `radial-gradient(circle, rgba(255, 215, 0, 0.5), transparent)`;
+            ripple.style.width = '100px';
+            ripple.style.height = '100px';
+            ripple.style.left = `${x - 50}px`;
+            ripple.style.top = `${y - 50}px`;
+            ripple.style.pointerEvents = 'none';
+            ripple.style.zIndex = 100;
+            document.body.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 1000);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const storedUser = localStorage.getItem('user');
+            if (storedUser) {
+                user = JSON.parse(storedUser);
+                updateUIFor EldenRing();
+                fetchOrders();
+            }
+        });
+
+        document.getElementById('loginBtn').addEventListener('click', () => openModal('loginModal'));
+        document.getElementById('signupBtn').addEventListener('click', () => openModal('signupModal'));
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('user');
+            user = null;
+            updateUIForLoggedOutUser();
+            showMessage('loginMessage', 'အကောင့်ထွက်ပြီးပါပြီၡ。', 'success');
+        });
+        document.getElementById('aboutBtn').addEventListener('click', () => openModal('aboutModal'));
+
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+            clearMessages();
+        }
+
+        function showMessage(elementId, message, type) {
+            const messageDiv = document.getElementById(elementId);
+            messageDiv.textContent = message;
+            messageDiv.className = `message ${type}`;
+            setTimeout(() => messageDiv.textContent = '', 5000);
+        }
+
+        function clearMessages() {
+            document.getElementById('signupMessage').textContent = '';
+            document.getElementById('loginMessage').textContent = '';
+        }
+
+        async function signup() {
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value.trim();
+            if (!email || !password) {
+                showMessage('signupMessage', 'အီးမေးလ် နှင့် စကားဝှက် ဖြည့်ပါၡ。', 'error');
+                return;
+            }
+
+            const anonymousId = `anon_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+            try {
+                const response = await fetch('/.netlify/functions/data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'signup', email, password, deviceId, anonymousId })
+                });
+                const data = await response.json();
+                if (data.error) {
+                    showMessage('signupMessage', data.error, 'error');
+                } else {
+                    user = { email, deviceId, anonymousId };
+                    localStorage.setItem('user', JSON.stringify(user));
+                    closeModal('signupModal');
+                    showMessage('signupMessage', 'အကောင့်ဖွင့်ပြီးပါပြီၡ。', 'success');
+                    updateUIForLoggedInUser();
+                    fetchOrders();
+                }
+            } catch (error) {
+                console.error('Signup Error:', error);
+                showMessage('signupMessage', 'အမှား: ' + error.message, 'error');
+            }
+        }
+
+        async function login() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            if (!email || !password) {
+                showMessage('loginMessage', 'အီးမေးလ် နှင့် စကားဝှက် ဖြည့်ပါၡ。', 'error');
+                return;
+            }
+            try {
+                const response = await fetch('/.netlify/functions/data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'login', email, password, deviceId })
+                });
+                const data = await response.json();
+                if (data.error) {
+                    showMessage('loginMessage', data.error, 'error');
+                } else {
+                    user = { email, deviceId, anonymousId: data.anonymousId };
+                    localStorage.setItem('user', JSON.stringify(user));
+                    closeModal('loginModal');
+                    showMessage('loginMessage', 'အကောင့်ဝင်ပြီးပါပြီၡ。', 'success');
+                    updateUIForLoggedInUser();
+                    fetchOrders();
+                }
+            } catch (error) {
+                console.error('Login Error:', error);
+                showMessage('loginMessage', 'အမှား: ' + error.message, 'error');
+            }
+        }
+
+        function updateUIForLoggedInUser() {
+            document.getElementById('loginBtn').style.display = 'none';
+            document.getElementById('signupBtn').style.display = 'none';
+            document.getElementById('logoutBtn').style.display = 'block';
+            document.querySelector('.hero').style.display = 'block';
+            document.querySelector('.container').style.display = 'block';
+            document.getElementById('orderHistory').style.display = 'block';
+        }
+
+        function updateUIForLoggedOutUser() {
+            document.getElementById('loginBtn').style.display = 'block';
+            document.getElementById('signupBtn').style.display = 'block';
+            document.getElementById('logoutBtn').style.display = 'none';
+            document.querySelector('.hero').style.display = 'none';
+            document.querySelector('.container').style.display = 'none';
+            document.getElementById('orderHistory').style.display = 'none';
+        }
+
+        document.querySelectorAll('.premium-option').forEach(option => {
+            option.addEventListener('click', () => {
+                selectedMonths = parseInt(option.dataset.months);
+                selectedPrice = parseInt(option.dataset.price);
+                updateTotal();
+            });
+        });
+
+        function increaseQuantity() { quantity++; updateTotal(); }
+        function decreaseQuantity() { if (quantity > 1) quantity--; updateTotal(); }
+        function updateTotal() {
+            document.getElementById('quantity').textContent = quantity;
+            document.getElementById('totalPrice').textContent = `စုစုပေါင်း: ${selectedPrice * quantity} ကျပ်`;
+        }
+
+        function selectPayment(method) {
+            selectedPaymentMethod = method;
+            document.querySelectorAll('.payment-option').forEach(option => option.classList.remove('selected'));
+            document.querySelector(`img[alt="${method.charAt(0).toUpperCase() + method.slice(1)}"]`).classList.add('selected');
+            const popup = document.getElementById('phoneNumberPopup');
+            popup.style.display = 'block';
+            setTimeout(() => popup.style.display = 'none', 10000);
+        }
+
+        async function submitOrder() {
+            if (!user) {
+                alert('အကောင့်ဝင်ပါၡ。');
+                return;
+            }
+            if (!selectedPaymentMethod || !document.getElementById('transactionLast6').value || !document.getElementById('telegramUsername').value) {
+                alert('အားလုံးဖြည့်ပါၡ。');
+                return;
+            }
+            const order = {
+                email: user.email,
+                deviceId: user.deviceId,
+                anonymousId: user.anonymousId,
+                months: selectedMonths,
+                quantity,
+                total: selectedPrice * quantity,
+                transactionLast6: document.getElementById('transactionLast6').value,
+                telegramUsername: document.getElementById('telegramUsername').value,
+                paymentMethod: selectedPaymentMethod
+            };
+            try {
+                const response = await fetch('/.netlify/functions/data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'submitOrder', order })
+                });
+                const data = await response.json();
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    document.getElementById('status').textContent = 'အော်ဒါတင်ပြီးပါပြီၡ。';
+                    document.getElementById('transactionLast6').value = '';
+                    document.getElementById('telegramUsername').value = '';
+                    const lightning = document.getElementById('lightning');
+                    lightning.style.display = 'block';
+                    setTimeout(() => lightning.style.display = 'none', 1000);
+                    fetchOrders();
+                }
+            } catch (error) {
+                console.error('Submit Order Error:', error);
+                alert('အမှား: ' + error.message);
+            }
+        }
+
+        async function fetchOrders() {
+            if (!user) return;
+            try {
+                const response = await fetch('/.netlify/functions/data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'getOrders', email: user.email })
+                });
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                if (data.error) {
+                    document.getElementById('orderList').innerHTML = `<p>${data.error}</p>`;
+                } else {
+                    const orders = data.orders || [];
+                    document.getElementById('orderList').innerHTML = orders.map(order => `
+                        <div class="order-item">
+                            <p>အမှာစာအမှတ်: ${order.id}</p>
+                            <p>လများ: ${order.months}</p>
+                            <p>အရေအတွက်: ${order.quantity}</p>
+                            <p>စုစုပေါင်း: ${order.total} ကျပ်</p>
+                            <p>အခြေအနေ: ${order.status}</p>
+                            <p>အချိန်: ${new Date(order.timestamp).toLocaleString()}</p>
+                            <button class="download-btn" onclick='downloadReceipt(${JSON.stringify(order)})'>Download Receipt</button>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+                document.getElementById('orderList').innerHTML = `<p>အမှား: ${error.message}</p>`;
+            }
+        }
+
+        function downloadReceipt(order) {
+            const doc = new jsPDF();
+            const logoUrl = 'https://raw.githubusercontent.com/Opper125/telegram-premium-shop/756e2da02cfc2a5f510630e894b736fb6351468f/telegram-logo.png';
+
+            const img = new Image();
+            img.crossOrigin = 'Anonymous';
+            img.src = logoUrl;
+            img.onload = () => {
+                doc.addImage(img, 'PNG', 10, 10, 30, 30);
+                doc.setFontSize(20);
+                doc.setTextColor(0, 136, 204);
+                doc.text('Telegram Premium Shop', 50, 25);
+                doc.setFontSize(12);
+                doc.setTextColor(0);
+                doc.text('Order Receipt', 50, 35);
+                doc.setFontSize(12);
+                doc.setTextColor(0);
+                doc.text(`Order ID: ${order.id}`, 10, 50);
+                doc.text(`Email: ${order.email}`, 10, 60);
+                doc.text(`Months: ${order.months}`, 10, 70);
+                doc.text(`Quantity: ${order.quantity}`, 10, 80);
+                doc.text(`Total: ${order.total} ကျပ်`, 10, 90);
+                doc.text(`Transaction Last 6: ${order.transactionLast6}`, 10, 100);
+                doc.text(`Telegram Username: ${order.telegramUsername}`, 10, 110);
+                doc.text(`Payment Method: ${order.paymentMethod}`, 10, 120);
+                doc.text(`Status: ${order.status}`, 10, 130);
+                doc.text(`Date: ${new Date(order.timestamp).toLocaleString()}`, 10, 140);
+                doc.setDrawColor(0, 136, 204);
+                doc.setLineWidth(1);
+                doc.roundedRect(5, 5, 200, 280, 5, 5, 'S');
+                doc.save(`Telegram_Premium_Order_${order.id}.pdf`);
+            };
+            img.onerror = () => {
+                alert('Failed to load Telegram Logo for the receipt. Please try again.');
+            };
+        }
+    </script>
+</body>
+</html>
