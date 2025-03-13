@@ -68,6 +68,12 @@
             transform: scale(1.1);
             box-shadow: 0 0 15px #0088cc;
         }
+        .loading {
+            text-align: center;
+            font-size: 1.2em;
+            color: #ffeb3b;
+            margin: 20px 0;
+        }
         @media (max-width: 768px) {
             h1 { font-size: 2em; }
             .admin-section { padding: 15px; }
@@ -86,12 +92,15 @@
     <script>
         async function fetchAllOrders() {
             try {
+                document.getElementById('adminOrders').innerHTML = '<p class="loading">အော်ဒါများ လုပ်ဆောင်နေပါသည်ၡ ခဏစောင့်ပါၡ。</p>';
                 const response = await fetch('/.netlify/functions/data', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action: 'getAllOrders' })
                 });
-                if (!response.ok) throw new Error('Network response was not ok');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
                 const data = await response.json();
                 if (data.error) {
                     document.getElementById('adminOrders').innerHTML = `<p>${data.error}</p>`;
