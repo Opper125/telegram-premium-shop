@@ -430,6 +430,12 @@
             40% { opacity: 0; background: rgba(255, 255, 255, 0); }
             100% { opacity: 0; background: rgba(255, 255, 255, 0); }
         }
+        .loading {
+            text-align: center;
+            font-size: 1.2em;
+            color: #ffeb3b;
+            margin: 20px 0;
+        }
         @media (max-width: 768px) {
             .navbar { flex-direction: column; gap: 15px; }
             .menu { flex-direction: column; gap: 15px; }
@@ -582,7 +588,7 @@
             const storedUser = localStorage.getItem('user');
             if (storedUser) {
                 user = JSON.parse(storedUser);
-                updateUIFor EldenRing();
+                updateUIForLoggedInUser();
                 fetchOrders();
             }
         });
@@ -616,6 +622,7 @@
         function clearMessages() {
             document.getElementById('signupMessage').textContent = '';
             document.getElementById('loginMessage').textContent = '';
+            document.getElementById('status').textContent = '';
         }
 
         async function signup() {
@@ -628,11 +635,15 @@
 
             const anonymousId = `anon_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
             try {
+                showMessage('signupMessage', 'အကောင့်ဖွင့်နေပါသည်။ ခဏစောင့်ပါၡ。', 'success');
                 const response = await fetch('/.netlify/functions/data', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action: 'signup', email, password, deviceId, anonymousId })
                 });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
                 const data = await response.json();
                 if (data.error) {
                     showMessage('signupMessage', data.error, 'error');
@@ -646,7 +657,7 @@
                 }
             } catch (error) {
                 console.error('Signup Error:', error);
-                showMessage('signupMessage', 'အမှား: ' + error.message, 'error');
+                showMessage('signupMessage', `အမှား: ${error.message}`, 'error');
             }
         }
 
@@ -658,11 +669,15 @@
                 return;
             }
             try {
+                showMessage('loginMessage', 'အကောင့်ဝင်နေပါသည်ၡ ခဏစောင့်ပါၡ。', 'success');
                 const response = await fetch('/.netlify/functions/data', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action: 'login', email, password, deviceId })
                 });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
                 const data = await response.json();
                 if (data.error) {
                     showMessage('loginMessage', data.error, 'error');
@@ -676,7 +691,7 @@
                 }
             } catch (error) {
                 console.error('Login Error:', error);
-                showMessage('loginMessage', 'အမှား: ' + error.message, 'error');
+                showMessage('loginMessage', `အမှား: ${error.message}`, 'error');
             }
         }
 
@@ -724,11 +739,11 @@
 
         async function submitOrder() {
             if (!user) {
-                alert('အကောင့်ဝင်ပါၡ。');
+                showMessage('status', 'အကောင့်ဝင်ပါၡ。', 'error');
                 return;
             }
             if (!selectedPaymentMethod || !document.getElementById('transactionLast6').value || !document.getElementById('telegramUsername').value) {
-                alert('အားလုံးဖြည့်ပါၡ。');
+                showMessage('status', 'အားလုံးဖြည့်ပါၡ。', 'error');
                 return;
             }
             const order = {
@@ -743,16 +758,20 @@
                 paymentMethod: selectedPaymentMethod
             };
             try {
+                showMessage('status', 'အော်ဒါတင်နေပါသည်ၡ ခဏစောင့်ပါၡ。', 'success');
                 const response = await fetch('/.netlify/functions/data', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action: 'submitOrder', order })
                 });
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
                 const data = await response.json();
                 if (data.error) {
-                    alert(data.error);
+                    showMessage('status', data.error, 'error');
                 } else {
-                    document.getElementById('status').textContent = 'အော်ဒါတင်ပြီးပါပြီၡ。';
+                    showMessage('status', 'အော်ဒါတင်ပြီးပါပြီၡ。', 'success');
                     document.getElementById('transactionLast6').value = '';
                     document.getElementById('telegramUsername').value = '';
                     const lightning = document.getElementById('lightning');
@@ -762,19 +781,22 @@
                 }
             } catch (error) {
                 console.error('Submit Order Error:', error);
-                alert('အမှား: ' + error.message);
+                showMessage('status', `အမှား: ${error.message}`, 'error');
             }
         }
 
         async function fetchOrders() {
             if (!user) return;
             try {
+                document.getElementById('orderList').innerHTML = '<p class="loading">အော်ဒါများ လုပ်ဆောင်နေပါသည်ၡ ခဏစောင့်ပါၡ。</p>';
                 const response = await fetch('/.netlify/functions/data', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ action: 'getOrders', email: user.email })
                 });
-                if (!response.ok) throw new Error('Network response was not ok');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
                 const data = await response.json();
                 if (data.error) {
                     document.getElementById('orderList').innerHTML = `<p>${data.error}</p>`;
