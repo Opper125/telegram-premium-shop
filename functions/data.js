@@ -1,88 +1,27 @@
-const fetch = require('node-fetch');
+const fs = require('fs');
+const path = require('path');
 
-const GITHUB_TOKEN = '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'; // Replace with your new Token
-const REPO = 'Opper125/telegram-premium-shop'; // Replace with your actual repo if different
-const DATA_PATH = 'data.json';
+const DATA_FILE = path.join(__dirname, 'data.json');
 
-process.removeAllListeners('warning');
-
-async function getDataFromGitHub() {
+function readData() {
     try {
-        if (!fetch) {
-            throw new Error('node-fetch module is not properly imported');
+        if (!fs.existsSync(DATA_FILE)) {
+            fs.writeFileSync(DATA_FILE, JSON.stringify({ users: [], orders: [] }));
         }
-
-        const response = await fetch(`https://api.github.com/repos/${REPO}/contents/${DATA_PATH}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `token ${GITHUB_TOKEN}`,
-                'Accept': 'application/vnd.github.v3+json',
-                'User-Agent': 'Telegram-Premium-Shop'
-            }
-        });
-
-        if (!response.ok) {
-            if (response.status === 404) {
-                console.log('data.json not found, returning empty data');
-                return { users: [], orders: [] };
-            }
-            const errorText = await response.text();
-            throw new Error(`GitHub API error: ${response.status} - ${errorText}`);
-        }
-
-        const data = await response.json();
-        const content = Buffer.from(data.content, 'base64').toString('utf8');
-        return JSON.parse(content);
+        const rawData = fs.readFileSync(DATA_FILE);
+        return JSON.parse(rawData);
     } catch (error) {
-        console.error('Error in getDataFromGitHub:', error.message);
-        throw error;
+        console.error('Error reading data:', error);
+        return { users: [], orders: [] };
     }
 }
 
-async function updateDataToGitHub(newData) {
+function writeData(data) {
     try {
-        if (!fetch) {
-            throw new Error('node-fetch module is not properly imported');
-        }
-
-        const currentDataResponse = await fetch(`https://api.github.com/repos/${REPO}/contents/${DATA_PATH}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `token ${GITHUB_TOKEN}`,
-                'Accept': 'application/vnd.github.v3+json',
-                'User-Agent': 'Telegram-Premium-Shop'
-            }
-        });
-
-        let sha;
-        if (currentDataResponse.ok) {
-            const currentData = await currentDataResponse.json();
-            sha = currentData.sha;
-        }
-
-        const content = Buffer.from(JSON.stringify(newData, null, 2)).toString('base64');
-        const updateResponse = await fetch(`https://api.github.com/repos/${REPO}/contents/${DATA_PATH}`, {
-            method: 'PUT',
-            headers: {
-                'Authorization': `token ${GITHUB_TOKEN}`,
-                'Accept': 'application/vnd.github.v3+json',
-                'User-Agent': 'Telegram-Premium-Shop'
-            },
-            body: JSON.stringify({
-                message: 'Update data.json with new user/order data',
-                content,
-                sha: sha || undefined,
-                branch: 'main'
-            })
-        });
-
-        if (!updateResponse.ok) {
-            const errorText = await updateResponse.text();
-            throw new Error(`Failed to update GitHub: ${updateResponse.status} - ${errorText}`);
-        }
+        fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
     } catch (error) {
-        console.error('Error in updateDataToGitHub:', error.message);
-        throw error;
+        console.error('Error writing data:', error);
+        throw new Error('Failed to save data');
     }
 }
 
@@ -103,7 +42,7 @@ exports.handler = async (event) => {
     try {
         const body = JSON.parse(event.body);
         const { action } = body;
-        let data = await getDataFromGitHub();
+        let data = readData();
 
         switch (action) {
             case 'signup': {
@@ -120,7 +59,7 @@ exports.handler = async (event) => {
 
                 const user = { email, password, deviceId, anonymousId, createdAt: Date.now() };
                 data.users.push(user);
-                await updateDataToGitHub(data);
+                writeData(data);
                 return {
                     statusCode: 200,
                     body: JSON.stringify({ success: true, message: 'အကောင့်ဖွင့်ပြီးပါပြီၡ', user: { email, anonymousId } })
@@ -143,7 +82,7 @@ exports.handler = async (event) => {
 
                 user.deviceId = deviceId;
                 user.lastLogin = Date.now();
-                await updateDataToGitHub(data);
+                writeData(data);
                 return {
                     statusCode: 200,
                     body: JSON.stringify({ success: true, anonymousId: user.anonymousId, message: 'အကောင့်ဝင်ပြီးပါပြီၡ' })
@@ -172,7 +111,7 @@ exports.handler = async (event) => {
                     timestamp: Date.now()
                 };
                 data.orders.push(newOrder);
-                await updateDataToGitHub(data);
+                writeData(data);
                 return {
                     statusCode: 200,
                     body: JSON.stringify({ success: true, orderId: newOrder.id, message: 'အော်ဒါတင်ပြီးပါပြီၡ', order: newOrder })
