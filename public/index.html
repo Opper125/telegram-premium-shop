@@ -6,57 +6,18 @@
     <title>Telegram Premium Shop - အဆင့်မြင့် အတွေ့အကြုံ ✨</title>
     <link rel="icon" href="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/756e2da02cfc2a5f510630e894b736fb6351468f/telegram-logo.png" type="image/png">
     <style>
-        :root {
-            --primary: #0088cc;
-            --secondary: #00aaff;
-            --success: #28a745;
-            --error: #dc3545;
-            --bg-gradient: linear-gradient(135deg, #0f0c29, #24243e, #4a4063);
-        }
-
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Poppins', 'Noto Sans Myanmar', sans-serif;
         }
-
         body {
-            background: var(--bg-gradient);
+            background: linear-gradient(135deg, #0f0c29, #24243e, #4a4063);
             color: #fff;
             min-height: 100vh;
             overflow-x: hidden;
         }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 15px 30px;
-            border-radius: 25px;
-            z-index: 5000;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            animation: slideDown 0.5s ease-out;
-        }
-
-        .notification.success {
-            background: var(--success);
-            box-shadow: 0 0 15px rgba(40, 167, 69, 0.5);
-        }
-
-        .notification.error {
-            background: var(--error);
-            box-shadow: 0 0 15px rgba(220, 53, 69, 0.5);
-        }
-
-        @keyframes slideDown {
-            from { top: -100px; }
-            to { top: 20px; }
-        }
-
         .navbar {
             background: rgba(0, 0, 0, 0.9);
             padding: 20px;
@@ -66,115 +27,94 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 3px solid var(--primary);
+            border-bottom: 3px solid #0088cc;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
         }
-
         .logo {
             display: flex;
             align-items: center;
         }
-
         .logo-img {
             width: 60px;
             height: 60px;
             margin-right: 15px;
             border-radius: 50%;
-            border: 2px solid var(--primary);
+            border: 2px solid #0088cc;
             animation: pulse 2s infinite;
         }
-
         @keyframes pulse {
-            0% { transform: scale(1); box-shadow: 0 0 5px var(--primary); }
-            50% { transform: scale(1.1); box-shadow: 0 0 20px var(--primary); }
-            100% { transform: scale(1); box-shadow: 0 0 5px var(--primary); }
+            0% { transform: scale(1); box-shadow: 0 0 5px #0088cc; }
+            50% { transform: scale(1.1); box-shadow: 0 0 20px #0088cc; }
+            100% { transform: scale(1); box-shadow: 0 0 5px #0088cc; }
         }
-
         .logo h1 {
             font-size: 2em;
             font-weight: 700;
-            color: var(--primary);
+            color: #0088cc;
             text-shadow: 0 0 10px rgba(0, 136, 204, 0.8);
         }
-
-        .btn {
-            padding: 12px 30px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        .menu button {
+            padding: 10px 25px;
+            background: linear-gradient(135deg, #0088cc, #00aaff);
             border: none;
             border-radius: 25px;
             color: #fff;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 136, 204, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
         }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 136, 204, 0.5);
+        .menu button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px #0088cc;
         }
-
         .hero {
             text-align: center;
             padding: 80px 20px;
             background: url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c') no-repeat center/cover;
-            border: 3px solid var(--primary);
+            border: 3px solid #0088cc;
             border-radius: 20px;
-            margin: 30px;
+            margin: 30px 0;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
-            animation: fadeIn 1s ease-in;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
         .hero h2 {
             font-size: 3em;
             font-weight: 700;
-            color: var(--primary);
-            text-shadow: 0 0 15px var(--primary);
+            color: #0088cc;
+            text-shadow: 0 0 15px #0088cc;
         }
-
         .hero p {
             font-size: 1.5em;
             font-weight: 300;
             color: #e6e6e6;
             margin-top: 10px;
         }
-
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
-
         .section {
             padding: 40px;
             background: rgba(255, 255, 255, 0.05);
-            border: 2px solid var(--primary);
+            border: 2px solid #0088cc;
             border-radius: 20px;
             margin-bottom: 30px;
             box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
         }
-
         .section h2 {
             font-size: 2.2em;
-            color: var(--primary);
+            color: #0088cc;
             text-align: center;
             margin-bottom: 20px;
-            text-shadow: 0 0 10px var(--primary);
+            text-shadow: 0 0 10px #0088cc;
         }
-
         .premium-options {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
         }
-
         .premium-option {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, #0088cc, #00aaff);
             padding: 20px;
             border-radius: 15px;
             text-align: center;
@@ -183,21 +123,18 @@
             cursor: pointer;
             transition: transform 0.3s, box-shadow 0.3s;
         }
-
         .premium-option:hover {
             transform: scale(1.05);
-            box-shadow: 0 0 20px var(--primary);
+            box-shadow: 0 0 20px #0088cc;
         }
-
         .quantity {
             display: flex;
             justify-content: center;
             align-items: center;
             margin: 20px 0;
         }
-
         .quantity-btn {
-            background: var(--primary);
+            background: #0088cc;
             border: none;
             padding: 10px 20px;
             border-radius: 10px;
@@ -207,19 +144,16 @@
             margin: 0 15px;
             transition: background 0.3s;
         }
-
         .quantity-btn:hover {
-            background: var(--secondary);
+            background: #00aaff;
         }
-
         #totalPrice {
             text-align: center;
             font-size: 2em;
-            color: var(--primary);
+            color: #0088cc;
             margin: 20px 0;
-            text-shadow: 0 0 10px var(--primary);
+            text-shadow: 0 0 10px #0088cc;
         }
-
         .payment-method {
             display: flex;
             flex-wrap: wrap;
@@ -227,52 +161,47 @@
             justify-content: center;
             margin-bottom: 30px;
         }
-
         .payment-method img {
             width: 80px;
             height: 50px;
             object-fit: contain;
-            border: 2px solid var(--primary);
+            border: 2px solid #0088cc;
             border-radius: 10px;
             cursor: pointer;
             transition: transform 0.3s, border-color 0.3s;
         }
-
         .payment-method img.selected {
-            border-color: var(--secondary);
+            border-color: #00aaff;
             transform: scale(1.1);
         }
-
-        .payment-method input, .modal-content input {
+        .payment-method input {
             width: 100%;
             padding: 15px;
             margin: 15px 0;
-            border: 2px solid var(--primary);
+            border: 2px solid transparent;
             border-radius: 15px;
             background: rgba(255, 255, 255, 0.1);
             color: #fff;
-            transition: border-color 0.3s ease;
+            font-size: 1.1em;
+            animation: glowingBorder 2s infinite;
         }
-
-        .payment-method input:focus, .modal-content input:focus {
-            border-color: var(--secondary);
-            outline: none;
-            box-shadow: 0 0 10px rgba(0, 170, 255, 0.3);
+        @keyframes glowingBorder {
+            0% { border-color: #ff4500; box-shadow: 0 0 10px #ff4500; }
+            50% { border-color: #ffa500; box-shadow: 0 0 20px #ffa500; }
+            100% { border-color: #ff4500; box-shadow: 0 0 10px #ff4500; }
         }
-
         #status {
             text-align: center;
             font-size: 1.5em;
-            color: var(--primary);
+            color: #0088cc;
             font-weight: 600;
             margin-top: 20px;
         }
-
         .submit-btn {
             display: block;
             margin: 0 auto;
             padding: 15px 40px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, #0088cc, #00aaff);
             border: none;
             border-radius: 25px;
             color: #fff;
@@ -281,12 +210,10 @@
             cursor: pointer;
             transition: transform 0.3s, box-shadow 0.3s;
         }
-
         .submit-btn:hover {
             transform: scale(1.1);
-            box-shadow: 0 0 20px var(--primary);
+            box-shadow: 0 0 20px #0088cc;
         }
-
         .modal {
             display: none;
             position: fixed;
@@ -297,39 +224,44 @@
             background: rgba(0, 0, 0, 0.8);
             z-index: 2000;
         }
-
         .modal-content {
             background: rgba(255, 255, 255, 0.1);
             width: 90%;
             max-width: 450px;
             margin: 100px auto;
             padding: 30px;
-            border: 2px solid var(--primary);
+            border: 2px solid #0088cc;
             border-radius: 20px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
         }
-
         .modal-content h2 {
             font-size: 2em;
-            color: var(--primary);
+            color: #0088cc;
             text-align: center;
             margin-bottom: 20px;
-            text-shadow: 0 0 10px var(--primary);
+            text-shadow: 0 0 10px #0088cc;
         }
-
+        .modal-content input {
+            width: 100%;
+            padding: 15px;
+            margin: 15px 0;
+            border: 2px solid #0088cc;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
         .modal-content .close {
             float: right;
             font-size: 2em;
             cursor: pointer;
-            color: var(--primary);
-            text-shadow: 0 0 10px var(--primary);
+            color: #0088cc;
+            text-shadow: 0 0 10px #0088cc;
         }
-
         .phone-number-popup {
             position: fixed;
             top: 50%;
             right: -300px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, #0088cc, #00aaff);
             color: #fff;
             padding: 20px;
             border-radius: 15px;
@@ -338,17 +270,47 @@
             animation: slideIn 0.5s forwards, slideOut 0.5s 9.5s forwards;
             z-index: 1000;
         }
-
         @keyframes slideIn {
             from { right: -300px; }
             to { right: 20px; }
         }
-
         @keyframes slideOut {
             from { right: 20px; }
             to { right: -300px; }
         }
-
+        .order-item {
+            background: linear-gradient(135deg, rgba(0, 136, 204, 0.2), rgba(0, 170, 255, 0.2));
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 15px;
+            border: 2px solid #0088cc;
+            box-shadow: 0 0 20px rgba(0, 136, 204, 0.5);
+            transition: transform 0.3s;
+        }
+        .order-item:hover {
+            transform: scale(1.02);
+        }
+        .order-item p {
+            margin: 5px 0;
+            font-size: 1.1em;
+            color: #e6e6e6;
+        }
+        .download-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 20px;
+            background: linear-gradient(135deg, #0088cc, #00aaff);
+            border: none;
+            border-radius: 25px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .download-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px #0088cc;
+        }
         #lightning {
             display: none;
             position: fixed;
@@ -360,7 +322,6 @@
             z-index: 3000;
             animation: lightningFlash 1s;
         }
-
         @keyframes lightningFlash {
             0% { opacity: 0; background: rgba(255, 255, 255, 0); }
             10% { opacity: 1; background: rgba(255, 255, 255, 0.8); }
@@ -369,7 +330,6 @@
             40% { opacity: 0; background: rgba(255, 255, 255, 0); }
             100% { opacity: 0; background: rgba(255, 255, 255, 0); }
         }
-
         @media (max-width: 768px) {
             .navbar { flex-direction: column; gap: 15px; }
             .menu { flex-direction: column; gap: 15px; }
@@ -381,7 +341,6 @@
     </style>
 </head>
 <body>
-    <div id="notification" class="notification" style="display: none;"></div>
     <div id="lightning"></div>
     <div class="navbar">
         <div class="logo">
@@ -389,10 +348,9 @@
             <h1>Telegram Premium Shop</h1>
         </div>
         <div class="menu">
-            <button id="loginBtn" class="btn">အကောင့်ဝင်ရန်</button>
-            <button id="signupBtn" class="btn">အကောင့်ဖွင့်ရန်</button>
-            <button id="logoutBtn" class="btn" style="display:none;">အကောင့်ထွက်ရန်</button>
-            <a href="/orders.html" class="btn" id="ordersBtn" style="display:none;">အော်ဒါမှတ်တမ်း</a>
+            <button id="loginBtn">အကောင့်ဝင်ရန်</button>
+            <button id="signupBtn">အကောင့်ဖွင့်ရန်</button>
+            <button id="logoutBtn" style="display:none;">အကောင့်ထွက်ရန်</button>
         </div>
     </div>
 
@@ -424,6 +382,10 @@
             <button class="submit-btn" onclick="submitOrder()">အော်ဒါတင်မည်</button>
             <div id="status"></div>
         </div>
+        <div class="section" id="orderHistory" style="display:none;">
+            <h2>အော်ဒါ မှတ်တမ်း</h2>
+            <div id="orderList"></div>
+        </div>
     </div>
 
     <div id="loginModal" class="modal">
@@ -448,32 +410,24 @@
 
     <div id="phoneNumberPopup" class="phone-number-popup" style="display:none;">09786284670 (DHMK)</div>
 
+    <!-- Include jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
+        const { jsPDF } = window.jspdf;
         let user = null;
         let selectedMonths = 3;
         let selectedPrice = 60000;
         let quantity = 1;
         let selectedPaymentMethod = '';
-        const deviceId = `${navigator.userAgent}-${Date.now()}`;
-        const GITHUB_TOKEN = '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'; // Replace with your GitHub Token
-        const REPO = 'Opper125/telegram-premium-shop'; // Replace with your GitHub repo
-        const DATA_PATH = 'data.json';
+        const deviceId = navigator.userAgent + Date.now(); // Unique device identifier
 
-        function showNotification(message, type) {
-            const notification = document.getElementById('notification');
-            notification.innerHTML = `<span>${type === 'success' ? '✓' : '✗'}</span> ${message}`;
-            notification.className = `notification ${type}`;
-            notification.style.display = 'flex';
-            setTimeout(() => notification.style.display = 'none', 3000);
-        }
-
+        // Check if user is logged in from LocalStorage
         document.addEventListener('DOMContentLoaded', () => {
             const storedUser = localStorage.getItem('user');
             if (storedUser) {
                 user = JSON.parse(storedUser);
                 updateUIForLoggedInUser();
-            } else {
-                openModal('signupModal');
+                fetchOrders();
             }
         });
 
@@ -483,7 +437,7 @@
             localStorage.removeItem('user');
             user = null;
             updateUIForLoggedOutUser();
-            showNotification('အကောင့်ထွက်ပြီးပါပြီၡ', 'success');
+            alert('အကောင့်ထွက်ပြီးပါပြီၡ。');
         });
 
         function openModal(modalId) {
@@ -498,7 +452,7 @@
             const email = document.getElementById('signupEmail').value.trim();
             const password = document.getElementById('signupPassword').value.trim();
             if (!email || !password) {
-                showNotification('အီးမေးလ် နှင့် စကားဝှက် ဖြည့်ပါၡ', 'error');
+                alert('အီးမေးလ် နှင့် စကားဝှက် ဖြည့်ပါၡ。');
                 return;
             }
 
@@ -511,16 +465,18 @@
                 });
                 const data = await response.json();
                 if (data.error) {
-                    showNotification(data.error, 'error');
+                    alert(data.error);
                 } else {
                     user = { email, deviceId, anonymousId };
                     localStorage.setItem('user', JSON.stringify(user));
                     closeModal('signupModal');
-                    showNotification('အကောင့်ဖွင့်ပြီးပါပြီၡ', 'success');
+                    alert('အကောင့်ဖွင့်ပြီးပါပြီၡ。Anonymous စနစ်ဖြင့် အတည်ပြုပြီးပါတယ်ၡ。');
                     updateUIForLoggedInUser();
+                    fetchOrders();
                 }
             } catch (error) {
-                showNotification('ဆာဗာအမှားၡ နောက်မှထပ်ကြိုးစားပါၡ', 'error');
+                console.error('Signup Error:', error);
+                alert('အမှား: ' + error.message);
             }
         }
 
@@ -528,10 +484,9 @@
             const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value.trim();
             if (!email || !password) {
-                showNotification('အီးမေးလ် နှင့် စကားဝှက် ဖြည့်ပါၡ', 'error');
+                alert('အီးမေးလ် နှင့် စကားဝှက် ဖြည့်ပါၡ。');
                 return;
             }
-
             try {
                 const response = await fetch('/.netlify/functions/data', {
                     method: 'POST',
@@ -540,16 +495,18 @@
                 });
                 const data = await response.json();
                 if (data.error) {
-                    showNotification(data.error, 'error');
+                    alert(data.error);
                 } else {
                     user = { email, deviceId, anonymousId: data.anonymousId };
                     localStorage.setItem('user', JSON.stringify(user));
                     closeModal('loginModal');
-                    showNotification('အကောင့်ဝင်ပြီးပါပြီၡ', 'success');
+                    alert('အကောင့်ဝင်ပြီးပါပြီၡ。');
                     updateUIForLoggedInUser();
+                    fetchOrders();
                 }
             } catch (error) {
-                showNotification('ဆာဗာအမှားၡ နောက်မှထပ်ကြိုးစားပါၡ', 'error');
+                console.error('Login Error:', error);
+                alert('အမှား: ' + error.message);
             }
         }
 
@@ -557,19 +514,18 @@
             document.getElementById('loginBtn').style.display = 'none';
             document.getElementById('signupBtn').style.display = 'none';
             document.getElementById('logoutBtn').style.display = 'block';
-            document.getElementById('ordersBtn').style.display = 'block';
             document.querySelector('.hero').style.display = 'block';
             document.querySelector('.container').style.display = 'block';
+            document.getElementById('orderHistory').style.display = 'block';
         }
 
         function updateUIForLoggedOutUser() {
             document.getElementById('loginBtn').style.display = 'block';
             document.getElementById('signupBtn').style.display = 'block';
             document.getElementById('logoutBtn').style.display = 'none';
-            document.getElementById('ordersBtn').style.display = 'none';
             document.querySelector('.hero').style.display = 'none';
             document.querySelector('.container').style.display = 'none';
-            openModal('signupModal');
+            document.getElementById('orderHistory').style.display = 'none';
         }
 
         document.querySelectorAll('.premium-option').forEach(option => {
@@ -598,11 +554,11 @@
 
         async function submitOrder() {
             if (!user) {
-                showNotification('အကောင့်ဝင်ပါၡ', 'error');
+                alert('အကောင့်ဝင်ပါၡ。');
                 return;
             }
             if (!selectedPaymentMethod || !document.getElementById('transactionLast6').value || !document.getElementById('telegramUsername').value) {
-                showNotification('အားလုံးဖြည့်ပါၡ', 'error');
+                alert('အားလုံးဖြည့်ပါၡ。');
                 return;
             }
             const order = {
@@ -614,9 +570,7 @@
                 total: selectedPrice * quantity,
                 transactionLast6: document.getElementById('transactionLast6').value,
                 telegramUsername: document.getElementById('telegramUsername').value,
-                paymentMethod: selectedPaymentMethod,
-                status: 'Approved',
-                timestamp: Date.now()
+                paymentMethod: selectedPaymentMethod
             };
             try {
                 const response = await fetch('/.netlify/functions/data', {
@@ -626,19 +580,89 @@
                 });
                 const data = await response.json();
                 if (data.error) {
-                    showNotification(data.error, 'error');
+                    alert(data.error);
                 } else {
-                    document.getElementById('status').textContent = 'အော်ဒါတင်ပြီးပါပြီၡ';
-                    showNotification('အော်ဒါတင်ပြီးပါပြီၡ', 'success');
+                    document.getElementById('status').textContent = 'အော်ဒါတင်ပြီးပါပြီၡ。';
                     document.getElementById('transactionLast6').value = '';
                     document.getElementById('telegramUsername').value = '';
                     const lightning = document.getElementById('lightning');
                     lightning.style.display = 'block';
                     setTimeout(() => lightning.style.display = 'none', 1000);
+                    fetchOrders();
                 }
             } catch (error) {
-                showNotification('ဆာဗာအမှားၡ နောက်မှထပ်ကြိုးစားပါၡ', 'error');
+                console.error('Submit Order Error:', error);
+                alert('အမှား: ' + error.message);
             }
+        }
+
+        async function fetchOrders() {
+            if (!user) return;
+            try {
+                const response = await fetch('/.netlify/functions/data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'getOrders', email: user.email })
+                });
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                if (data.error) {
+                    document.getElementById('orderList').innerHTML = `<p>${data.error}</p>`;
+                } else {
+                    const orders = data.orders || [];
+                    document.getElementById('orderList').innerHTML = orders.map(order => `
+                        <div class="order-item">
+                            <p>အမှာစာအမှတ်: ${order.id}</p>
+                            <p>လများ: ${order.months}</p>
+                            <p>အရေအတွက်: ${order.quantity}</p>
+                            <p>စုစုပေါင်း: ${order.total} ကျပ်</p>
+                            <p>အခြေအနေ: ${order.status}</p>
+                            <p>အချိန်: ${new Date(order.timestamp).toLocaleString()}</p>
+                            <button class="download-btn" onclick='downloadReceipt(${JSON.stringify(order)})'>Download Receipt</button>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+                document.getElementById('orderList').innerHTML = `<p>အမှား: ${error.message}</p>`;
+            }
+        }
+
+        function downloadReceipt(order) {
+            const doc = new jsPDF();
+            const logoUrl = 'https://raw.githubusercontent.com/Opper125/telegram-premium-shop/756e2da02cfc2a5f510630e894b736fb6351468f/telegram-logo.png';
+
+            const img = new Image();
+            img.crossOrigin = 'Anonymous';
+            img.src = logoUrl;
+            img.onload = () => {
+                doc.addImage(img, 'PNG', 10, 10, 30, 30);
+                doc.setFontSize(20);
+                doc.setTextColor(0, 136, 204);
+                doc.text('Telegram Premium Shop', 50, 25);
+                doc.setFontSize(12);
+                doc.setTextColor(0);
+                doc.text('Order Receipt', 50, 35);
+                doc.setFontSize(12);
+                doc.setTextColor(0);
+                doc.text(`Order ID: ${order.id}`, 10, 50);
+                doc.text(`Email: ${order.email}`, 10, 60);
+                doc.text(`Months: ${order.months}`, 10, 70);
+                doc.text(`Quantity: ${order.quantity}`, 10, 80);
+                doc.text(`Total: ${order.total} ကျပ်`, 10, 90);
+                doc.text(`Transaction Last 6: ${order.transactionLast6}`, 10, 100);
+                doc.text(`Telegram Username: ${order.telegramUsername}`, 10, 110);
+                doc.text(`Payment Method: ${order.paymentMethod}`, 10, 120);
+                doc.text(`Status: ${order.status}`, 10, 130);
+                doc.text(`Date: ${new Date(order.timestamp).toLocaleString()}`, 10, 140);
+                doc.setDrawColor(0, 136, 204);
+                doc.setLineWidth(1);
+                doc.roundedRect(5, 5, 200, 280, 5, 5, 'S');
+                doc.save(`Telegram_Premium_Order_${order.id}.pdf`);
+            };
+            img.onerror = () => {
+                alert('Failed to load Telegram Logo for the receipt. Please try again.');
+            };
         }
     </script>
 </body>
