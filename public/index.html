@@ -18,8 +18,8 @@
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
+            touch-action: manipulation;
         }
-        /* Galaxy Background with Stars Animation */
         body::before {
             content: '';
             position: fixed;
@@ -95,28 +95,11 @@
             font-weight: 600;
             cursor: pointer;
             transition: transform 0.3s, box-shadow 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-        .menu button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 10%, transparent 10%);
-            background-size: 20px 20px;
-            animation: galaxy 5s linear infinite;
-            z-index: 0;
+            margin-left: 10px;
         }
         .menu button:hover {
             transform: scale(1.1);
             box-shadow: 0 0 15px #0088cc;
-        }
-        @keyframes galaxy {
-            0% { background-position: 0 0; }
-            100% { background-position: 100px 100px; }
         }
         .hero {
             text-align: center;
@@ -318,37 +301,62 @@
             z-index: 2000;
         }
         .modal-content {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 215, 0, 0.3); /* Golden Background */
             width: 90%;
             max-width: 450px;
             margin: 100px auto;
             padding: 30px;
-            border: 2px solid #0088cc;
+            border: 2px solid #ffd700;
             border-radius: 20px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            position: relative;
+            overflow: hidden;
+        }
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #ffd700, #ffeb3b, #ff4500, #ffd700);
+            animation: ripple 5s infinite;
+            opacity: 0.3;
+            z-index: 0;
+        }
+        @keyframes ripple {
+            0% { transform: scale(0); opacity: 0.3; }
+            50% { transform: scale(2); opacity: 0; }
+            100% { transform: scale(0); opacity: 0.3; }
         }
         .modal-content h2 {
             font-size: 2em;
             color: #ffeb3b; /* Yellow Color */
             text-align: center;
             margin-bottom: 20px;
-            text-shadow: 0 0 10px #0088cc;
+            text-shadow: 0 0 10px #ffd700;
+            position: relative;
+            z-index: 1;
         }
         .modal-content input {
             width: 100%;
             padding: 15px;
             margin: 15px 0;
-            border: 2px solid #0088cc;
+            border: 2px solid #ffd700;
             border-radius: 15px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 215, 0, 0.1);
             color: #fff;
+            position: relative;
+            z-index: 1;
         }
         .modal-content .close {
             float: right;
             font-size: 2em;
             cursor: pointer;
-            color: #0088cc;
-            text-shadow: 0 0 10px #0088cc;
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700;
+            position: relative;
+            z-index: 1;
         }
         .message {
             text-align: center;
@@ -358,6 +366,8 @@
             padding: 10px;
             border-radius: 10px;
             animation: fadeIn 0.5s;
+            position: relative;
+            z-index: 1;
         }
         .message.success {
             background: #00ff00; /* Green Color */
@@ -480,6 +490,7 @@
             <button id="loginBtn">အကောင့်ဝင်ရန်</button>
             <button id="signupBtn">အကောင့်ဖွင့်ရန်</button>
             <button id="logoutBtn" style="display:none;">အကောင့်ထွက်ရန်</button>
+            <button id="aboutBtn">About</button>
         </div>
     </div>
 
@@ -539,6 +550,15 @@
         </div>
     </div>
 
+    <div id="aboutModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('aboutModal')">×</span>
+            <h2>About Us</h2>
+            <img src="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/756e2da02cfc2a5f510630e894b736fb6351468f/telegram-logo.png" alt="Telegram Logo" style="width: 100px; height: auto; display: block; margin: 20px auto;">
+            <p style="text-align: center; color: #ffeb3b;">Contact us on Telegram: <a href="https://t.me/OPPERN" target="_blank" style="color: #ffd700; text-decoration: underline;">https://t.me/OPPERN</a></p>
+        </div>
+    </div>
+
     <div id="phoneNumberPopup" class="phone-number-popup" style="display:none;">09786284670 (DHMK)</div>
 
     <!-- Include jsPDF for PDF generation -->
@@ -550,7 +570,7 @@
         let selectedPrice = 60000;
         let quantity = 1;
         let selectedPaymentMethod = '';
-        const deviceId = navigator.userAgent + Date.now(); // Unique device identifier
+        const deviceId = navigator.userAgent + Date.now();
 
         // Create Stars for Background Animation
         function createStars() {
@@ -568,6 +588,37 @@
         }
         createStars();
 
+        // Touch Ripple Effect
+        let lastTouch = null;
+        body.addEventListener('touchstart', (e) => {
+            lastTouch = e.touches[0];
+        });
+        body.addEventListener('touchmove', (e) => {
+            if (lastTouch) {
+                const currentTouch = e.touches[0];
+                const dx = currentTouch.clientX - lastTouch.clientX;
+                const dy = currentTouch.clientY - lastTouch.clientY;
+                if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+                    createRipple(currentTouch.clientX, currentTouch.clientY);
+                    lastTouch = currentTouch;
+                }
+            }
+        });
+        function createRipple(x, y) {
+            const ripple = document.createElement('div');
+            ripple.style.position = 'absolute';
+            ripple.style.borderRadius = '50%';
+            ripple.style.background = `radial-gradient(circle, rgba(255, 215, 0, 0.5), transparent)`;
+            ripple.style.width = '100px';
+            ripple.style.height = '100px';
+            ripple.style.left = `${x - 50}px`;
+            ripple.style.top = `${y - 50}px`;
+            ripple.style.pointerEvents = 'none';
+            ripple.style.zIndex = 100;
+            document.body.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 1000);
+        }
+
         // Check if user is logged in from LocalStorage
         document.addEventListener('DOMContentLoaded', () => {
             const storedUser = localStorage.getItem('user');
@@ -584,8 +635,9 @@
             localStorage.removeItem('user');
             user = null;
             updateUIForLoggedOutUser();
-            showMessage('logoutMessage', 'အကောင့်ထွက်ပြီးပါပြီၡ。', 'success');
+            showMessage('loginMessage', 'အကောင့်ထွက်ပြီးပါပြီၡ。', 'success');
         });
+        document.getElementById('aboutBtn').addEventListener('click', () => openModal('aboutModal'));
 
         function openModal(modalId) {
             document.getElementById(modalId).style.display = 'block';
@@ -600,7 +652,7 @@
             const messageDiv = document.getElementById(elementId);
             messageDiv.textContent = message;
             messageDiv.className = `message ${type}`;
-            setTimeout(() => messageDiv.textContent = '', 3000);
+            setTimeout(() => messageDiv.textContent = '', 5000); // 5 seconds
         }
 
         function clearMessages() {
@@ -630,7 +682,7 @@
                     user = { email, deviceId, anonymousId };
                     localStorage.setItem('user', JSON.stringify(user));
                     closeModal('signupModal');
-                    showMessage('signupMessage', 'အကောင့်ဖွင့်ပြီးပါပြီၡ。Anonymous စနစ်ဖြင့် အတည်ပြုပြီးပါတယ်ၡ。', 'success');
+                    showMessage('signupMessage', 'အကောင့်ဖွင့်ပြီးပါပြီၡ。', 'success');
                     updateUIForLoggedInUser();
                     fetchOrders();
                 }
