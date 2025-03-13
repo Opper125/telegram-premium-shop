@@ -1,4 +1,4 @@
-// In-Memory Storage (Temporary solution)
+// In-Memory Storage
 let data = { users: [], orders: [] };
 
 function isValidEmail(email) {
@@ -10,7 +10,7 @@ exports.handler = async (event) => {
     if (event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
-            body: JSON.stringify({ error: 'ခွင့်မပြုသော တောင်းဆိုမှု။ POST သာသုံးပါဗျ' }),
+            body: JSON.stringify({ error: 'ခွင့်မပြုသော တောင်းဆိုမှု။ POST သာသုံးပါၡ' }),
             headers: { 'Content-Type': 'application/json' }
         };
     }
