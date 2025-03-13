@@ -4,7 +4,6 @@ const GITHUB_TOKEN = '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'; // Replace with
 const REPO = 'Opper125/telegram-premium-shop'; // Replace with your actual repo if different
 const DATA_PATH = 'data.json';
 
-// Suppress punycode deprecation warning if it appears
 process.removeAllListeners('warning');
 
 async function getDataFromGitHub() {
@@ -200,7 +199,8 @@ exports.handler = async (event) => {
         console.error('ဆာဗာ အမှား:', error.message);
         return {
             statusCode: 500,
-            body: JSON.stringify({ error: `ဆာဗာအတွင်းပိုင်း အမှားၡ ${error.message}` })
+            body: JSON.stringify({ error: `ဆာဗာအတွင်းပိုင်း အမှားၡ ${error.message}` }),
+            headers: { 'Content-Type': 'application/json' }
         };
     }
 };
