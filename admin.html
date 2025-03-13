@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Telegram Premium Shop</title>
+    <link rel="icon" href="https://raw.githubusercontent.com/Opper125/telegram-premium-shop/756e2da02cfc2a5f510630e894b736fb6351468f/telegram-logo.png" type="image/png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Noto Sans Myanmar', sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #0f0c29, #24243e, #4a4063);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 2.5em;
+            color: #ffeb3b;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #0088cc;
+        }
+        .admin-section {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border: 2px solid #0088cc;
+            border-radius: 15px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.4);
+        }
+        .order-item {
+            background: linear-gradient(135deg, rgba(0, 136, 204, 0.2), rgba(0, 170, 255, 0.2));
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border: 1px solid #0088cc;
+        }
+        .order-item p {
+            margin: 5px 0;
+            font-size: 1.1em;
+            color: #ffeb3b;
+        }
+        #adminOrders {
+            margin-top: 20px;
+        }
+        .refresh-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 30px;
+            background: linear-gradient(135deg, #0088cc, #00aaff);
+            border: none;
+            border-radius: 25px;
+            color: #fff;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .refresh-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px #0088cc;
+        }
+        @media (max-width: 768px) {
+            h1 { font-size: 2em; }
+            .admin-section { padding: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Admin - Order Dashboard</h1>
+        <div class="admin-section">
+            <button class="refresh-btn" onclick="fetchAllOrders()">Refresh Orders</button>
+            <div id="adminOrders"></div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchAllOrders() {
+            try {
+                const response = await fetch('/.netlify/functions/data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'getAllOrders' })
+                });
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                if (data.error) {
+                    document.getElementById('adminOrders').innerHTML = `<p>${data.error}</p>`;
+                } else {
+                    const orders = data.orders || [];
+                    document.getElementById('adminOrders').innerHTML = orders.map(order => `
+                        <div class="order-item">
+                            <p>အမှာစာအမှတ်: ${order.id}</p>
+                            <p>အီးမေးလ်: ${order.email}</p>
+                            <p>လများ: ${order.months}</p>
+                            <p>အရေအတွက်: ${order.quantity}</p>
+                            <p>စုစုပေါင်း: ${order.total} ကျပ်</p>
+                            <p>ငွေလွှဲအမှတ်: ${order.transactionLast6}</p>
+                            <p>Telegram အမည်: ${order.telegramUsername}</p>
+                            <p>ငွေပေးချေမှုနည်းလမ်း: ${order.paymentMethod}</p>
+                            <p>အခြေအနေ: ${order.status}</p>
+                            <p>အချိန်: ${new Date(order.timestamp).toLocaleString()}</p>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error fetching orders:', error);
+                document.getElementById('adminOrders').innerHTML = `<p>အမှား: ${error.message}</p>`;
+            }
+        }
+
+        // Initial fetch
+        fetchAllOrders();
+
+        // Refresh every 10 seconds
+        setInterval(fetchAllOrders, 10000);
+    </script>
+</body>
+</html>
